@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mifleteciudad.app"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -31,12 +31,19 @@ android {
     }
 
     signingConfigs {
+        // APK de prueba: firma v1 + v2 para que instale en cualquier Android desde 5.0.
+        getByName("debug") {
+            enableV1Signing = true
+            enableV2Signing = true
+        }
         if (hasSigning) {
             create("release") {
                 storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
                 storePassword = keystoreProps.getProperty("storePassword")
                 keyAlias = keystoreProps.getProperty("keyAlias")
                 keyPassword = keystoreProps.getProperty("keyPassword")
+                enableV1Signing = true
+                enableV2Signing = true
             }
         }
     }

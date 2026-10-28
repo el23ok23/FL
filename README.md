@@ -1,7 +1,7 @@
 # Mi Flete Ciudad
 
 App Android nativa (Kotlin + Jetpack Compose) para pedir fletes dentro de la Ciudad de Buenos Aires.
-Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque.
+Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque. Funciona en Android 5.0 o más nuevo.
 
 ## Qué hace
 
