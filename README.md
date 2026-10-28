@@ -1,0 +1,35 @@
+# Mi Flete Ciudad
+
+App Android nativa (Kotlin + Jetpack Compose) para pedir fletes dentro de la Ciudad de Buenos Aires.
+Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque.
+
+## Qué hace
+
+1. **Origen y destino** con autocompletado y mini mapa del recorrido. Avisa si una dirección queda fuera de la Ciudad.
+2. **Vehículo** en un carrusel (Kangoo, furgón mediano, furgón grande, pickup, camión 3/4, camión mediano y grande con caja cerrada, camión playo).
+3. **Ayudantes** (0, 1 o 2).
+4. **Pisos** en origen y destino (planta baja, ascensor o escalera + cantidad de pisos).
+5. **Qué lleva** (campo corto opcional).
+6. **Precio aproximado** con desglose. No se paga nada en la app.
+7. **Contacto**: nombre y WhatsApp argentino válido. El pedido te llega a tu WhatsApp.
+8. **Confirmación** animada: "¡Listo! Te contactamos en breve".
+
+## Estructura
+
+```
+app/    App Android (Compose). Config editable en app/src/main/assets/config.json
+core/   Lógica pura (precios, zona CABA, teléfonos, mensaje) con tests
+docs/   Configuración, política de privacidad y guía de Google Play
+store/  Ícono 512 px y gráfico destacado para la ficha de Play
+```
+
+## Compilar
+
+- **Android Studio** (Ladybug o más nuevo): abrir la carpeta, esperar la sincronización y ejecutar. Para el bundle de Play: *Build → Generate Signed App Bundle*.
+- **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba) o `./gradlew :app:bundleRelease` (AAB).
+- **GitHub Actions**: cada push compila y deja el APK y el AAB en *Actions → Artifacts* (ver `.github/workflows/android.yml`).
+- Solo los tests de lógica, sin SDK de Android: `./gradlew :core:test -PcoreOnly`.
+
+## Qué completar antes de publicar
+
+Ver **docs/CONFIGURACION.md** (números, claves y precios) y **docs/GOOGLE_PLAY.md** (firma, ficha y formulario de datos).

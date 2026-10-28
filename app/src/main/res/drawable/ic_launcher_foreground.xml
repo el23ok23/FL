@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Camioneta blanca sobre el fondo naranja del ícono adaptativo (zona segura: círculo central de 66dp). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Caja -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M27,39 H58 A3,3 0 0 1 61,42 V65 H24 V42 A3,3 0 0 1 27,39 Z" />
+    <!-- Cabina -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M61,46 H72 A3.5,3.5 0 0 1 74.8,47.4 L81.4,56.2 A3.5,3.5 0 0 1 82.1,58.3 V62 A3,3 0 0 1 79.1,65 H61 Z" />
+    <!-- Ventana -->
+    <path
+        android:fillColor="#FFFF5A1F"
+        android:pathData="M64.5,49.2 H71.6 L77.4,57 H64.5 Z" />
+    <!-- Ruedas -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M32.5,67 m-5.6,0 a5.6,5.6 0 1 0 11.2,0 a5.6,5.6 0 1 0 -11.2,0" />
+    <path
+        android:fillColor="#FFFF5A1F"
+        android:pathData="M32.5,67 m-2.2,0 a2.2,2.2 0 1 0 4.4,0 a2.2,2.2 0 1 0 -4.4,0" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M73,67 m-5.6,0 a5.6,5.6 0 1 0 11.2,0 a5.6,5.6 0 1 0 -11.2,0" />
+    <path
+        android:fillColor="#FFFF5A1F"
+        android:pathData="M73,67 m-2.2,0 a2.2,2.2 0 1 0 4.4,0 a2.2,2.2 0 1 0 -4.4,0" />
+</vector>
