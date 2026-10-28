@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /** Tarjeta seleccionable con borde y fondo animados. */
@@ -23,6 +24,7 @@ fun ChoiceCard(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    padding: Dp = 16.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val border by animateColorAsState(
@@ -46,7 +48,8 @@ fun ChoiceCard(
         shape = MaterialTheme.shapes.medium,
         color = container,
         border = BorderStroke(width, border),
+        shadowElevation = if (selected) 2.dp else 0.dp,
     ) {
-        Column(Modifier.padding(16.dp), content = content)
+        Column(Modifier.padding(padding), content = content)
     }
 }

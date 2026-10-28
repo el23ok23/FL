@@ -19,13 +19,14 @@ data class OrderSummary(
     val originFloor: FloorInfo,
     val destinationFloor: FloorInfo,
     val cargo: String,
+    val schedule: Schedule,
     val distanceKm: Double,
     val price: PriceBreakdown,
 )
 
 object OrderMessage {
     /** Texto del pedido tal como llega al WhatsApp del dueño. */
-    fun build(o: OrderSummary): String = buildString {
+    fun build(o: OrderSummary, today: DayDate = DayDate.today()): String = buildString {
         appendLine("🚚 *Nuevo pedido de flete* · ${o.businessName}")
         appendLine()
         appendLine("👤 Nombre: ${o.customerName.trim()}")
@@ -39,6 +40,7 @@ object OrderMessage {
         appendLine("🚐 Vehículo: ${o.vehicle.name}")
         appendLine("🧑‍🔧 Ayudantes: ${o.helpers}")
         appendLine("📦 Qué lleva: ${o.cargo.trim().ifBlank { "(no indicado)" }}")
+        appendLine("📅 Cuándo: ${o.schedule.describe(today)}")
         appendLine("📏 Distancia aprox.: ${Money.formatKm(o.distanceKm)}")
         appendLine()
         append("💰 Precio aproximado: ${Money.formatArs(o.price.total)}")

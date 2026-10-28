@@ -100,14 +100,15 @@ fun PriceBar(
     ) {
         Column(Modifier.weight(1f)) {
             Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            AnimatedMoney(total, style = MaterialTheme.typography.headlineSmall)
+            AnimatedMoney(total, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
         }
         Spacer(Modifier.width(16.dp))
         Button(
             onClick = onClick,
             enabled = enabled,
-            modifier = Modifier.height(52.dp),
+            modifier = Modifier.height(54.dp),
             shape = MaterialTheme.shapes.medium,
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 26.dp),
         ) {
             Text(buttonText, style = MaterialTheme.typography.titleMedium)
         }

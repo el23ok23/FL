@@ -1,13 +1,17 @@
 package com.mifleteciudad.app.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -16,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mifleteciudad.app.OrderViewModel
 import com.mifleteciudad.app.ui.components.ChoiceCard
@@ -36,30 +41,35 @@ fun HelpersScreen(vm: OrderViewModel, step: Int, total: Int) {
             PriceBar(total = vm.price.total, buttonText = "Continuar", onClick = { vm.next() })
         },
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            HelperOption(
-                count = 0,
-                title = "Sin ayudantes",
-                detail = "Vos cargás y descargás.",
-                extra = "Sin cargo",
-                selected = vm.helpers == 0,
-                onClick = { vm.selectHelpers(0) },
-            )
-            HelperOption(
-                count = 1,
-                title = "1 ayudante",
-                detail = "Ideal para muebles medianos y cajas.",
-                extra = "+ ${Money.formatArs(perHelper)}",
-                selected = vm.helpers == 1,
-                onClick = { vm.selectHelpers(1) },
-            )
-            HelperOption(
-                count = 2,
-                title = "2 ayudantes",
-                detail = "Para mudanzas o cosas pesadas.",
-                extra = "+ ${Money.formatArs(perHelper * 2)}",
-                selected = vm.helpers == 2,
-                onClick = { vm.selectHelpers(2) },
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            for (n in 0..2) {
+                HelperOption(
+                    count = n,
+                    extra = if (n == 0) "Sin cargo" else "+ ${Money.formatArs(perHelper * n)}",
+                    selected = vm.helpers == n,
+                    onClick = { vm.selectHelpers(n) },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+        AnimatedContent(
+            targetState = vm.helpers,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            label = "helpersHint",
+        ) { n ->
+            Text(
+                when (n) {
+                    0 -> "Vos cargás y descargás. Ideal para cajas y cosas livianas."
+                    1 -> "Un ayudante para muebles medianos, electrodomésticos y cajas."
+                    else -> "Dos ayudantes para mudanzas o cosas muy pesadas."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -68,41 +78,50 @@ fun HelpersScreen(vm: OrderViewModel, step: Int, total: Int) {
 @Composable
 private fun HelperOption(
     count: Int,
-    title: String,
-    detail: String,
     extra: String,
     selected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    ChoiceCard(selected = selected, onClick = onClick) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Row(Modifier.width(56.dp)) {
-                if (count == 0) {
-                    Icon(
-                        Icons.Filled.Person, contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(28.dp),
-                    )
-                } else {
-                    repeat(count) {
+    val colors = MaterialTheme.colorScheme
+    ChoiceCard(selected = selected, onClick = onClick, modifier = modifier, padding = 12.dp) {
+        Column(
+            Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(Modifier.height(36.dp), contentAlignment = Alignment.Center) {
+                Row(horizontalArrangement = Arrangement.spacedBy((-6).dp)) {
+                    repeat(maxOf(count, 1)) {
                         Icon(
-                            Icons.Filled.Person, contentDescription = null,
-                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(28.dp),
+                            Icons.Filled.Person,
+                            contentDescription = null,
+                            tint = when {
+                                count == 0 -> colors.outline
+                                selected -> colors.primary
+                                else -> colors.onSurfaceVariant
+                            },
+                            modifier = Modifier.size(30.dp),
                         )
                     }
                 }
             }
-            Spacer(Modifier.width(8.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(2.dp))
-                Text(detail, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.height(6.dp))
+            Text(
+                count.toString(),
+                style = MaterialTheme.typography.headlineLarge,
+                color = if (selected) colors.primary else colors.onSurface,
+            )
+            Text(
+                if (count == 1) "ayudante" else "ayudantes",
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(10.dp))
             Text(
                 extra,
                 style = MaterialTheme.typography.labelLarge,
-                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (selected) colors.primary else colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
         }
     }

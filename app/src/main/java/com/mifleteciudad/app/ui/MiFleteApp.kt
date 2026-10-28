@@ -26,9 +26,10 @@ import com.mifleteciudad.app.ui.screens.IntroScreen
 import com.mifleteciudad.app.ui.screens.PriceScreen
 import com.mifleteciudad.app.ui.screens.RouteScreen
 import com.mifleteciudad.app.ui.screens.VehicleScreen
+import com.mifleteciudad.app.ui.screens.WhenScreen
 
 /** Pasos que cuentan para la barra de progreso (sin intro ni confirmación). */
-private const val TOTAL_STEPS = 7
+private const val TOTAL_STEPS = 8
 
 /**
  * Navegación del flujo. Sin librería de navegación: un solo estado y una transición
@@ -68,8 +69,9 @@ fun MiFleteApp(vm: OrderViewModel = viewModel()) {
             Step.HELPERS -> HelpersScreen(vm, step = 3, total = TOTAL_STEPS)
             Step.FLOORS -> FloorsScreen(vm, step = 4, total = TOTAL_STEPS)
             Step.CARGO -> CargoScreen(vm, step = 5, total = TOTAL_STEPS)
-            Step.PRICE -> PriceScreen(vm, step = 6, total = TOTAL_STEPS)
-            Step.CONTACT -> ContactScreen(vm, step = 7, total = TOTAL_STEPS)
+            Step.WHEN -> WhenScreen(vm, step = 6, total = TOTAL_STEPS)
+            Step.PRICE -> PriceScreen(vm, step = 7, total = TOTAL_STEPS)
+            Step.CONTACT -> ContactScreen(vm, step = 8, total = TOTAL_STEPS)
             Step.DONE -> DoneScreen(vm)
         }
     }

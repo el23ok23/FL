@@ -34,7 +34,7 @@ La app intenta, en este orden, lo que tengas configurado:
 
 Si CallMeBot falla en algún momento, la app pasa sola al canal siguiente (abrir WhatsApp), así que el pedido nunca se pierde.
 
-**JSON que recibe el webhook:** `nombre`, `whatsapp`, `origen`, `origen_lat`, `origen_lng`, `piso_origen`, `destino`, `destino_lat`, `destino_lng`, `piso_destino`, `vehiculo`, `ayudantes`, `que_lleva`, `distancia_km`, `precio`, `mensaje` (el texto completo listo para reenviar).
+**JSON que recibe el webhook:** `nombre`, `whatsapp`, `origen`, `origen_lat`, `origen_lng`, `piso_origen`, `destino`, `destino_lat`, `destino_lng`, `piso_destino`, `vehiculo`, `ayudantes`, `que_lleva`, `cuando`, `distancia_km`, `precio`, `mensaje` (el texto completo listo para reenviar).
 
 ## 3. Clave de Google (opcional, recomendada)
 

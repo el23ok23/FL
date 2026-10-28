@@ -65,6 +65,7 @@ class OrderSender(context: Context, private val config: AppConfig) {
         .put("vehiculo", o.vehicle.name)
         .put("ayudantes", o.helpers)
         .put("que_lleva", o.cargo.trim())
+        .put("cuando", o.schedule.describe())
         .put("distancia_km", o.distanceKm)
         .put("precio", o.price.total)
         .put("mensaje", message)

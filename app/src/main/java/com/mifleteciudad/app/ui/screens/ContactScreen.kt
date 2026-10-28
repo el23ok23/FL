@@ -79,11 +79,12 @@ fun ContactScreen(vm: OrderViewModel, step: Int, total: Int) {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focus.clearFocus(); if (vm.canSend) vm.send() }),
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
         Text(
             "Usamos tu nombre y tu WhatsApp únicamente para contactarte por este pedido. No se guardan en la app ni se comparten con nadie más.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
     }
 }

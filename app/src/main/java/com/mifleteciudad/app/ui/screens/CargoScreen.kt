@@ -8,11 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -35,7 +36,7 @@ fun CargoScreen(vm: OrderViewModel, step: Int, total: Int) {
         subtitle = "Opcional. Un detalle corto nos ayuda a mandarte el flete justo.",
         onBack = { vm.back() },
         bottomBar = {
-            PriceBar(total = vm.price.total, buttonText = "Ver precio", onClick = { focus.clearFocus(); vm.next() })
+            PriceBar(total = vm.price.total, buttonText = "Continuar", onClick = { focus.clearFocus(); vm.next() })
         },
     ) {
         OutlinedTextField(
@@ -50,18 +51,21 @@ fun CargoScreen(vm: OrderViewModel, step: Int, total: Int) {
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focus.clearFocus() }),
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(4.dp))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             QUICK.forEach { item ->
-                SuggestionChip(
+                val active = vm.cargo.contains(item, ignoreCase = true)
+                FilterChip(
+                    selected = active,
                     onClick = {
                         val current = vm.cargo.trim()
                         val next = when {
+                            active -> current.split(",").map { it.trim() }.filter { !it.equals(item, ignoreCase = true) }.joinToString(", ")
                             current.isEmpty() -> item
-                            current.contains(item, ignoreCase = true) -> current
                             else -> "$current, ${item.lowercase()}"
                         }
                         vm.setCargoText(next)

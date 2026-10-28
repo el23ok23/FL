@@ -81,6 +81,15 @@ fun DoneScreen(vm: OrderViewModel) {
                     )
                 }
             }
+            Spacer(Modifier.height(20.dp))
+            AnimatedVisibility(visible = textVisible, enter = fadeIn(tween(400, delayMillis = 150))) {
+                Text(
+                    "${vm.vehicle.name} · ${com.mifleteciudad.core.Money.formatArs(vm.price.total)} · ${vm.schedule.describe()}",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
             Spacer(Modifier.weight(1f))
             PrimaryButton(text = "Hacer otro pedido", onClick = { vm.reset() })
             Spacer(Modifier.height(16.dp))

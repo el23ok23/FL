@@ -53,7 +53,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
         step = step,
         totalSteps = total,
         title = "¿Qué vehículo necesitás?",
-        subtitle = "Deslizá para ver las opciones.",
+        subtitle = "Deslizá para ver las opciones. El precio se actualiza solo.",
         onBack = { vm.back() },
         bottomBar = {
             PriceBar(total = vm.price.total, buttonText = "Continuar", onClick = { vm.next() })
@@ -88,7 +88,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
                         this.alpha = alpha
                     }
                     .fillMaxWidth()
-                    .height(300.dp),
+                    .height(310.dp),
             ) {
                 Column(
                     Modifier
@@ -108,7 +108,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
                     }
                     Spacer(Modifier.height(16.dp))
                     Text(v.name, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
-                    Text(v.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(v.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(12.dp))
                     SpecRow(label = "Medidas", value = v.dimensions)
                     Spacer(Modifier.height(4.dp))

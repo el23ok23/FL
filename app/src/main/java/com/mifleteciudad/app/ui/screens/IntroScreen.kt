@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +31,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.mifleteciudad.app.ui.components.VehicleIcon
@@ -64,17 +67,27 @@ fun IntroScreen(title: String, subtitle: String, onFinished: () -> Unit) {
         contentAlignment = Alignment.Center,
     ) {
         val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
+        val glow = MaterialTheme.colorScheme.primaryContainer
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                Modifier.offset { androidx.compose.ui.unit.IntOffset((truckX.value * widthPx).toInt(), 0) },
-            ) {
-                VehicleIcon(
-                    kind = VehicleKind.FURGON_MEDIANO,
-                    modifier = Modifier.size(width = 150.dp, height = 84.dp),
-                    wheelRotation = wheel.value,
+            Box(contentAlignment = Alignment.Center) {
+                // Resplandor de la marca detrás de la camioneta
+                Box(
+                    Modifier
+                        .size(250.dp)
+                        .clip(CircleShape)
+                        .background(Brush.radialGradient(listOf(glow.copy(alpha = 0.9f), glow.copy(alpha = 0f)))),
                 )
+                Box(
+                    Modifier.offset { androidx.compose.ui.unit.IntOffset((truckX.value * widthPx).toInt(), 0) },
+                ) {
+                    VehicleIcon(
+                        kind = VehicleKind.FURGON_MEDIANO,
+                        modifier = Modifier.size(width = 170.dp, height = 96.dp),
+                        wheelRotation = wheel.value,
+                    )
+                }
             }
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(8.dp))
             AnimatedVisibility(
                 visible = titleVisible,
                 enter = fadeIn(tween(350)) + slideInVertically(tween(350)) { it / 2 },

@@ -62,6 +62,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         totalSteps = total,
         title = "¿De dónde a dónde?",
         subtitle = "Solo dentro de ${zone.name}.",
+        centered = false,
         bottomBar = {
             PrimaryButton(
                 text = "Continuar",

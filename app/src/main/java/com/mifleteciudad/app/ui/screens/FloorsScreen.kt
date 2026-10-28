@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,8 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mifleteciudad.app.OrderViewModel
+import com.mifleteciudad.app.ui.components.PointBadge
 import com.mifleteciudad.app.ui.components.PriceBar
 import com.mifleteciudad.app.ui.components.StepScaffold
 import com.mifleteciudad.app.ui.components.Stepper
@@ -32,36 +35,50 @@ import com.mifleteciudad.core.Money
 
 @Composable
 fun FloorsScreen(vm: OrderViewModel, step: Int, total: Int) {
+    val perFloor = vm.config.pricing.perStairFloor
     StepScaffold(
         step = step,
         totalSteps = total,
         title = "¿Hay pisos que subir?",
-        subtitle = "Por escalera se cobra ${Money.formatArs(vm.config.pricing.perStairFloor)} por piso. Con ascensor no hay recargo.",
+        subtitle = "Por escalera se cobran ${Money.formatArs(perFloor)} por piso. Con ascensor no hay recargo.",
         onBack = { vm.back() },
         bottomBar = {
             PriceBar(total = vm.price.total, buttonText = "Continuar", onClick = { vm.next() })
         },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            val perFloor = vm.config.pricing.perStairFloor
-            FloorCard(title = "Origen", info = vm.originFloor, perFloor = perFloor, onChange = { vm.updateOriginFloor(it) })
-            FloorCard(title = "Destino", info = vm.destinationFloor, perFloor = perFloor, onChange = { vm.updateDestinationFloor(it) })
+            FloorCard(
+                letter = "A", title = "Origen", color = MaterialTheme.colorScheme.primary,
+                info = vm.originFloor, perFloor = perFloor, onChange = { vm.updateOriginFloor(it) },
+            )
+            FloorCard(
+                letter = "B", title = "Destino", color = MaterialTheme.colorScheme.tertiary,
+                info = vm.destinationFloor, perFloor = perFloor, onChange = { vm.updateDestinationFloor(it) },
+            )
         }
     }
 }
 
 @Composable
-private fun FloorCard(title: String, info: FloorInfo, perFloor: Int, onChange: (FloorInfo) -> Unit) {
+private fun FloorCard(
+    letter: String,
+    title: String,
+    color: Color,
+    info: FloorInfo,
+    perFloor: Int,
+    onChange: (FloorInfo) -> Unit,
+) {
     val options = listOf(Access.GROUND to "Planta baja", Access.ELEVATOR to "Ascensor", Access.STAIRS to "Escalera")
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shadowElevation = 1.dp,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(12.dp))
+        Column(Modifier.padding(18.dp)) {
+            PointBadge(letter = letter, text = title, color = color)
+            Spacer(Modifier.height(14.dp))
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 options.forEachIndexed { index, (access, label) ->
                     SegmentedButton(
@@ -83,7 +100,7 @@ private fun FloorCard(title: String, info: FloorInfo, perFloor: Int, onChange: (
                 exit = fadeOut() + shrinkVertically(),
             ) {
                 Column {
-                    Spacer(Modifier.height(14.dp))
+                    Spacer(Modifier.height(16.dp))
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text("¿Qué piso?", style = MaterialTheme.typography.bodyLarge)

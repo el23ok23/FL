@@ -12,9 +12,10 @@ Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y 
 3. **Ayudantes** (0, 1 o 2).
 4. **Pisos** en origen y destino (planta baja, ascensor o escalera + cantidad de pisos).
 5. **Qué lleva** (campo corto opcional).
-6. **Precio aproximado** con desglose. No se paga nada en la app.
-7. **Contacto**: nombre y WhatsApp argentino válido. El pedido te llega a tu WhatsApp.
-8. **Confirmación** animada: "¡Listo! Te contactamos en breve".
+6. **Cuándo**: día (hoy, mañana o los próximos 14 días, o "lo antes posible") y franja horaria.
+7. **Precio aproximado** con desglose. No se paga nada en la app.
+8. **Contacto**: nombre y WhatsApp argentino válido. El pedido te llega a tu WhatsApp.
+9. **Confirmación** animada: "¡Listo! Te contactamos en breve".
 
 ## Estructura
 

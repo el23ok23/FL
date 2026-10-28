@@ -150,6 +150,28 @@ class ArgentinePhoneTest {
     }
 }
 
+class ScheduleTest {
+    @Test fun `dia de la semana y formatos`() {
+        val d = DayDate(2026, 10, 28) // miércoles
+        assertEquals(2, d.dayOfWeek)
+        assertEquals("mié 28/10", d.short())
+        assertEquals("miércoles 28 de octubre", d.long())
+        assertEquals(DayDate(2026, 11, 1), d.plusDays(4))
+        assertEquals("dom", DayDate(2026, 11, 1).dayName)
+        assertEquals(0, DayDate(2024, 1, 1).dayOfWeek) // lunes
+        assertEquals(6, DayDate(2000, 2, 27).dayOfWeek) // domingo
+    }
+
+    @Test fun `descripcion relativa`() {
+        val today = DayDate(2026, 10, 28)
+        assertEquals("lo antes posible, horario a coordinar", Schedule().describe(today))
+        assertEquals("hoy (mié 28/10), por la tarde (13 a 18 h)", Schedule(today, TimeSlot.AFTERNOON).describe(today))
+        assertEquals("mañana (jue 29/10), por la mañana (8 a 12 h)", Schedule(today.plusDays(1), TimeSlot.MORNING).describe(today))
+        assertEquals("sábado 31 de octubre, horario a coordinar", Schedule(today.plusDays(3)).describe(today))
+        assertEquals(14, DayDate.upcoming(14, today).size)
+    }
+}
+
 class OrderMessageTest {
     @Test fun `mensaje contiene todos los datos`() {
         val config = PricingConfig(25000, 6000, 500, 1.3, 2.0)
@@ -167,14 +189,17 @@ class OrderMessageTest {
                 originFloor = FloorInfo(Access.STAIRS, 3),
                 destinationFloor = FloorInfo(),
                 cargo = "heladera y 10 cajas",
+                schedule = Schedule(DayDate(2026, 10, 30), TimeSlot.MORNING),
                 distanceKm = 7.8,
                 price = price,
-            )
+            ),
+            today = DayDate(2026, 10, 20),
         )
         listOf(
             "Juan", "+54 9 11 2345-6789", "Av. Corrientes 1234", "Av. Cabildo 2000",
             "Furgón mediano (Sprinter)", "Ayudantes: 1", "Piso 3 por escalera", "Planta baja",
             "heladera y 10 cajas", "7,8 km", Money.formatArs(price.total),
+            "viernes 30 de octubre, por la mañana (8 a 12 h)",
         ).forEach { assertTrue("falta: $it", msg.contains(it)) }
     }
 }

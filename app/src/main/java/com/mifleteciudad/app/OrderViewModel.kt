@@ -22,6 +22,7 @@ import com.mifleteciudad.core.FloorInfo
 import com.mifleteciudad.core.OrderSummary
 import com.mifleteciudad.core.PriceBreakdown
 import com.mifleteciudad.core.PriceCalculator
+import com.mifleteciudad.core.Schedule
 import com.mifleteciudad.core.VehicleSpec
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,7 +30,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 /** Pantallas del flujo, en orden. */
-enum class Step { INTRO, ROUTE, VEHICLE, HELPERS, FLOORS, CARGO, PRICE, CONTACT, DONE }
+enum class Step { INTRO, ROUTE, VEHICLE, HELPERS, FLOORS, CARGO, WHEN, PRICE, CONTACT, DONE }
 
 enum class Field { ORIGIN, DESTINATION }
 
@@ -205,6 +206,10 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         private set
     fun setCargoText(text: String) { cargo = text.take(CARGO_MAX) }
 
+    var schedule by mutableStateOf(Schedule())
+        private set
+    fun updateSchedule(s: Schedule) { schedule = s }
+
     /** Precio aproximado, siempre al día con las elecciones actuales. */
     val price: PriceBreakdown
         get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, originFloor, destinationFloor, config.pricing)
@@ -242,6 +247,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             originFloor = originFloor,
             destinationFloor = destinationFloor,
             cargo = cargo,
+            schedule = schedule,
             distanceKm = distanceKm,
             price = price,
         )
@@ -264,6 +270,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         helpers = 0
         originFloor = FloorInfo(); destinationFloor = FloorInfo()
         cargo = ""
+        schedule = Schedule()
         customerName = ""; customerPhone = ""
         sending = false; sendResult = null
         sessionToken = UUID.randomUUID().toString()
