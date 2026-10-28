@@ -1,6 +1,10 @@
 # Configuración de Mi Flete Ciudad
 
-Todo lo que se personaliza está en **un solo archivo**: `app/src/main/assets/config.json`.
+Todo lo que se personaliza está en **un solo archivo por ciudad**:
+
+- Mi Flete Ciudad: `app/src/caba/assets/config.json`
+- Mi Flete Salto: `app/src/salto/assets/config.json`
+
 Abrilo con cualquier editor de texto, cambiá los valores (no las claves) y volvé a generar la app.
 Los montos van en pesos, sin puntos ni decimales (`25000`, no `25.000`).
 
@@ -39,7 +43,7 @@ Sin clave la app **funciona igual**: usa el geocodificador del teléfono para la
 1. Entrá a [console.cloud.google.com](https://console.cloud.google.com), creá un proyecto y asociá facturación (Google da crédito mensual gratuito; para el volumen de una app de fletes normalmente no se paga).
 2. En *APIs y servicios → Biblioteca* habilitá **Places API (New)** y **Routes API**.
 3. En *Credenciales → Crear credenciales → Clave de API*, copiá la clave y pegala en `"api_key": "AIza..."`.
-4. Restringí la clave (*Restricciones de aplicación → Apps para Android*): nombre del paquete `com.mifleteciudad.app` y la huella SHA-1 de tu clave de firma (`keytool -list -v -keystore mi-flete-ciudad.jks`). En *Restricciones de API* dejá solo las dos APIs de arriba.
+4. Restringí la clave (*Restricciones de aplicación → Apps para Android*): nombre del paquete `com.mifleteciudad.app` o `com.mifletesalto.app` y la huella SHA-1 de tu clave de firma (`keytool -list -v -keystore mi-flete-ciudad.jks`). En *Restricciones de API* dejá solo las dos APIs de arriba.
 
 ## 4. Precios
 
@@ -57,6 +61,23 @@ Fórmula: **tarifa_base del vehículo + por_km × km + por_ayudante × ayudantes
 
 Cada vehículo tiene `tarifa_base`, `por_km`, `nombre`, `descripcion`, `medidas` y `carga`. Podés cambiar textos y montos; el `id` no se toca. Los valores que vienen cargados corresponden al tramo alto del mercado de CABA; ajustalos cuando quieras.
 
-## 5. Política de privacidad
+## 5. Zona de cobertura
+
+```json
+"zona": {
+  "nombre": "Salto (Provincia de Buenos Aires)",
+  "sufijo": "Salto",
+  "busqueda_extra": "Salto, Buenos Aires",
+  "palabras_fuera": [],
+  "palabras_dentro": [],
+  "poligono": [[-34.05, -60.45], [-34.08, -60.25], ...]
+}
+```
+
+- `poligono`: puntos `[latitud, longitud]` que rodean la zona, en orden (como dibujando el contorno). Para ajustarla, abrí Google Maps, tocá y mantené sobre un punto del borde, copiá las coordenadas y agregalas a la lista. Con 8 o 10 puntos alcanza para un partido.
+- `nombre`: aparece en los textos ("Solo dentro de ..."). `sufijo`: se agrega a las direcciones en el pedido.
+- `palabras_fuera` / `palabras_dentro`: palabras que, si aparecen en la provincia o localidad que informa el servicio de direcciones, deciden sin mirar el polígono. En CABA "Provincia" manda afuera; en Salto se dejan vacías.
+
+## 6. Política de privacidad
 
 Pegá la URL donde publiques la política (ver `docs/GOOGLE_PLAY.md`) en `"politica_privacidad_url"`.

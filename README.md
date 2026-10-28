@@ -1,11 +1,13 @@
-# Mi Flete Ciudad
+# Mi Flete Ciudad / Mi Flete Salto
 
-App Android nativa (Kotlin + Jetpack Compose) para pedir fletes dentro de la Ciudad de Buenos Aires.
+App Android nativa (Kotlin + Jetpack Compose) para pedir fletes. Un mismo proyecto genera dos apps:
+**Mi Flete Ciudad** (Ciudad de Buenos Aires) y **Mi Flete Salto** (Salto, Provincia de Buenos Aires).
+Cada una tiene su nombre, su zona de cobertura, sus precios y su propio APK.
 Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque. Funciona en Android 5.0 o más nuevo.
 
 ## Qué hace
 
-1. **Origen y destino** con autocompletado y mini mapa del recorrido. Avisa si una dirección queda fuera de la Ciudad.
+1. **Origen y destino** con autocompletado y mini mapa del recorrido. Avisa si una dirección queda fuera de la zona.
 2. **Vehículo** en un carrusel (Kangoo, furgón mediano, furgón grande, pickup, camión 3/4, camión mediano y grande con caja cerrada, camión playo).
 3. **Ayudantes** (0, 1 o 2).
 4. **Pisos** en origen y destino (planta baja, ascensor o escalera + cantidad de pisos).
@@ -17,17 +19,21 @@ Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y 
 ## Estructura
 
 ```
-app/    App Android (Compose). Config editable en app/src/main/assets/config.json
-core/   Lógica pura (precios, zona CABA, teléfonos, mensaje) con tests
-docs/   Configuración, política de privacidad y guía de Google Play
-store/  Ícono 512 px y gráfico destacado para la ficha de Play
+app/                 App Android (Compose), común a las dos ciudades
+app/src/caba/assets/config.json    Mi Flete Ciudad: WhatsApp, zona, precios
+app/src/salto/assets/config.json   Mi Flete Salto: WhatsApp, zona, precios
+core/                Lógica pura (precios, zona, teléfonos, mensaje) con tests
+docs/                Configuración, política de privacidad y guía de Google Play
+store/               Íconos 512 px y gráficos destacados para las fichas de Play
 ```
+
+Para agregar otra ciudad: copiá un bloque de `productFlavors` en `app/build.gradle.kts`, creá `app/src/<ciudad>/assets/config.json` con su zona y precios, y sumá sus archivos al workflow.
 
 ## Compilar
 
 - **Android Studio** (Ladybug o más nuevo): abrir la carpeta, esperar la sincronización y ejecutar. Para el bundle de Play: *Build → Generate Signed App Bundle*.
-- **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba) o `./gradlew :app:bundleRelease` (AAB).
-- **GitHub Actions**: cada push compila y deja el APK y el AAB en *Actions → Artifacts* (ver `.github/workflows/android.yml`).
+- **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba de ambas) o `./gradlew :app:bundleSaltoRelease` / `:app:bundleCabaRelease` (AAB).
+- **GitHub Actions**: cada push compila las dos apps y publica los APK con enlace directo en *Releases* (`ultima-version`), además de dejar APK y AAB en *Actions → Artifacts*.
 - Solo los tests de lógica, sin SDK de Android: `./gradlew :core:test -PcoreOnly`.
 
 ## Qué completar antes de publicar

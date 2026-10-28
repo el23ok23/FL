@@ -3,7 +3,7 @@ package com.mifleteciudad.app.data
 import android.content.Context
 import android.location.Geocoder
 import com.mifleteciudad.core.AddressPoint
-import com.mifleteciudad.core.CabaZone
+import com.mifleteciudad.core.ServiceZone
 import com.mifleteciudad.core.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,14 +26,15 @@ interface AddressProvider {
 }
 
 /** Arma la etiqueta corta que se muestra y se manda por WhatsApp. */
-internal fun buildLabel(primary: String, inside: Boolean): String =
-    if (inside) "$primary, CABA" else primary
+internal fun buildLabel(primary: String, inside: Boolean, zone: ServiceZone): String =
+    if (inside && zone.suffix.isNotBlank()) "$primary, ${zone.suffix}" else primary
 
 /** Google Places API (New) vía REST, sin SDK: autocompletado real y detalles con coordenadas. */
 class GooglePlacesProvider(
     private val apiKey: String,
     private val packageName: String,
     private val certSha1: String,
+    private val zone: ServiceZone,
 ) : AddressProvider {
 
     private val headers: Map<String, String>
@@ -56,8 +57,8 @@ class GooglePlacesProvider(
                 JSONObject().put(
                     "rectangle",
                     JSONObject()
-                        .put("low", JSONObject().put("latitude", CabaZone.minLat).put("longitude", CabaZone.minLng))
-                        .put("high", JSONObject().put("latitude", CabaZone.maxLat).put("longitude", CabaZone.maxLng)),
+                        .put("low", JSONObject().put("latitude", zone.minLat).put("longitude", zone.minLng))
+                        .put("high", JSONObject().put("latitude", zone.maxLat).put("longitude", zone.maxLng)),
                 ),
             )
         val response = Http.request(
@@ -105,8 +106,8 @@ class GooglePlacesProvider(
                     }
                 }
             }
-            val inside = CabaZone.isInside(point, admin)
-            AddressPoint(buildLabel(suggestion.primary, inside), point, inside)
+            val inside = zone.isInside(point, admin)
+            AddressPoint(buildLabel(suggestion.primary, inside, zone), point, inside)
         }.getOrNull()
     }
 }
@@ -115,7 +116,7 @@ class GooglePlacesProvider(
  * Respaldo sin clave: el geocodificador del propio Android (en la mayoría de los teléfonos lo
  * provee Google Play Services). No es un autocompletado real, funciona mejor con calle y altura.
  */
-class GeocoderProvider(context: Context) : AddressProvider {
+class GeocoderProvider(context: Context, private val zone: ServiceZone) : AddressProvider {
     private val appContext = context.applicationContext
     private val locale = Locale("es", "AR")
 
@@ -123,8 +124,8 @@ class GeocoderProvider(context: Context) : AddressProvider {
         val q = query.trim()
         if (q.length < 4 || !Geocoder.isPresent()) return emptyList()
         val results = geocode(q).ifEmpty {
-            val lower = q.lowercase()
-            if ("buenos aires" in lower || "caba" in lower) emptyList() else geocode("$q, Ciudad Autónoma de Buenos Aires")
+            val hint = zone.searchHint
+            if (hint.isBlank() || hint.lowercase() in q.lowercase()) emptyList() else geocode("$q, $hint")
         }
         return results
     }
@@ -135,8 +136,8 @@ class GeocoderProvider(context: Context) : AddressProvider {
             val geocoder = Geocoder(appContext, locale)
             val addresses = geocoder.getFromLocationName(
                 q, 6,
-                CabaZone.minLat - 0.02, CabaZone.minLng - 0.02,
-                CabaZone.maxLat + 0.02, CabaZone.maxLng + 0.02,
+                zone.minLat - 0.02, zone.minLng - 0.02,
+                zone.maxLat + 0.02, zone.maxLng + 0.02,
             ).orEmpty()
             val seen = HashSet<String>()
             buildList {
@@ -165,7 +166,7 @@ class GeocoderProvider(context: Context) : AddressProvider {
 
     override suspend fun resolve(suggestion: AddressSuggestion, sessionToken: String): AddressPoint? {
         val point = suggestion.location ?: return null
-        val inside = CabaZone.isInside(point, suggestion.adminTexts)
-        return AddressPoint(buildLabel(suggestion.primary, inside), point, inside)
+        val inside = zone.isInside(point, suggestion.adminTexts)
+        return AddressPoint(buildLabel(suggestion.primary, inside, zone), point, inside)
     }
 }

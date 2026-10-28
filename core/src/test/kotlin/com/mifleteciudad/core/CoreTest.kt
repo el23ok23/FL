@@ -6,7 +6,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class CabaZoneTest {
+class ServiceZoneTest {
+    private val CabaZone = ServiceZone.CABA
+
     @Test fun `puntos dentro de la ciudad`() {
         assertTrue(CabaZone.contains(LatLng(-34.6037, -58.3816))) // Obelisco
         assertTrue(CabaZone.contains(LatLng(-34.5875, -58.4300))) // Palermo
@@ -30,6 +32,17 @@ class CabaZoneTest {
         assertFalse(CabaZone.isInside(obelisco, listOf("Provincia de Buenos Aires")))
         assertTrue(CabaZone.isInside(LatLng(-34.6600, -58.3650), listOf("Cdad. Autónoma de Buenos Aires")))
         assertTrue(CabaZone.isInside(obelisco, listOf(null, "")))
+    }
+
+    @Test fun `zona de salto`() {
+        val salto = ServiceZone.SALTO
+        assertTrue(salto.contains(LatLng(-34.2925, -60.2550))) // Salto centro
+        assertTrue(salto.contains(LatLng(-34.3764, -60.2664))) // Berdier
+        assertTrue(salto.contains(LatLng(-34.1100, -60.4000))) // Arroyo Dulce
+        assertFalse(salto.contains(LatLng(-33.8900, -60.5700))) // Pergamino
+        assertFalse(salto.contains(LatLng(-34.2460, -59.4700))) // San Antonio de Areco
+        // En Salto "Provincia de Buenos Aires" no es motivo para quedar afuera.
+        assertTrue(salto.isInside(LatLng(-34.2925, -60.2550), listOf("Provincia de Buenos Aires")))
     }
 }
 

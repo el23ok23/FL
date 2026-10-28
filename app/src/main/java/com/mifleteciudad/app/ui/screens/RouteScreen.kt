@@ -55,12 +55,13 @@ import com.mifleteciudad.core.Money
 @Composable
 fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
     val focus = LocalFocusManager.current
+    val zone = vm.config.zone
 
     StepScaffold(
         step = step,
         totalSteps = total,
         title = "¿De dónde a dónde?",
-        subtitle = "Solo dentro de la Ciudad de Buenos Aires.",
+        subtitle = "Solo dentro de ${zone.name}.",
         bottomBar = {
             PrimaryButton(
                 text = "Continuar",
@@ -117,7 +118,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                         Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Esa dirección está fuera de la zona. Por ahora solo hacemos fletes dentro de la Ciudad de Buenos Aires.",
+                            "Esa dirección está fuera de la zona. Por ahora solo hacemos fletes en ${zone.name}.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                         )
@@ -135,6 +136,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         ) {
             Column {
                 MiniMap(
+                    zone = zone,
                     origin = vm.origin?.location,
                     destination = vm.destination?.location,
                     path = vm.route?.path.orEmpty(),
@@ -148,7 +150,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                 val km = vm.distanceKm
                 val info = when {
                     vm.origin == null || vm.destination == null -> "Elegí origen y destino para ver el recorrido."
-                    !vm.bothInside -> "Recorrido no disponible fuera de la Ciudad."
+                    !vm.bothInside -> "Recorrido no disponible fuera de la zona."
                     vm.route != null -> buildString {
                         append(Money.formatKm(km))
                         vm.route?.durationMin?.let { append(" · ~$it min") }
@@ -180,8 +182,8 @@ private fun AddressField(
 ) {
     val isError = point?.insideCaba == false
     val support: (@Composable () -> Unit)? = when {
-        isError -> { { Text("Fuera de la Ciudad de Buenos Aires") } }
-        point != null -> { { Text("Dentro de la Ciudad ✓") } }
+        isError -> { { Text("Fuera de la zona de cobertura") } }
+        point != null -> { { Text("Dentro de la zona ✓") } }
         else -> null
     }
     OutlinedTextField(

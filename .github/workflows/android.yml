@@ -44,30 +44,44 @@ jobs:
           keyPassword=${{ secrets.KEY_PASSWORD }}
           PROPS
 
-      - name: APK de prueba (debug)
+      - name: APK de prueba (debug) de las dos ciudades
         run: ./gradlew :app:assembleDebug --no-daemon
 
-      - name: Bundle para Google Play (release)
+      - name: Bundles para Google Play (release) de las dos ciudades
         run: ./gradlew :app:bundleRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: mi-flete-ciudad-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/caba/debug/*.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mi-flete-salto-debug-apk
+          path: app/build/outputs/apk/salto/debug/*.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: mi-flete-ciudad-release-aab
-          path: app/build/outputs/bundle/release/*.aab
+          path: app/build/outputs/bundle/cabaRelease/*.aab
 
-      # Publica el APK de prueba como archivo directo (sin zip) en la sección Releases del repo,
-      # siempre con el mismo enlace: https://github.com/el23ok23/FL/releases/download/ultima-version/MiFleteCiudad.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mi-flete-salto-release-aab
+          path: app/build/outputs/bundle/saltoRelease/*.aab
+
+      # Publica los APK de prueba como archivos directos (sin zip) en la sección Releases del repo,
+      # siempre con los mismos enlaces:
+      #   https://github.com/el23ok23/FL/releases/download/ultima-version/MiFleteCiudad.apk
+      #   https://github.com/el23ok23/FL/releases/download/ultima-version/MiFleteSalto.apk
       - name: Preparar archivos para Releases
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp app/build/outputs/apk/debug/app-debug.apk release/MiFleteCiudad.apk
-          cp app/build/outputs/bundle/release/app-release.aab release/MiFleteCiudad-release.aab
+          cp app/build/outputs/apk/caba/debug/app-caba-debug.apk release/MiFleteCiudad.apk
+          cp app/build/outputs/apk/salto/debug/app-salto-debug.apk release/MiFleteSalto.apk
+          cp app/build/outputs/bundle/cabaRelease/app-caba-release.aab release/MiFleteCiudad-release.aab
+          cp app/build/outputs/bundle/saltoRelease/app-salto-release.aab release/MiFleteSalto-release.aab
 
       - uses: softprops/action-gh-release@v2
         if: github.event_name != 'pull_request'
@@ -75,8 +89,11 @@ jobs:
           tag_name: ultima-version
           name: Última versión de prueba
           body: |
-            APK de prueba generado automáticamente desde la rama `${{ github.ref_name }}` (commit ${{ github.sha }}).
-            Instalá **MiFleteCiudad.apk** en el celular. El `.aab` es para Google Play.
+            APK de prueba generados automáticamente desde la rama `${{ github.ref_name }}` (commit ${{ github.sha }}).
+            Instalá **MiFleteCiudad.apk** (Ciudad de Buenos Aires) o **MiFleteSalto.apk** (Salto) en el celular.
+            Los `.aab` son para Google Play.
           files: |
             release/MiFleteCiudad.apk
+            release/MiFleteSalto.apk
             release/MiFleteCiudad-release.aab
+            release/MiFleteSalto-release.aab

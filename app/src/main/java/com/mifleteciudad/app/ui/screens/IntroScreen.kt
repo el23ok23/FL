@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
  * Dura ~1,3 s y pasa sola a la pantalla principal (o antes, si se toca).
  */
 @Composable
-fun IntroScreen(onFinished: () -> Unit) {
+fun IntroScreen(title: String, subtitle: String, onFinished: () -> Unit) {
     val finish by rememberUpdatedState(onFinished)
     val truckX = remember { Animatable(-1.2f) } // en fracciones del ancho
     val wheel = remember { Animatable(0f) }
@@ -81,13 +81,13 @@ fun IntroScreen(onFinished: () -> Unit) {
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        "Mi Flete Ciudad",
+                        title,
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "Fletes en la Ciudad de Buenos Aires",
+                        subtitle,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

@@ -1,5 +1,7 @@
 # Publicar en Google Play
 
+Son dos apps separadas en Play Console: **Mi Flete Ciudad** (`com.mifleteciudad.app`) y **Mi Flete Salto** (`com.mifletesalto.app`). Podés usar la misma clave de firma para las dos; cada una tiene su propia ficha, sus capturas y su `.aab`.
+
 ## 1. Clave de firma (una sola vez, guardala bien)
 
 ```bash
@@ -15,9 +17,9 @@ Para que GitHub Actions firme el bundle por vos, cargá en *Settings → Secrets
 
 ## 2. Generar el archivo para subir (.aab)
 
-- Android Studio: *Build → Generate Signed App Bundle / APK → Android App Bundle*.
-- Terminal: `./gradlew :app:bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`.
-- GitHub Actions: *Actions → Android → la última ejecución → Artifacts → mi-flete-ciudad-release-aab*.
+- Android Studio: *Build → Generate Signed App Bundle / APK → Android App Bundle*, eligiendo la variante `cabaRelease` o `saltoRelease`.
+- Terminal: `./gradlew :app:bundleCabaRelease` o `./gradlew :app:bundleSaltoRelease` → `app/build/outputs/bundle/<variante>/`.
+- GitHub Actions: *Actions → Android → la última ejecución → Artifacts → mi-flete-ciudad-release-aab* o *mi-flete-salto-release-aab*.
 
 Antes de cada versión nueva subí `versionCode` (y `versionName`) en `app/build.gradle.kts`.
 
@@ -27,11 +29,11 @@ Play exige una URL pública. Publicá `docs/politica-de-privacidad.html` (comple
 
 ## 4. Ficha de la tienda
 
-- **Nombre**: Mi Flete Ciudad
-- **Descripción breve** (80): Pedí tu flete en la Ciudad de Buenos Aires y conocé el precio al toque.
-- **Descripción completa**: Elegí origen y destino, el vehículo (de Kangoo a camión grande), ayudantes y pisos, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Solo dentro de la Ciudad Autónoma de Buenos Aires.
-- **Ícono**: `store/icono-512.png` (512 × 512).
-- **Gráfico destacado**: `store/grafico-destacado-1024x500.png`.
+- **Nombre**: Mi Flete Ciudad / Mi Flete Salto
+- **Descripción breve** (80): Pedí tu flete en la Ciudad de Buenos Aires y conocé el precio al toque. / Pedí tu flete en Salto y conocé el precio al toque.
+- **Descripción completa**: Elegí origen y destino, el vehículo (de Kangoo a camión grande), ayudantes y pisos, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Solo dentro de la Ciudad Autónoma de Buenos Aires (o: solo en Salto, Provincia de Buenos Aires).
+- **Ícono**: `store/icono-512.png` (sirve para las dos) .
+- **Gráfico destacado**: `store/grafico-destacado-1024x500.png` (Ciudad) y `store/grafico-destacado-salto-1024x500.png` (Salto).
 - **Capturas**: al menos 2 del teléfono (sacalas desde el emulador o un celular: direcciones, carrusel de vehículos, precio, confirmación).
 - **Categoría**: Mapas y navegación (o Empresa). **Clasificación de contenido**: cuestionario estándar, sin contenido sensible.
 

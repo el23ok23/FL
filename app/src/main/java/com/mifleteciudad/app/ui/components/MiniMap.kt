@@ -18,17 +18,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mifleteciudad.core.CabaZone
+import com.mifleteciudad.core.ServiceZone
 import com.mifleteciudad.core.LatLng
 import kotlin.math.cos
 import kotlin.math.min
 
 /**
- * Mapa esquemático de la Ciudad dibujado en Canvas: contorno de CABA, recorrido y
+ * Mapa esquemático dibujado en Canvas: contorno de la zona de cobertura, recorrido y
  * marcadores de origen (A) y destino (B). Funciona sin clave de Google ni SDK de mapas.
  */
 @Composable
 fun MiniMap(
+    zone: ServiceZone,
     origin: LatLng?,
     destination: LatLng?,
     path: List<LatLng>,
@@ -41,13 +42,13 @@ fun MiniMap(
     val labelStyle = TextStyle(color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
 
     Canvas(modifier) {
-        // Encuadre: la ciudad completa, más un pequeño margen, respetando el aspecto real.
-        val cosLat = cos(Math.toRadians(CabaZone.center.lat)).toFloat()
-        val pad = 0.012f
-        val minLng = (CabaZone.minLng - pad).toFloat()
-        val maxLng = (CabaZone.maxLng + pad).toFloat()
-        val minLat = (CabaZone.minLat - pad).toFloat()
-        val maxLat = (CabaZone.maxLat + pad).toFloat()
+        // Encuadre: la zona completa, más un pequeño margen, respetando el aspecto real.
+        val cosLat = cos(Math.toRadians(zone.center.lat)).toFloat()
+        val pad = ((zone.maxLat - zone.minLat) * 0.07).toFloat()
+        val minLng = (zone.minLng - pad).toFloat()
+        val maxLng = (zone.maxLng + pad).toFloat()
+        val minLat = (zone.minLat - pad).toFloat()
+        val maxLat = (zone.maxLat + pad).toFloat()
         val worldW = (maxLng - minLng) * cosLat
         val worldH = maxLat - minLat
         val scale = min(size.width / worldW, size.height / worldH)
@@ -60,9 +61,9 @@ fun MiniMap(
             return Offset(x.coerceIn(10f, size.width - 10f), y.coerceIn(10f, size.height - 10f))
         }
 
-        // Contorno de la ciudad
+        // Contorno de la zona
         val outline = Path()
-        CabaZone.polygon.forEachIndexed { i, p ->
+        zone.polygon.forEachIndexed { i, p ->
             val o = project(p)
             if (i == 0) outline.moveTo(o.x, o.y) else outline.lineTo(o.x, o.y)
         }

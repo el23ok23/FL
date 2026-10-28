@@ -1,8 +1,8 @@
-# Política de privacidad – Mi Flete Ciudad
+# Política de privacidad – Mi Flete Ciudad y Mi Flete Salto
 
 **Última actualización:** 28 de octubre de 2026
 
-Mi Flete Ciudad (la "app") permite pedir un presupuesto de flete dentro de la Ciudad de Buenos Aires. Esta política explica qué datos se usan y para qué.
+Mi Flete Ciudad y Mi Flete Salto (la "app") permiten pedir un presupuesto de flete dentro de su zona de cobertura (Ciudad de Buenos Aires y Salto, Provincia de Buenos Aires, respectivamente). Esta política explica qué datos se usan y para qué.
 
 ## Datos que pedimos
 

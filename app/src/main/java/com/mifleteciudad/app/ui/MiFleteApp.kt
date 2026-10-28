@@ -58,7 +58,11 @@ fun MiFleteApp(vm: OrderViewModel = viewModel()) {
         label = "steps",
     ) { current ->
         when (current) {
-            Step.INTRO -> IntroScreen(onFinished = { vm.finishIntro() })
+            Step.INTRO -> IntroScreen(
+                title = vm.config.businessName,
+                subtitle = "Fletes en ${vm.config.zone.name}",
+                onFinished = { vm.finishIntro() },
+            )
             Step.ROUTE -> RouteScreen(vm, step = 1, total = TOTAL_STEPS)
             Step.VEHICLE -> VehicleScreen(vm, step = 2, total = TOTAL_STEPS)
             Step.HELPERS -> HelpersScreen(vm, step = 3, total = TOTAL_STEPS)

@@ -3,7 +3,9 @@ package com.mifleteciudad.app.data
 import android.content.Context
 import android.util.Log
 import com.mifleteciudad.core.ArgentinePhone
+import com.mifleteciudad.core.LatLng
 import com.mifleteciudad.core.PricingConfig
+import com.mifleteciudad.core.ServiceZone
 import com.mifleteciudad.core.VehicleKind
 import com.mifleteciudad.core.VehicleSpec
 import org.json.JSONObject
@@ -21,6 +23,7 @@ data class AppConfig(
     val googleApiKey: String?,
     val pricing: PricingConfig,
     val vehicles: List<VehicleSpec>,
+    val zone: ServiceZone,
 ) {
     companion object {
         private const val TAG = "AppConfig"
@@ -39,6 +42,7 @@ data class AppConfig(
             val envio = root.optJSONObject("envio_pedido") ?: JSONObject()
             val google = root.optJSONObject("google") ?: JSONObject()
             val precios = root.optJSONObject("precios") ?: JSONObject()
+            val zona = root.optJSONObject("zona")
 
             val vehicles = ArrayList<VehicleSpec>()
             root.optJSONArray("vehiculos")?.let { arr ->
@@ -75,6 +79,30 @@ data class AppConfig(
                     minKm = precios.optDouble("km_minimo", 2.0),
                 ),
                 vehicles = vehicles.ifEmpty { defaults().vehicles },
+                zone = zona?.let(::parseZone) ?: ServiceZone.CABA,
+            )
+        }
+
+        private fun parseZone(z: JSONObject): ServiceZone? {
+            val polygon = ArrayList<LatLng>()
+            z.optJSONArray("poligono")?.let { arr ->
+                for (i in 0 until arr.length()) {
+                    val pt = arr.optJSONArray(i) ?: continue
+                    if (pt.length() >= 2) polygon += LatLng(pt.getDouble(0), pt.getDouble(1))
+                }
+            }
+            if (polygon.size < 3) return null
+            fun words(key: String): List<String> {
+                val arr = z.optJSONArray(key) ?: return emptyList()
+                return (0 until arr.length()).map { arr.optString(it) }.filter { it.isNotBlank() }
+            }
+            return ServiceZone(
+                name = z.optString("nombre").ifBlank { "la zona de cobertura" },
+                suffix = z.optString("sufijo"),
+                searchHint = z.optString("busqueda_extra"),
+                polygon = polygon,
+                insideKeywords = words("palabras_dentro"),
+                outsideKeywords = words("palabras_fuera"),
             )
         }
 
@@ -90,6 +118,7 @@ data class AppConfig(
             callMeBotKey = null,
             googleApiKey = null,
             pricing = PricingConfig(25000, 6000, 500, 1.3, 2.0),
+            zone = ServiceZone.CABA,
             vehicles = listOf(
                 VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800),
                 VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "Tipo Sprinter", "3,2 × 1,7 × 1,8 m", "Hasta 1.500 kg · 10 m³", 35000, 2300),

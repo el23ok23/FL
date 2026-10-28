@@ -39,7 +39,8 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     private val signature = AppSignature.sha1(app)
     private val addresses: AddressProvider =
-        config.googleApiKey?.let { GooglePlacesProvider(it, app.packageName, signature) } ?: GeocoderProvider(app)
+        config.googleApiKey?.let { GooglePlacesProvider(it, app.packageName, signature, config.zone) }
+            ?: GeocoderProvider(app, config.zone)
     private val routes: RoutesService? =
         config.googleApiKey?.let { RoutesService(it, app.packageName, signature) }
     private val sender = OrderSender(app, config)

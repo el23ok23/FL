@@ -30,6 +30,22 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    // Una app por ciudad. Cada variante tiene su nombre, su id y su config.json
+    // (app/src/<variante>/assets/config.json). Para agregar otra ciudad, copiá un bloque.
+    flavorDimensions += "ciudad"
+    productFlavors {
+        create("caba") {
+            dimension = "ciudad"
+            applicationId = "com.mifleteciudad.app"
+            resValue("string", "app_name", "Mi Flete Ciudad")
+        }
+        create("salto") {
+            dimension = "ciudad"
+            applicationId = "com.mifletesalto.app"
+            resValue("string", "app_name", "Mi Flete Salto")
+        }
+    }
+
     signingConfigs {
         // APK de prueba: firma v1 + v2 para que instale en cualquier Android desde 5.0.
         getByName("debug") {
