@@ -44,8 +44,8 @@ fun FloorsScreen(vm: OrderViewModel, step: Int, total: Int) {
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             val perFloor = vm.config.pricing.perStairFloor
-            FloorCard(title = "Origen", info = vm.originFloor, perFloor = perFloor, onChange = { vm.setOriginFloor(it) })
-            FloorCard(title = "Destino", info = vm.destinationFloor, perFloor = perFloor, onChange = { vm.setDestinationFloor(it) })
+            FloorCard(title = "Origen", info = vm.originFloor, perFloor = perFloor, onChange = { vm.updateOriginFloor(it) })
+            FloorCard(title = "Destino", info = vm.destinationFloor, perFloor = perFloor, onChange = { vm.updateDestinationFloor(it) })
         }
     }
 }

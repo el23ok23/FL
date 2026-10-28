@@ -197,8 +197,8 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var destinationFloor by mutableStateOf(FloorInfo())
         private set
-    fun setOriginFloor(f: FloorInfo) { originFloor = f }
-    fun setDestinationFloor(f: FloorInfo) { destinationFloor = f }
+    fun updateOriginFloor(f: FloorInfo) { originFloor = f }
+    fun updateDestinationFloor(f: FloorInfo) { destinationFloor = f }
 
     var cargo by mutableStateOf("")
         private set
