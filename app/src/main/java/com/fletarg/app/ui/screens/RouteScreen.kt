@@ -38,9 +38,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -69,6 +73,15 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
     val focus = LocalFocusManager.current
     val stops = vm.stops
     val count = stops.size
+    val requesters = remember { mutableMapOf<Long, FocusRequester>() }
+
+    // Cuando se confirma una dirección, el foco salta solo al siguiente campo vacío.
+    LaunchedEffect(vm.focusRequestId) {
+        if (vm.focusRequestId == 0) return@LaunchedEffect
+        val target = stops.getOrNull(vm.activeStop)
+        if (target == null || target.point != null) focus.clearFocus()
+        else runCatching { requesters[target.id]?.requestFocus() }
+    }
 
     StepScaffold(
         step = step,
@@ -94,6 +107,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                     value = draft.query,
                     inside = draft.point?.insideCoverage,
                     originProblem = originProblem,
+                    focusRequester = requesters.getOrPut(draft.id) { FocusRequester() },
                     color = stopColor(index, count),
                     removable = index != 0 && !isLast,
                     onValueChange = { vm.onQueryChange(index, it) },
@@ -101,7 +115,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                     onClear = { vm.clearStop(index) },
                     onRemove = { vm.removeStop(index) },
                     imeAction = if (isLast) ImeAction.Done else ImeAction.Next,
-                    onDone = { focus.clearFocus() },
+                    onSubmit = { vm.submitActive() },
                 )
                 SuggestionsPanel(
                     visible = vm.activeStop == index && (vm.suggestions.isNotEmpty() || vm.searching || vm.noResults),
@@ -199,6 +213,7 @@ private fun StopField(
     value: String,
     inside: Boolean?,
     originProblem: Boolean,
+    focusRequester: FocusRequester,
     color: Color,
     removable: Boolean,
     onValueChange: (String) -> Unit,
@@ -206,7 +221,7 @@ private fun StopField(
     onClear: () -> Unit,
     onRemove: () -> Unit,
     imeAction: ImeAction,
-    onDone: () -> Unit,
+    onSubmit: () -> Unit,
 ) {
     val isError = inside == false || originProblem
     val support: (@Composable () -> Unit)? = when {
@@ -221,6 +236,7 @@ private fun StopField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .weight(1f)
+                .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) onFocus() },
             label = { Text(label) },
             placeholder = { Text(if (letter == "A") "Calle y altura, CABA" else "Calle, altura y localidad") },
@@ -245,7 +261,7 @@ private fun StopField(
             },
             supportingText = support,
             keyboardOptions = KeyboardOptions(imeAction = imeAction),
-            keyboardActions = KeyboardActions(onDone = { onDone() }),
+            keyboardActions = KeyboardActions(onDone = { onSubmit() }, onNext = { onSubmit() }),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,

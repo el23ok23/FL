@@ -17,6 +17,7 @@ import com.fletarg.app.data.GooglePlacesProvider
 import com.fletarg.app.data.OrderSender
 import com.fletarg.app.data.RouteInfo
 import com.fletarg.app.data.RoutesService
+import com.fletarg.app.data.SearchScope
 import com.fletarg.core.AddressPoint
 import com.fletarg.core.ArgentinePhone
 import com.fletarg.core.FloorInfo
@@ -91,6 +92,12 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     private var routeJob: Job? = null
     private var sessionToken = UUID.randomUUID().toString()
 
+    /** Cambia cada vez que la app quiere que el foco pase al campo [activeStop] (o se cierre si no queda ninguno). */
+    var focusRequestId by mutableIntStateOf(0)
+        private set
+
+    private fun scopeFor(index: Int) = if (index == 0) SearchScope.CABA else SearchScope.ARGENTINA
+
     val canAddStop: Boolean get() = stops.size < OrderSummary.MAX_STOPS
 
     fun addStop() {
@@ -143,11 +150,39 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         searchJob = viewModelScope.launch {
             delay(350) // espera a que deje de tipear
             searching = true
-            val result = addresses.suggest(q, sessionToken)
+            val result = addresses.suggest(q, sessionToken, scopeFor(index))
             val stillCurrent = activeStop == index && stops.getOrNull(index)?.query?.trim() == q
             if (stillCurrent) { suggestions = result; noResults = result.isEmpty() }
             searching = false
         }
+    }
+
+    /**
+     * Enter en el teclado: busca ya mismo y, si hay una sola coincidencia, la toma directamente
+     * (con barrio y localidad) y pasa al siguiente campo. Si hay varias, las muestra.
+     */
+    fun submitActive() {
+        val index = activeStop
+        val draft = stops.getOrNull(index) ?: return
+        val q = draft.query.trim()
+        if (draft.point != null) { advanceFocus(); return }
+        if (q.length < 3) return
+        if (suggestions.size == 1) { selectSuggestion(suggestions.first()); return }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            searching = true
+            val result = addresses.suggest(q, sessionToken, scopeFor(index))
+            searching = false
+            if (activeStop != index) return@launch
+            if (result.size == 1) selectSuggestion(result.first())
+            else { suggestions = result; noResults = result.isEmpty() }
+        }
+    }
+
+    private fun advanceFocus() {
+        val next = stops.indexOfFirst { it.point == null }
+        if (next >= 0) activeStop = next
+        focusRequestId++
     }
 
     fun selectSuggestion(s: AddressSuggestion) {
@@ -162,8 +197,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             if (point == null) return@launch
             val current = stops.getOrNull(index) ?: return@launch
             stops[index] = current.copy(query = point.label, point = point)
-            // Pasa al siguiente campo vacío.
-            stops.indexOfFirst { it.point == null }.takeIf { it >= 0 }?.let { activeStop = it }
+            advanceFocus() // pasa al siguiente campo vacío (o cierra el teclado si no queda ninguno)
             recomputeRoute()
         }
     }

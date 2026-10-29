@@ -22,15 +22,21 @@ data class AddressSuggestion(
     val adminTexts: List<String> = emptyList(),
 )
 
+/** Dónde buscar: el origen solo en Capital Federal; paradas y destino en todo el país. */
+enum class SearchScope { CABA, ARGENTINA }
+
 interface AddressProvider {
-    suspend fun suggest(query: String, sessionToken: String): List<AddressSuggestion>
+    suspend fun suggest(query: String, sessionToken: String, scope: SearchScope): List<AddressSuggestion>
     suspend fun resolve(suggestion: AddressSuggestion, sessionToken: String): AddressPoint?
 }
 
-/** Etiqueta corta: "Av. Corrientes 1234, Buenos Aires" (calle y localidad). */
+/** Etiqueta corta: calle y altura + barrio y localidad, p. ej. "Lima 29, Monserrat, Buenos Aires". */
 internal fun buildLabel(primary: String, secondary: String): String {
-    val locality = secondary.split(",").map { it.trim() }.firstOrNull { it.isNotBlank() && !it.equals("Argentina", true) }
-    return if (locality != null && !primary.contains(locality, ignoreCase = true)) "$primary, $locality" else primary
+    val parts = secondary.split(",").map { it.trim() }
+        .filter { it.isNotBlank() && !it.equals("Argentina", true) && !primary.contains(it, ignoreCase = true) }
+        .distinct()
+        .take(2)
+    return if (parts.isEmpty()) primary else "$primary, ${parts.joinToString(", ")}"
 }
 
 /** Google Places API (New) vía REST, sin SDK: autocompletado real en toda la Argentina. */
@@ -47,23 +53,26 @@ class GooglePlacesProvider(
             if (certSha1.isNotEmpty()) put("X-Android-Cert", certSha1)
         }
 
-    override suspend fun suggest(query: String, sessionToken: String): List<AddressSuggestion> {
+    override suspend fun suggest(query: String, sessionToken: String, scope: SearchScope): List<AddressSuggestion> {
         if (query.length < 3) return emptyList()
+        fun rect(minLat: Double, minLng: Double, maxLat: Double, maxLng: Double) = JSONObject().put(
+            "rectangle",
+            JSONObject()
+                .put("low", JSONObject().put("latitude", minLat).put("longitude", minLng))
+                .put("high", JSONObject().put("latitude", maxLat).put("longitude", maxLng)),
+        )
         val body = JSONObject()
             .put("input", query)
             .put("languageCode", "es-AR")
             .put("regionCode", "ar")
             .put("includedRegionCodes", JSONArray().put("ar"))
             .put("sessionToken", sessionToken)
-            .put(
-                "locationBias",
-                JSONObject().put(
-                    "rectangle",
-                    JSONObject()
-                        .put("low", JSONObject().put("latitude", Argentina.MIN_LAT).put("longitude", Argentina.MIN_LNG))
-                        .put("high", JSONObject().put("latitude", Argentina.MAX_LAT).put("longitude", Argentina.MAX_LNG)),
-                ),
-            )
+        if (scope == SearchScope.CABA) {
+            // Solo resultados dentro de Capital Federal.
+            body.put("locationRestriction", rect(CabaZone.minLat, CabaZone.minLng, CabaZone.maxLat, CabaZone.maxLng))
+        } else {
+            body.put("locationBias", rect(Argentina.MIN_LAT, Argentina.MIN_LNG, Argentina.MAX_LAT, Argentina.MAX_LNG))
+        }
         val response = Http.request(
             url = "https://places.googleapis.com/v1/places:autocomplete",
             method = "POST",
@@ -130,23 +139,29 @@ class GeocoderProvider(context: Context) : AddressProvider {
     private val appContext = context.applicationContext
     private val locale = Locale("es", "AR")
 
-    override suspend fun suggest(query: String, sessionToken: String): List<AddressSuggestion> {
+    override suspend fun suggest(query: String, sessionToken: String, scope: SearchScope): List<AddressSuggestion> {
         val q = query.trim()
         if (q.length < 4 || !Geocoder.isPresent()) return emptyList()
-        return geocode(q).ifEmpty {
-            if ("argentina" in q.lowercase()) emptyList() else geocode("$q, Argentina")
+        val lower = q.lowercase()
+        return if (scope == SearchScope.CABA) {
+            // Origen: solo Capital Federal. Se busca acotado a la Ciudad y se descarta lo que quede afuera.
+            val withCity = if ("caba" in lower || "buenos aires" in lower || "capital" in lower) q else "$q, Ciudad Autónoma de Buenos Aires"
+            geocode(withCity, scope).ifEmpty { geocode(q, scope) }
+                .filter { s -> s.location != null && CabaZone.isInside(s.location, s.adminTexts) }
+        } else {
+            geocode(q, scope).ifEmpty { if ("argentina" in lower) emptyList() else geocode("$q, Argentina", scope) }
         }
     }
 
     @Suppress("DEPRECATION")
-    private suspend fun geocode(q: String): List<AddressSuggestion> = withContext(Dispatchers.IO) {
+    private suspend fun geocode(q: String, scope: SearchScope): List<AddressSuggestion> = withContext(Dispatchers.IO) {
         runCatching {
             val geocoder = Geocoder(appContext, locale)
-            val addresses = geocoder.getFromLocationName(
-                q, 6,
-                Argentina.MIN_LAT, Argentina.MIN_LNG,
-                Argentina.MAX_LAT, Argentina.MAX_LNG,
-            ).orEmpty()
+            val addresses = if (scope == SearchScope.CABA) {
+                geocoder.getFromLocationName(q, 6, CabaZone.minLat - 0.01, CabaZone.minLng - 0.01, CabaZone.maxLat + 0.01, CabaZone.maxLng + 0.01)
+            } else {
+                geocoder.getFromLocationName(q, 6, Argentina.MIN_LAT, Argentina.MIN_LNG, Argentina.MAX_LAT, Argentina.MAX_LNG)
+            }.orEmpty()
             val seen = HashSet<String>()
             buildList {
                 for (a in addresses) {
@@ -154,8 +169,9 @@ class GeocoderProvider(context: Context) : AddressProvider {
                     val street = listOfNotNull(a.thoroughfare, a.subThoroughfare).joinToString(" ").trim()
                     val primary = street.ifBlank { a.getAddressLine(0)?.substringBefore(",").orEmpty() }
                     if (primary.isBlank()) continue
-                    val secondary = listOfNotNull(a.locality ?: a.subAdminArea, a.adminArea)
-                        .distinct().joinToString(", ")
+                    // Barrio (si lo hay), localidad y provincia: "Monserrat, Buenos Aires"
+                    val secondary = listOfNotNull(a.subLocality, a.locality ?: a.subAdminArea, a.adminArea)
+                        .filter { it.isNotBlank() }.distinct().joinToString(", ")
                     val key = "$primary|$secondary"
                     if (!seen.add(key)) continue
                     add(
