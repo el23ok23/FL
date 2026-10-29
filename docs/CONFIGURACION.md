@@ -30,7 +30,7 @@ La app intenta, en este orden, lo que tengas configurado:
 
 Si CallMeBot falla en algún momento, la app pasa sola al canal siguiente (abrir WhatsApp), así que el pedido nunca se pierde.
 
-**JSON que recibe el webhook:** `nombre`, `whatsapp`, `paradas` (lista con `tipo`, `direccion`, `lat`, `lng`, `piso`), `origen`, `destino`, `vehiculo`, `ayudantes`, `que_lleva`, `cuando`, `distancia_km`, `precio`, `mensaje` (el texto completo listo para reenviar).
+**JSON que recibe el webhook:** `nombre`, `whatsapp`, `paradas` (lista con `tipo`, `direccion`, `lat`, `lng`, `piso`), `origen`, `destino`, `vehiculo`, `ayudantes`, `que_lleva`, `cuando`, `distancia_km`, `precio`, `comision`, `neto_fletero`, `costo_base`, `mensaje` (el texto completo con la sección privada "Solo para vos").
 
 ## 3. Clave de Google (opcional, recomendada)
 
@@ -58,6 +58,20 @@ Sin clave la app **funciona igual**: usa el geocodificador del teléfono para la
 Fórmula: **tarifa_base del vehículo + por_km × km del recorrido completo + ayudantes × (por_ayudante + por_ayudante_km × km) + por_piso_escalera × pisos por escalera (sumando todas las paradas) + por_parada_extra × paradas intermedias**, redondeado hacia arriba al múltiplo de `redondeo`.
 
 Cada ayudante tiene una base fija (`por_ayudante`) más un valor por kilómetro (`por_ayudante_km`): para 3 km cuesta $16.500 y para 40 km, $35.000 con los valores de ejemplo.
+
+### Comisión y recargo operativo (invisibles para el cliente)
+
+```json
+"comision_porcentaje": 15,
+"recargo_operativo_porcentaje": 20
+```
+
+El precio que ve el cliente es **costo base × (1 + recargo operativo) ÷ (1 − comisión)**, redondeado. El desglose que se muestra reparte ese bruto entre las líneas visibles (tarifa, recorrido, ayudantes, pisos, paradas): no existe ninguna línea "comisión".
+
+- `comision_porcentaje`: tu parte, calculada sobre el **bruto** (lo que paga el cliente). Con 15 %, de un flete de $100.000 te quedan $15.000.
+- `recargo_operativo_porcentaje`: colchón para nafta, seguro, peajes y desgaste sobre el costo base.
+
+La comisión y el neto para el fletero te llegan en la sección **"Solo para vos"** del pedido cuando usás webhook o CallMeBot. Si el pedido se manda abriendo WhatsApp en el teléfono del cliente, esa sección no se incluye (el cliente vería el mensaje), así que en ese caso calculala vos: 15 % del precio.
 
 Cada vehículo tiene `tarifa_base`, `por_km`, `nombre`, `descripcion`, `medidas` y `carga`. Podés cambiar textos y montos; el `id` no se toca. Los valores que vienen cargados corresponden al tramo alto del mercado del AMBA; para viajes largos entre ciudades conviene revisar el valor por km.
 

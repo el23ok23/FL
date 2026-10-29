@@ -146,7 +146,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
                         Text(v.capacity, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Desde ${Money.formatArs(v.baseFare)} + ${Money.formatArs(v.perKm)}/km",
+                            "Desde ${Money.formatArs(PriceCalculator.gross(v.baseFare, vm.config.pricing))} + ${Money.formatArs(PriceCalculator.gross(v.perKm, vm.config.pricing))}/km",
                             style = MaterialTheme.typography.labelMedium,
                             color = colors.primary,
                         )
@@ -192,7 +192,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
         )
-        val helperCost = PriceCalculator.helperCost(vm.distanceKm, vm.config.pricing)
+        val helperCost = PriceCalculator.gross(PriceCalculator.helperCost(vm.distanceKm, vm.config.pricing), vm.config.pricing)
         Text(
             "Para cargar y descargar. El chofer va incluido. Cada ayudante: ${Money.formatArs(helperCost)} para este recorrido.",
             style = MaterialTheme.typography.bodySmall,

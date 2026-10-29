@@ -55,6 +55,7 @@ import com.fletarg.core.DayDate
 import com.fletarg.core.FloorInfo
 import com.fletarg.core.Money
 import com.fletarg.core.OrderMessage
+import com.fletarg.core.PriceCalculator
 import com.fletarg.core.TimeSlot
 
 private val QUICK = listOf("Heladera", "Lavarropas", "Cajas", "Sommier y colchón", "Mudanza chica", "Muebles")
@@ -65,7 +66,7 @@ private val QUICK = listOf("Heladera", "Lavarropas", "Cajas", "Sommier y colchó
 fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
     val focus = LocalFocusManager.current
     val colors = MaterialTheme.colorScheme
-    val perFloor = vm.config.pricing.perStairFloor
+    val perFloor = PriceCalculator.gross(vm.config.pricing.perStairFloor, vm.config.pricing)
     val today = remember { DayDate.today() }
     val days = remember(today) { DayDate.upcoming(14, today) }
     val schedule = vm.schedule

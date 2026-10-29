@@ -31,7 +31,11 @@
     "redondeo": 500,
     "km_minimo": 2,
     "factor_distancia_urbana": 1.3,
-    "_factor_distancia_urbana": "Solo se usa sin clave de Google: multiplica la distancia en línea recta para aproximar el recorrido por calle."
+    "_factor_distancia_urbana": "Solo se usa sin clave de Google: multiplica la distancia en línea recta para aproximar el recorrido por calle.",
+    "comision_porcentaje": 15,
+    "_comision_porcentaje": "Tu comisión, como porcentaje del precio BRUTO que paga el cliente. El cliente nunca la ve: el precio final ya la incluye. En el pedido que te llega por webhook o CallMeBot aparece aparte, en la sección 'Solo para vos'.",
+    "recargo_operativo_porcentaje": 20,
+    "_recargo_operativo_porcentaje": "Colchón para nafta, seguro, peajes y desgaste, como porcentaje sobre el costo base (tarifas + km + ayudantes + pisos + paradas). También invisible para el cliente. Cómo se calcula el precio final: costo base × (1 + recargo operativo) ÷ (1 − comisión)."
   },
 
   "vehiculos": [

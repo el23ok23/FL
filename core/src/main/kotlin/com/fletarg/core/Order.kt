@@ -39,8 +39,11 @@ object OrderMessage {
         else -> "Parada $index"
     }
 
-    /** Texto del pedido tal como llega al WhatsApp del dueño. */
-    fun build(o: OrderSummary, today: DayDate = DayDate.today()): String = buildString {
+    /**
+     * Texto del pedido. Con [ownerNotes] agrega al final la parte privada (comisión y neto):
+     * solo para canales que no pasan por el teléfono del cliente (webhook, CallMeBot).
+     */
+    fun build(o: OrderSummary, today: DayDate = DayDate.today(), ownerNotes: Boolean = false): String = buildString {
         appendLine("🚚 *Nuevo pedido de flete* · ${o.businessName}")
         appendLine()
         appendLine("👤 Nombre: ${o.customerName.trim()}")
@@ -63,5 +66,13 @@ object OrderMessage {
         appendLine("📏 Distancia aprox.: ${Money.formatKm(o.distanceKm)}")
         appendLine()
         append("💰 Precio aproximado: ${Money.formatArs(o.price.total)}")
+        if (ownerNotes && o.price.commission > 0) {
+            appendLine()
+            appendLine()
+            appendLine("🔒 Solo para vos")
+            appendLine("Comisión: ${Money.formatArs(o.price.commission)}")
+            appendLine("Neto para el fletero: ${Money.formatArs(o.price.netForDriver)}")
+            append("Costo base sin recargos: ${Money.formatArs(o.price.subtotal)}")
+        }
     }
 }

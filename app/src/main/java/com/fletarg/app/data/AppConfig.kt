@@ -75,6 +75,8 @@ data class AppConfig(
                     roundTo = precios.optInt("redondeo", 500),
                     urbanDistanceFactor = precios.optDouble("factor_distancia_urbana", 1.3),
                     minKm = precios.optDouble("km_minimo", 2.0),
+                    operatingPct = precios.optDouble("recargo_operativo_porcentaje", 20.0) / 100.0,
+                    commissionPct = precios.optDouble("comision_porcentaje", 15.0) / 100.0,
                 ),
                 vehicles = vehicles.ifEmpty { defaults().vehicles },
             )
@@ -91,7 +93,7 @@ data class AppConfig(
             webhookUrl = null,
             callMeBotKey = null,
             googleApiKey = null,
-            pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0),
+            pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.20, commissionPct = 0.15),
             vehicles = listOf(
                 VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800),
                 VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "Tipo Sprinter", "3,2 × 1,7 × 1,8 m", "Hasta 1.500 kg · 10 m³", 35000, 2300),

@@ -53,6 +53,10 @@ data class PricingConfig(
     val roundTo: Int,
     val urbanDistanceFactor: Double,
     val minKm: Double,
+    /** Recargo operativo (nafta, seguro, peajes, desgaste) sobre el costo base, p. ej. 0.20 = 20 %. Invisible para el cliente. */
+    val operatingPct: Double = 0.0,
+    /** Comisión del dueño de la app sobre el precio bruto, p. ej. 0.15 = 15 %. Invisible para el cliente. */
+    val commissionPct: Double = 0.0,
 )
 
 enum class Access { GROUND, ELEVATOR, STAIRS }
@@ -68,6 +72,11 @@ data class FloorInfo(val access: Access = Access.GROUND, val floors: Int = 0) {
     }
 }
 
+/**
+ * Desglose que ve el cliente. Las líneas ya incluyen, repartidos proporcionalmente, el recargo
+ * operativo y la comisión, así que suman exactamente [total] y nada de eso aparece por separado.
+ * [commission], [netForDriver] y [subtotal] son solo para el dueño (mensaje privado y webhook).
+ */
 data class PriceBreakdown(
     val base: Int,
     val distance: Int,
@@ -79,6 +88,10 @@ data class PriceBreakdown(
     val helperCount: Int,
     val extraStopCount: Int,
     val total: Int,
+    val subtotal: Int,
+    val operatingCost: Int,
+    val commission: Int,
+    val netForDriver: Int,
 )
 
 object PriceCalculator {
@@ -103,20 +116,48 @@ object PriceCalculator {
         val stairsCost = stairFloors * config.perStairFloor
         val extraStopCount = max(0, floors.size - 2)
         val extraStopsCost = extraStopCount * config.perExtraStop
-        val raw = vehicle.baseFare + distanceCost + helpersCost + stairsCost + extraStopsCost
+        val subtotal = vehicle.baseFare + distanceCost + helpersCost + stairsCost + extraStopsCost
+
+        // Bruto = subtotal × (1 + operativo) / (1 − comisión): así la comisión es exactamente
+        // el porcentaje pedido del precio final que paga el cliente.
+        val total = roundUp((subtotal * grossFactor(config)).roundToInt(), config.roundTo)
+        val commission = (total * config.commissionPct).roundToInt()
+        val operatingCost = ((total - commission) - subtotal).coerceAtLeast(0)
+
+        // Reparto proporcional del bruto entre las líneas visibles (la base absorbe el redondeo).
+        val scale = if (subtotal > 0) total.toDouble() / subtotal else 1.0
+        val distanceShown = (distanceCost * scale).roundToInt()
+        val helpersShown = (helpersCost * scale).roundToInt()
+        val stairsShown = (stairsCost * scale).roundToInt()
+        val extraStopsShown = (extraStopsCost * scale).roundToInt()
+        val baseShown = total - distanceShown - helpersShown - stairsShown - extraStopsShown
+
         return PriceBreakdown(
-            base = vehicle.baseFare,
-            distance = distanceCost,
-            helpers = helpersCost,
-            stairs = stairsCost,
-            extraStops = extraStopsCost,
+            base = baseShown,
+            distance = distanceShown,
+            helpers = helpersShown,
+            stairs = stairsShown,
+            extraStops = extraStopsShown,
             km = km,
             stairFloors = stairFloors,
             helperCount = helperCount,
             extraStopCount = extraStopCount,
-            total = roundUp(raw, config.roundTo),
+            total = total,
+            subtotal = subtotal,
+            operatingCost = operatingCost,
+            commission = commission,
+            netForDriver = total - commission,
         )
     }
+
+    /** Factor que convierte un costo base en precio bruto para el cliente. */
+    fun grossFactor(config: PricingConfig): Double {
+        val com = config.commissionPct.coerceIn(0.0, 0.9)
+        return (1 + config.operatingPct.coerceAtLeast(0.0)) / (1 - com)
+    }
+
+    /** Un costo base expresado como precio para el cliente (para mostrar "desde", "+ $" de ayudantes, etc.). */
+    fun gross(amount: Int, config: PricingConfig): Int = (amount * grossFactor(config)).roundToInt()
 
     /** Costo de un ayudante para un recorrido de [km] kilómetros: base + valor por km. */
     fun helperCost(km: Double, config: PricingConfig): Int =

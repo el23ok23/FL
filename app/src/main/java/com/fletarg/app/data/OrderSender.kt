@@ -23,10 +23,12 @@ class OrderSender(context: Context, private val config: AppConfig) {
     enum class Result { SENT, OPENED_WHATSAPP, NOT_CONFIGURED }
 
     suspend fun send(order: OrderSummary): Result {
+        // Con la parte privada (comisión y neto) solo en los canales que no pasan por el teléfono del cliente.
         val message = OrderMessage.build(order)
+        val ownerMessage = OrderMessage.build(order, ownerNotes = true)
 
         config.webhookUrl?.let { url ->
-            val ok = Http.request(url, "POST", toJson(order, message).toString()) != null
+            val ok = Http.request(url, "POST", toJson(order, ownerMessage).toString()) != null
             if (ok) return Result.SENT
             Log.w(TAG, "Falló el webhook, se prueba el siguiente canal")
         }
@@ -35,7 +37,7 @@ class OrderSender(context: Context, private val config: AppConfig) {
         val botKey = config.callMeBotKey
         if (owner != null && botKey != null) {
             val url = "https://api.callmebot.com/whatsapp.php?phone=%2B$owner" +
-                "&text=${encode(message)}&apikey=${encode(botKey)}"
+                "&text=${encode(ownerMessage)}&apikey=${encode(botKey)}"
             if (Http.request(url) != null) return Result.SENT
             Log.w(TAG, "Falló CallMeBot, se abre WhatsApp")
         }
@@ -76,6 +78,9 @@ class OrderSender(context: Context, private val config: AppConfig) {
             .put("cuando", o.schedule.describe())
             .put("distancia_km", o.distanceKm)
             .put("precio", o.price.total)
+            .put("comision", o.price.commission)
+            .put("neto_fletero", o.price.netForDriver)
+            .put("costo_base", o.price.subtotal)
             .put("mensaje", message)
     }
 

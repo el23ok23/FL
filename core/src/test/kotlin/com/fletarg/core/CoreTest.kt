@@ -69,14 +69,19 @@ class PriceCalculatorTest {
             floors = listOf(FloorInfo(Access.STAIRS, 3), FloorInfo(Access.ELEVATOR, 10)),
             config = config,
         )
-        assertEquals(25000, p.base)
+        // Las líneas visibles se reparten el redondeo del total (diferencias de pocos pesos).
+        assertEquals(25000.0, p.base.toDouble(), 60.0)
         assertEquals(0, p.extraStopCount)
-        assertEquals(14040, p.distance)
-        assertEquals(15000 + 3900, p.helpers) // base + 7,8 km × 500
+        assertEquals(14040.0, p.distance.toDouble(), 20.0)
+        assertEquals(18900.0, p.helpers.toDouble(), 20.0) // base + 7,8 km × 500
         assertEquals(3, p.stairFloors)
-        assertEquals(18000, p.stairs)
+        assertEquals(18000.0, p.stairs.toDouble(), 20.0)
+        assertEquals(p.total, p.base + p.distance + p.helpers + p.stairs + p.extraStops)
         // 25000 + 14040 + 18900 + 18000 = 75940 → redondeado hacia arriba a 500
+        assertEquals(75940, p.subtotal)
         assertEquals(76000, p.total)
+        assertEquals(0, p.commission)
+        assertEquals(76000, p.netForDriver)
     }
 
     @Test fun `km minimo y sin extras`() {
@@ -89,6 +94,21 @@ class PriceCalculatorTest {
     @Test fun `ayudantes se limitan a dos`() {
         val p = PriceCalculator.calculate(kangoo, 2.0, 7, listOf(FloorInfo(), FloorInfo()), config)
         assertEquals(2, p.helperCount)
+    }
+
+    @Test fun `comision y recargo operativo invisibles`() {
+        val cfg = config.copy(operatingPct = 0.20, commissionPct = 0.15)
+        val p = PriceCalculator.calculate(kangoo, 10.0, 1, listOf(FloorInfo(), FloorInfo()), cfg)
+        // subtotal: 25000 + 18000 + 20000 = 63000 → × 1,2 / 0,85 = 88.941 → 89.000
+        assertEquals(63000, p.subtotal)
+        assertEquals(89000, p.total)
+        assertEquals(13350, p.commission)             // 15 % del bruto
+        assertEquals(75650, p.netForDriver)
+        assertEquals(p.netForDriver - p.subtotal, p.operatingCost)
+        // Las líneas visibles suman exactamente el total y no hay línea de comisión.
+        assertEquals(p.total, p.base + p.distance + p.helpers + p.stairs + p.extraStops)
+        assertTrue(p.helpers > 20000) // el ayudante también se muestra ya "engordado"
+        assertEquals(PriceCalculator.gross(20000, cfg), 28235)
     }
 
     @Test fun `el ayudante cuesta mas cuanto mas lejos`() {
@@ -193,6 +213,27 @@ class ScheduleTest {
     }
 }
 
+class OwnerNotesTest {
+    @Test fun `la comision solo aparece en el mensaje privado`() {
+        val cfg = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.2, commissionPct = 0.15)
+        val vehicle = VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", 25000, 1800)
+        val price = PriceCalculator.calculate(vehicle, 10.0, 0, listOf(FloorInfo(), FloorInfo()), cfg)
+        val order = OrderSummary(
+            "Fletarg", "Ana", "5491123456789",
+            listOf(
+                Stop(AddressPoint("Lima 29, Monserrat", LatLng(-34.61, -58.38), true, true), FloorInfo()),
+                Stop(AddressPoint("Av. Cabildo 2000", LatLng(-34.56, -58.45), true), FloorInfo()),
+            ),
+            vehicle, 0, "", Schedule(), 10.0, price,
+        )
+        val public = OrderMessage.build(order, DayDate(2026, 10, 20), ownerNotes = false)
+        val private = OrderMessage.build(order, DayDate(2026, 10, 20), ownerNotes = true)
+        assertFalse(public.contains("Comisión"))
+        assertTrue(private.contains("Comisión: ${Money.formatArs(price.commission)}"))
+        assertTrue(private.contains("Neto para el fletero"))
+    }
+}
+
 class OrderMessageTest {
     @Test fun `mensaje contiene todos los datos`() {
         val config = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0)
@@ -217,6 +258,7 @@ class OrderMessageTest {
             ),
             today = DayDate(2026, 10, 20),
         )
+        assertFalse("la parte privada no va al cliente", msg.contains("Comisión"))
         listOf(
             "Juan", "+54 9 11 2345-6789", "Origen: Av. Corrientes 1234", "Parada 1: Av. Santa Fe 3000", "Destino: Av. Cabildo 2000",
             "Furgón mediano (Sprinter)", "Ayudantes: 1", "Piso 3 por escalera", "Planta baja",
