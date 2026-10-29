@@ -37,9 +37,9 @@ Si CallMeBot falla en algún momento, la app pasa sola al canal siguiente (abrir
 Sin clave la app **funciona igual**: usa el geocodificador del teléfono para las direcciones y estima la distancia en línea recta por un factor urbano. Con clave, el autocompletado es el de Google Maps en todo el país y la distancia es la del recorrido real por calle pasando por todas las paradas.
 
 1. Entrá a [console.cloud.google.com](https://console.cloud.google.com), creá un proyecto y asociá facturación (Google da crédito mensual gratuito; para el volumen de una app de fletes normalmente no se paga).
-2. En *APIs y servicios → Biblioteca* habilitá **Places API (New)** y **Routes API**.
+2. En *APIs y servicios → Biblioteca* habilitá **Places API (New)**, **Routes API** y **Maps Static API** (esta última es la que muestra el mapa real del recorrido dentro de la app).
 3. En *Credenciales → Crear credenciales → Clave de API*, copiá la clave y pegala en `"api_key": "AIza..."`.
-4. Restringí la clave (*Restricciones de aplicación → Apps para Android*): nombre del paquete `com.fletarg.app` o `com.mifletesalto.app` y la huella SHA-1 de tu clave de firma (`keytool -list -v -keystore mi-flete-ciudad.jks`). En *Restricciones de API* dejá solo las dos APIs de arriba.
+4. Restringí la clave. Lo más simple: en *Restricciones de API* dejá solo las tres APIs de arriba y no pongas restricción de aplicación (Maps Static API no acepta la restricción "Apps para Android"). Si preferís restringir por app (`com.fletarg.app` + huella SHA-1 de tu clave de firma), creá una segunda clave solo para Maps Static API y pegala en `"static_maps_key"`.
 
 ## 4. Precios
 

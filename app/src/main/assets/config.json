@@ -18,7 +18,9 @@
 
   "google": {
     "api_key": "",
-    "_api_key": "Opcional. Clave de Google Cloud con 'Places API (New)' y 'Routes API' habilitadas. Con la clave: autocompletado de Google en todo el país y distancia real por calle con todas las paradas. Sin la clave: la app usa el geocodificador del teléfono y estima la distancia (sigue funcionando)."
+    "_api_key": "Opcional. Clave de Google Cloud con 'Places API (New)', 'Routes API' y 'Maps Static API' habilitadas. Con la clave: autocompletado de Google en todo el país, distancia real por calle con todas las paradas y mapa real del recorrido. Sin la clave: la app usa el geocodificador del teléfono, estima la distancia y dibuja un mapa esquemático (sigue funcionando).",
+    "static_maps_key": "",
+    "_static_maps_key": "Opcional. Solo si querés una clave distinta para el mapa (Maps Static API no admite restricción por app Android). Vacío = usa api_key."
   },
 
   "precios": {
