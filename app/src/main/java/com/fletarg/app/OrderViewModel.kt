@@ -18,6 +18,7 @@ import com.fletarg.app.data.OrderSender
 import com.fletarg.app.data.RouteInfo
 import com.fletarg.app.data.RoutesService
 import com.fletarg.app.data.SearchScope
+import com.fletarg.app.data.StaticMapService
 import com.fletarg.core.AddressPoint
 import com.fletarg.core.ArgentinePhone
 import com.fletarg.core.FloorInfo
@@ -53,6 +54,8 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     private val routes: RoutesService? =
         config.googleApiKey?.let { RoutesService(it, app.packageName, signature) }
     private val sender = OrderSender(app, config)
+    /** Mapa real (solo con clave de Google); si es null la app dibuja el esquema. */
+    val staticMaps: StaticMapService? = config.staticMapsKey?.let { StaticMapService(it) }
 
     // ---- Navegación -------------------------------------------------------------------------
     var step by mutableStateOf(Step.INTRO)

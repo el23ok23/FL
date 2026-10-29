@@ -78,6 +78,7 @@ fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
         title = "Detalles del flete",
         subtitle = "Pisos en cada parada, qué llevás y cuándo lo necesitás.",
         onBack = { vm.back() },
+        stepName = "Detalles",
         centered = false,
         bottomBar = {
             PriceBar(total = vm.price.total, buttonText = "Ver precio", onClick = { focus.clearFocus(); vm.next() })

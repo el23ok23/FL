@@ -19,6 +19,8 @@ data class AppConfig(
     val webhookUrl: String?,
     val callMeBotKey: String?,
     val googleApiKey: String?,
+    /** Clave para Maps Static API (si está vacía se usa googleApiKey). */
+    val staticMapsKey: String?,
     val pricing: PricingConfig,
     val vehicles: List<VehicleSpec>,
 ) {
@@ -67,6 +69,7 @@ data class AppConfig(
                 webhookUrl = clean(envio.optString("webhook_url"))?.takeIf { it.startsWith("https://") },
                 callMeBotKey = clean(envio.optString("callmebot_apikey")),
                 googleApiKey = clean(google.optString("api_key")),
+                staticMapsKey = clean(google.optString("static_maps_key")) ?: clean(google.optString("api_key")),
                 pricing = PricingConfig(
                     perHelper = precios.optInt("por_ayudante", 15000),
                     perHelperKm = precios.optInt("por_ayudante_km", 500),
@@ -93,6 +96,7 @@ data class AppConfig(
             webhookUrl = null,
             callMeBotKey = null,
             googleApiKey = null,
+            staticMapsKey = null,
             pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.20, commissionPct = 0.15),
             vehicles = listOf(
                 VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800),

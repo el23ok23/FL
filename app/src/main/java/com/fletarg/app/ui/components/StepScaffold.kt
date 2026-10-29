@@ -54,6 +54,7 @@ fun StepScaffold(
     title: String,
     subtitle: String? = null,
     onBack: (() -> Unit)? = null,
+    stepName: String? = null,
     centered: Boolean = true,
     bottomBar: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
@@ -119,6 +120,17 @@ fun StepScaffold(
                     "$step/$totalSteps",
                     style = MaterialTheme.typography.labelMedium,
                     color = colors.onSurfaceVariant,
+                )
+            }
+            if (stepName != null) {
+                Text(
+                    "PASO $step · ${stepName.uppercase()}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp),
                 )
             }
 

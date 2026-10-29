@@ -37,8 +37,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,13 +50,16 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fletarg.app.OrderViewModel
 import com.fletarg.app.data.AddressSuggestion
-import com.fletarg.app.ui.components.MiniMap
+import com.fletarg.app.ui.components.MapCard
 import com.fletarg.app.ui.components.PrimaryButton
 import com.fletarg.app.ui.components.StepScaffold
 import com.fletarg.core.Money
@@ -88,6 +94,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         totalSteps = total,
         title = "¿A dónde va el flete?",
         subtitle = "Salimos desde Capital Federal a cualquier punto del país. Podés sumar hasta ${OrderSummary.MAX_STOPS - 2} paradas en el medio.",
+        stepName = "Recorrido",
         centered = false,
         bottomBar = {
             PrimaryButton(
@@ -100,6 +107,16 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         Column(Modifier.animateContentSize()) {
             stops.forEachIndexed { index, draft ->
                 val isLast = index == count - 1
+                if (index > 0) {
+                    // Conector punteado entre una parada y la siguiente (alineado con el círculo de la letra)
+                    Box(
+                        Modifier
+                            .padding(start = 27.dp)
+                            .width(2.dp)
+                            .height(14.dp)
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)),
+                    )
+                }
                 val originProblem = index == 0 && draft.point?.let { it.insideCoverage && !it.insideCaba } == true
                 StopField(
                     letter = ('A' + index).toString(),
@@ -123,7 +140,6 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                     searching = vm.searching,
                     onPick = { vm.selectSuggestion(it) },
                 )
-                if (!isLast) Spacer(Modifier.height(10.dp))
             }
         }
 
@@ -163,45 +179,69 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         }
 
         Spacer(Modifier.height(18.dp))
+        val resolvedPoints = vm.resolvedPoints
+        val resolvedCount = resolvedPoints.count { it != null }
+        val km = vm.distanceKm
+        val caption = when {
+            vm.outOfCoverage -> "Fuera del país"
+            vm.originOutsideCaba -> "Origen fuera de Capital"
+            vm.route != null -> buildString {
+                append(Money.formatKm(km))
+                vm.route?.durationMin?.let { append(" · ~${formatMinutes(it)}") }
+            }
+            else -> "≈ ${Money.formatKm(km)} (estimado)"
+        }
+        val emptyHint = when {
+            resolvedCount == 0 -> "Escribí el origen y el destino para ver el recorrido"
+            resolvedCount == 1 -> "Falta el destino para trazar el recorrido"
+            else -> null
+        }
+        // Mapa real (una imagen de Google, solo con clave). Si falla o no hay clave, se dibuja el esquema.
+        val density = LocalDensity.current
+        val dark = isSystemInDarkTheme()
+        val primaryHex = hex(MaterialTheme.colorScheme.primary)
+        val destinationHex = hex(MaterialTheme.colorScheme.tertiary)
+        val service = vm.staticMaps
+        val knownPoints = resolvedPoints.filterNotNull()
+        val mapKey = knownPoints.joinToString { "${it.location.lat},${it.location.lng}" } + (vm.route?.encodedPolyline ?: "")
+        val image by produceState<ImageBitmap?>(initialValue = null, key1 = mapKey, key2 = service) {
+            value = if (service != null && knownPoints.isNotEmpty()) {
+                service.load(
+                    points = knownPoints.map { it.location },
+                    encodedPolyline = vm.route?.encodedPolyline,
+                    widthPx = with(density) { 340.dp.roundToPx() },
+                    heightPx = with(density) { 230.dp.roundToPx() },
+                    primaryHex = primaryHex,
+                    destinationHex = destinationHex,
+                    dark = dark,
+                )
+            } else null
+        }
         Surface(
             shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 2.dp,
+            shadowElevation = 3.dp,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column {
-                MiniMap(
-                    points = vm.resolvedPoints.map { it?.location },
-                    insideFlags = vm.resolvedPoints.mapIndexed { i, p -> p?.insideCoverage != false && !(i == 0 && p != null && !p.insideCaba) },
-                    path = vm.route?.path.orEmpty(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                        .clip(MaterialTheme.shapes.large)
-                        .padding(10.dp),
-                )
-                val km = vm.distanceKm
-                val resolvedCount = vm.resolvedPoints.count { it != null }
-                val info = when {
-                    resolvedCount < 2 -> "Elegí las direcciones para ver el recorrido."
-                    vm.outOfCoverage -> "Recorrido no disponible fuera del país."
-                    vm.originOutsideCaba -> "El origen tiene que estar en Capital Federal."
-                    vm.route != null -> buildString {
-                        append("${Money.formatKm(km)} en total")
-                        vm.route?.durationMin?.let { append(" · ~${formatMinutes(it)}") }
-                    }
-                    else -> "≈ ${Money.formatKm(km)} en total (estimado)"
-                }
-                Text(
-                    info,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 14.dp),
-                )
-            }
+            MapCard(
+                points = resolvedPoints.map { it?.location },
+                insideFlags = resolvedPoints.mapIndexed { i, p -> p?.insideCoverage != false && !(i == 0 && p != null && !p.insideCaba) },
+                path = vm.route?.path.orEmpty(),
+                image = image,
+                caption = caption,
+                emptyHint = emptyHint,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(230.dp)
+                    .clip(MaterialTheme.shapes.large),
+            )
         }
     }
 }
+
+/** "1B7BE0" a partir de un Color de Compose (para la URL del mapa estático). */
+private fun hex(color: androidx.compose.ui.graphics.Color): String =
+    String.format(java.util.Locale.US, "%06X", color.toArgb() and 0xFFFFFF)
 
 private fun formatMinutes(min: Int): String =
     if (min < 60) "$min min" else "${min / 60} h ${(min % 60).toString().padStart(2, '0')}"

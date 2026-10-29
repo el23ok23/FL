@@ -72,6 +72,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
         title = "¿Qué tamaño necesitás?",
         subtitle = "De la Kangoo al camión grande. Deslizá o tocá las flechas; el precio se actualiza solo.",
         onBack = { vm.back() },
+        stepName = "Vehículo",
         centered = false,
         bottomBar = {
             PriceBar(total = vm.price.total, buttonText = "Continuar", onClick = { vm.next() })

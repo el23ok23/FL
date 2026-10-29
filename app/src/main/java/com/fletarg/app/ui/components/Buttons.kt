@@ -34,6 +34,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
@@ -61,19 +63,25 @@ fun PrimaryButton(
     loading: Boolean = false,
 ) {
     val interaction = remember { MutableInteractionSource() }
+    val colors = MaterialTheme.colorScheme
+    val active = enabled && !loading
+    val gradient = Brush.horizontalGradient(listOf(colors.primary, colors.primary.copy(alpha = 0.82f)))
     Button(
         onClick = onClick,
-        enabled = enabled && !loading,
+        enabled = active,
         interactionSource = interaction,
         modifier = modifier
             .fillMaxWidth()
             .height(58.dp)
-            .pressScale(interaction, 0.97f),
+            .pressScale(interaction, 0.97f)
+            .then(if (active) Modifier.background(gradient, MaterialTheme.shapes.medium) else Modifier),
         shape = MaterialTheme.shapes.medium,
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = if (active) 4.dp else 0.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
         colors = ButtonDefaults.buttonColors(
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            containerColor = Color.Transparent,
+            contentColor = colors.onPrimary,
+            disabledContainerColor = colors.surfaceVariant,
+            disabledContentColor = colors.onSurfaceVariant,
         ),
     ) {
         if (loading) {

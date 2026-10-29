@@ -10,6 +10,8 @@ data class RouteInfo(
     val distanceKm: Double,
     val durationMin: Int?,
     val path: List<LatLng>,
+    /** Polilínea codificada de Google (para el mapa estático). */
+    val encodedPolyline: String? = null,
 )
 
 /** Google Routes API vía REST, con paradas intermedias. Devuelve null si falla (la app estima). */
@@ -56,6 +58,7 @@ class RoutesService(
                 distanceKm = meters / 1000.0,
                 durationMin = seconds?.let { (it + 59) / 60 },
                 path = if (encoded.isNotEmpty()) Geo.decodePolyline(encoded) else points,
+                encodedPolyline = encoded.ifEmpty { null },
             )
         }.getOrNull()
     }

@@ -61,6 +61,7 @@ fun QuoteScreen(vm: OrderViewModel, step: Int, total: Int) {
         title = "Tu precio aproximado",
         subtitle = "Lo confirmamos por WhatsApp. No se paga nada en la app.",
         onBack = { vm.back() },
+        stepName = "Precio y contacto",
         centered = false,
         bottomBar = {
             PrimaryButton(
