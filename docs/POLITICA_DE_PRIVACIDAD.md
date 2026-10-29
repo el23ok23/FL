@@ -1,13 +1,13 @@
-# Política de privacidad – Mi Flete Ciudad y Mi Flete Salto
+# Política de privacidad – Fletarg
 
-**Última actualización:** 28 de octubre de 2026
+**Última actualización:** 29 de octubre de 2026
 
-Mi Flete Ciudad y Mi Flete Salto (la "app") permiten pedir un presupuesto de flete dentro de su zona de cobertura (Ciudad de Buenos Aires y Salto, Provincia de Buenos Aires, respectivamente). Esta política explica qué datos se usan y para qué.
+Fletarg (la "app") permite pedir un presupuesto de flete en toda la Argentina. Esta política explica qué datos se usan y para qué.
 
 ## Datos que pedimos
 
 - **Nombre** y **número de WhatsApp**: los ingresa el cliente de manera voluntaria, solo si decide pedir que lo contactemos.
-- **Direcciones de origen y destino**, **vehículo**, **ayudantes**, **pisos** y **descripción de la carga**: datos del pedido, necesarios para calcular el precio y coordinar el flete.
+- **Direcciones de origen, paradas y destino**, **vehículo**, **ayudantes**, **pisos** y **descripción de la carga**: datos del pedido, necesarios para calcular el precio y coordinar el flete.
 
 ## Para qué los usamos
 

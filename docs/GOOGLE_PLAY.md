@@ -1,11 +1,11 @@
 # Publicar en Google Play
 
-Son dos apps separadas en Play Console: **Mi Flete Ciudad** (`com.mifleteciudad.app`) y **Mi Flete Salto** (`com.mifletesalto.app`). Podés usar la misma clave de firma para las dos; cada una tiene su propia ficha, sus capturas y su `.aab`.
+La app en Play Console es **Fletarg** (`com.fletarg.app`).
 
 ## 1. Clave de firma (una sola vez, guardala bien)
 
 ```bash
-keytool -genkeypair -v -keystore mi-flete-ciudad.jks -alias mifleteciudad \
+keytool -genkeypair -v -keystore fletarg.jks -alias fletarg \
   -keyalg RSA -keysize 2048 -validity 10000
 ```
 
@@ -13,13 +13,13 @@ Guardá el archivo `.jks` y las contraseñas en un lugar seguro: si se pierden n
 Después copiá `keystore.properties.example` como `keystore.properties` (en la raíz del proyecto) y completalo. Ese archivo no se sube al repositorio.
 
 Para que GitHub Actions firme el bundle por vos, cargá en *Settings → Secrets and variables → Actions* estos secrets:
-`KEYSTORE_BASE64` (resultado de `base64 -w0 mi-flete-ciudad.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+`KEYSTORE_BASE64` (resultado de `base64 -w0 fletarg.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
 
 ## 2. Generar el archivo para subir (.aab)
 
-- Android Studio: *Build → Generate Signed App Bundle / APK → Android App Bundle*, eligiendo la variante `cabaRelease` o `saltoRelease`.
-- Terminal: `./gradlew :app:bundleCabaRelease` o `./gradlew :app:bundleSaltoRelease` → `app/build/outputs/bundle/<variante>/`.
-- GitHub Actions: *Actions → Android → la última ejecución → Artifacts → mi-flete-ciudad-release-aab* o *mi-flete-salto-release-aab*.
+- Android Studio: *Build → Generate Signed App Bundle / APK → Android App Bundle*.
+- Terminal: `./gradlew :app:bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`.
+- GitHub Actions: *Actions → Android → la última ejecución → Artifacts → fletarg-release-aab*.
 
 Antes de cada versión nueva subí `versionCode` (y `versionName`) en `app/build.gradle.kts`.
 
@@ -29,12 +29,12 @@ Play exige una URL pública. Publicá `docs/politica-de-privacidad.html` (comple
 
 ## 4. Ficha de la tienda
 
-- **Nombre**: Mi Flete Ciudad / Mi Flete Salto
-- **Descripción breve** (80): Pedí tu flete en la Ciudad de Buenos Aires y conocé el precio al toque. / Pedí tu flete en Salto y conocé el precio al toque.
-- **Descripción completa**: Elegí origen y destino, el vehículo (de Kangoo a camión grande), ayudantes y pisos, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Solo dentro de la Ciudad Autónoma de Buenos Aires (o: solo en Salto, Provincia de Buenos Aires).
-- **Ícono**: `store/icono-512.png` (sirve para las dos) .
-- **Gráfico destacado**: `store/grafico-destacado-1024x500.png` (Ciudad) y `store/grafico-destacado-salto-1024x500.png` (Salto).
-- **Capturas**: al menos 2 del teléfono (sacalas desde el emulador o un celular: direcciones, carrusel de vehículos, precio, confirmación).
+- **Nombre**: Fletarg
+- **Descripción breve** (80): Pedí tu flete en toda la Argentina y conocé el precio al toque.
+- **Descripción completa**: Elegí origen, destino y hasta 4 paradas, el vehículo (de Kangoo a camión grande), ayudantes, pisos y cuándo lo necesitás, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Cobertura en toda la Argentina.
+- **Ícono**: `store/icono-512.png`.
+- **Gráfico destacado**: `store/grafico-destacado-1024x500.png`.
+- **Capturas**: al menos 2 del teléfono (sacalas desde el emulador o un celular: recorrido con paradas, carrusel de vehículos, precio, confirmación).
 - **Categoría**: Mapas y navegación (o Empresa). **Clasificación de contenido**: cuestionario estándar, sin contenido sensible.
 
 ## 5. Formulario "Seguridad de los datos" (Data safety)

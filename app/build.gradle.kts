@@ -15,11 +15,11 @@ val keystoreProps = Properties().apply {
 val hasSigning = keystoreProps.getProperty("storeFile")?.isNotBlank() == true
 
 android {
-    namespace = "com.mifleteciudad.app"
+    namespace = "com.fletarg.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.mifleteciudad.app"
+        applicationId = "com.fletarg.app"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
@@ -28,22 +28,6 @@ android {
         // Solo recursos en español: achica la descarga.
         resourceConfigurations += listOf("es")
         vectorDrawables.useSupportLibrary = true
-    }
-
-    // Una app por ciudad. Cada variante tiene su nombre, su id y su config.json
-    // (app/src/<variante>/assets/config.json). Para agregar otra ciudad, copiá un bloque.
-    flavorDimensions += "ciudad"
-    productFlavors {
-        create("caba") {
-            dimension = "ciudad"
-            applicationId = "com.mifleteciudad.app"
-            resValue("string", "app_name", "Mi Flete Ciudad")
-        }
-        create("salto") {
-            dimension = "ciudad"
-            applicationId = "com.mifletesalto.app"
-            resValue("string", "app_name", "Mi Flete Salto")
-        }
     }
 
     signingConfigs {

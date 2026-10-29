@@ -1,42 +1,36 @@
-# Mi Flete Ciudad / Mi Flete Salto
+# Fletarg
 
-App Android nativa (Kotlin + Jetpack Compose) para pedir fletes. Un mismo proyecto genera dos apps:
-**Mi Flete Ciudad** (Ciudad de Buenos Aires) y **Mi Flete Salto** (Salto, Provincia de Buenos Aires).
-Cada una tiene su nombre, su zona de cobertura, sus precios y su propio APK.
-Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque. Funciona en Android 5.0 o más nuevo.
+App Android nativa (Kotlin + Jetpack Compose) para pedir fletes en toda la Argentina.
+Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque.
+Funciona en Android 5.0 o más nuevo.
 
-## Qué hace
+## Qué hace (5 pantallas)
 
-1. **Origen y destino** con autocompletado y mini mapa del recorrido. Avisa si una dirección queda fuera de la zona.
-2. **Vehículo** en un carrusel (Kangoo, furgón mediano, furgón grande, pickup, camión 3/4, camión mediano y grande con caja cerrada, camión playo).
-3. **Ayudantes** (0, 1 o 2).
-4. **Pisos** en origen y destino (planta baja, ascensor o escalera + cantidad de pisos).
-5. **Qué lleva** (campo corto opcional).
-6. **Cuándo**: día (hoy, mañana o los próximos 14 días, o "lo antes posible") y franja horaria.
-7. **Precio aproximado** con desglose. No se paga nada en la app.
-8. **Contacto**: nombre y WhatsApp argentino válido. El pedido te llega a tu WhatsApp.
-9. **Confirmación** animada: "¡Listo! Te contactamos en breve".
+1. **Recorrido**: origen, destino y hasta 4 paradas intermedias, con autocompletado y un mapa que dibuja el recorrido. Avisa si una dirección queda fuera del país.
+2. **Vehículo y ayudantes**: carrusel con 8 vehículos (Kangoo, furgones, pickup, camiones) y 0, 1 o 2 ayudantes.
+3. **Detalles**: pisos en cada parada (planta baja, ascensor o escalera), qué lleva y cuándo (día y franja horaria).
+4. **Precio y contacto**: precio aproximado con desglose, nombre y WhatsApp argentino válido, enviar. No se paga nada en la app.
+5. **Confirmación** animada: "¡Listo! Te contactamos en breve".
+
+El pedido te llega a tu WhatsApp con todas las paradas, vehículo, ayudantes, pisos, qué lleva, cuándo, distancia y precio.
 
 ## Estructura
 
 ```
-app/                 App Android (Compose), común a las dos ciudades
-app/src/caba/assets/config.json    Mi Flete Ciudad: WhatsApp, zona, precios
-app/src/salto/assets/config.json   Mi Flete Salto: WhatsApp, zona, precios
-core/                Lógica pura (precios, zona, teléfonos, mensaje) con tests
-docs/                Configuración, política de privacidad y guía de Google Play
-store/               Íconos 512 px y gráficos destacados para las fichas de Play
+app/                           App Android (Compose)
+app/src/main/assets/config.json  WhatsApp, canal de envío, clave de Google y precios (editable)
+core/                          Lógica pura (precios, cobertura, teléfonos, fechas, mensaje) con tests
+docs/                          Configuración, política de privacidad y guía de Google Play
+store/                         Ícono 512 px y gráfico destacado para la ficha de Play
 ```
-
-Para agregar otra ciudad: copiá un bloque de `productFlavors` en `app/build.gradle.kts`, creá `app/src/<ciudad>/assets/config.json` con su zona y precios, y sumá sus archivos al workflow.
 
 ## Compilar
 
 - **Android Studio** (Ladybug o más nuevo): abrir la carpeta, esperar la sincronización y ejecutar. Para el bundle de Play: *Build → Generate Signed App Bundle*.
-- **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba de ambas) o `./gradlew :app:bundleSaltoRelease` / `:app:bundleCabaRelease` (AAB).
-- **GitHub Actions**: cada push compila las dos apps y publica los APK con enlace directo en *Releases* (`ultima-version`), además de dejar APK y AAB en *Actions → Artifacts*.
+- **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba) o `./gradlew :app:bundleRelease` (AAB).
+- **GitHub Actions**: cada push compila y publica el APK con enlace directo en *Releases* (`ultima-version`), además de dejar APK y AAB en *Actions → Artifacts*.
 - Solo los tests de lógica, sin SDK de Android: `./gradlew :core:test -PcoreOnly`.
 
 ## Qué completar antes de publicar
 
-Ver **docs/CONFIGURACION.md** (números, claves y precios) y **docs/GOOGLE_PLAY.md** (firma, ficha y formulario de datos).
+Ver **docs/CONFIGURACION.md** (número, claves y precios) y **docs/GOOGLE_PLAY.md** (firma, ficha y formulario de datos).
