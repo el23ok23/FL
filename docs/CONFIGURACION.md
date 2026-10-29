@@ -59,6 +59,19 @@ Fórmula: **tarifa_base del vehículo + por_km × km del recorrido completo + ay
 
 Cada ayudante tiene una base fija (`por_ayudante`) más un valor por kilómetro (`por_ayudante_km`): para 3 km cuesta $16.500 y para 40 km, $35.000 con los valores de ejemplo.
 
+### Tiempo de carga y descarga incluido
+
+```json
+"tiempos": {
+  "minutos_por_piso_escalera": 6,
+  "minutos_ascensor": 10,
+  "factor_parada_intermedia": 0.5,
+  "espera_por_15_min": 6000
+}
+```
+
+Cada vehículo tiene `minutos_carga`: lo que tarda **una persona** en cargarlo lleno (Kangoo 30, furgón mediano 45, camión grande 140…). El presupuesto incluye ese tiempo en el origen y en el destino (y la mitad en cada parada intermedia), dividido por la cantidad de personas (chofer solo: 100 %, con 1 ayudante: 60 %, con 2: 45 %), más los minutos de escalera por piso o el fijo de ascensor. El resultado se muestra al cliente parada por parada y va en el pedido para el conductor; pasado ese tiempo se cobra `espera_por_15_min`.
+
 ### Comisión y recargo operativo (invisibles para el cliente)
 
 ```json

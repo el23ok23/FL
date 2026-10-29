@@ -51,6 +51,7 @@ import com.fletarg.app.ui.components.ChoiceCard
 import com.fletarg.app.ui.components.PriceBar
 import com.fletarg.app.ui.components.StepScaffold
 import com.fletarg.app.ui.components.VehicleIcon
+import com.fletarg.core.LoadTime
 import com.fletarg.core.Money
 import com.fletarg.core.PriceCalculator
 import kotlin.math.absoluteValue
@@ -145,7 +146,13 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
                         Spacer(Modifier.height(10.dp))
                         Text(v.dimensions, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
                         Text(v.capacity, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
-                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "Cargarlo lleno: ~${LoadTime.format(v.loadMinutes)} por persona",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colors.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(6.dp))
                         Text(
                             "Desde ${Money.formatArs(PriceCalculator.gross(v.baseFare, vm.config.pricing))} + ${Money.formatArs(PriceCalculator.gross(v.perKm, vm.config.pricing))}/km",
                             style = MaterialTheme.typography.labelMedium,
@@ -237,12 +244,13 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
             }
         }
         Spacer(Modifier.height(10.dp))
-        AnimatedContent(targetState = vm.helpers, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "hint") { n ->
+        val includedMinutes = vm.loadTime.totalMinutes
+        AnimatedContent(targetState = vm.helpers to includedMinutes, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "hint") { (n, minutes) ->
             Text(
                 when (n) {
-                    0 -> "Vos cargás y descargás. Ideal para cajas y cosas livianas."
-                    1 -> "Un ayudante para muebles medianos, electrodomésticos y cajas."
-                    else -> "Dos ayudantes para mudanzas o cosas muy pesadas."
+                    0 -> "Vos cargás y descargás con el chofer. Tiempo de carga y descarga incluido: hasta ${LoadTime.format(minutes)}."
+                    1 -> "Un ayudante para muebles medianos, electrodomésticos y cajas. Tiempo incluido: hasta ${LoadTime.format(minutes)}."
+                    else -> "Dos ayudantes para mudanzas o cosas muy pesadas. Tiempo incluido: hasta ${LoadTime.format(minutes)}."
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.onSurfaceVariant,

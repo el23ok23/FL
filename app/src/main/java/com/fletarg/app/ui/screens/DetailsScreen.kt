@@ -53,6 +53,7 @@ import com.fletarg.app.ui.components.Stepper
 import com.fletarg.core.Access
 import com.fletarg.core.DayDate
 import com.fletarg.core.FloorInfo
+import com.fletarg.core.LoadTime
 import com.fletarg.core.Money
 import com.fletarg.core.OrderMessage
 import com.fletarg.core.PriceCalculator
@@ -85,7 +86,8 @@ fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
         },
     ) {
         // ---- Pisos por parada ----
-        SectionTitle("Pisos", "Por escalera se cobran ${Money.formatArs(perFloor)} por piso. Con ascensor no hay recargo.")
+        SectionTitle("Pisos", "Por escalera se cobran ${Money.formatArs(perFloor)} por piso y suma tiempo de carga. Con ascensor no hay recargo.")
+        val loadTime = vm.loadTime
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             vm.stops.forEachIndexed { index, draft ->
                 FloorCard(
@@ -95,10 +97,19 @@ fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
                     color = stopColor(index, count),
                     info = draft.floor,
                     perFloor = perFloor,
+                    includedMinutes = loadTime.stops.getOrNull(index)?.minutes ?: 0,
                     onChange = { vm.updateFloor(index, it) },
                 )
             }
         }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            "Tiempo de carga y descarga incluido: hasta ${LoadTime.format(loadTime.totalMinutes)} con ${loadTime.people} persona${if (loadTime.people > 1) "s" else ""}.",
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.primary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+        )
 
         Spacer(Modifier.height(28.dp))
 
@@ -239,6 +250,7 @@ private fun FloorCard(
     color: Color,
     info: FloorInfo,
     perFloor: Int,
+    includedMinutes: Int,
     onChange: (FloorInfo) -> Unit,
 ) {
     val options = listOf(Access.GROUND to "Planta baja", Access.ELEVATOR to "Ascensor", Access.STAIRS to "Escalera")
@@ -269,6 +281,14 @@ private fun FloorCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)) {
+                    Text(
+                        "⏱ ${LoadTime.format(includedMinutes)}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     )
                 }
             }

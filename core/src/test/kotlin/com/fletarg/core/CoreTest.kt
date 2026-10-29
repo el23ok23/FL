@@ -213,6 +213,43 @@ class ScheduleTest {
     }
 }
 
+class LoadTimeTest {
+    private val cfg = TimeConfig(stairMinutesPerFloor = 6, elevatorMinutes = 10, intermediateFactor = 0.5, waitFeePer15Min = 6000)
+    private val kangoo = VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", 25000, 1800, loadMinutes = 30)
+    private val grande = VehicleSpec(VehicleKind.CAMION_GRANDE_CERRADO, "Camión grande", "", "", "", 130000, 6000, loadMinutes = 140)
+
+    @Test fun `una kangoo se carga mucho antes que un camion grande`() {
+        val k = LoadTime.calculate(kangoo, 0, listOf(FloorInfo(), FloorInfo()), cfg)
+        val g = LoadTime.calculate(grande, 0, listOf(FloorInfo(), FloorInfo()), cfg)
+        assertEquals(60, k.totalMinutes)   // 30 + 30
+        assertEquals(280, g.totalMinutes)  // 140 + 140
+        assertTrue(g.totalMinutes > k.totalMinutes)
+    }
+
+    @Test fun `los ayudantes bajan el tiempo y los pisos lo suben`() {
+        val solo = LoadTime.calculate(kangoo, 0, listOf(FloorInfo(Access.STAIRS, 3), FloorInfo()), cfg)
+        val con1 = LoadTime.calculate(kangoo, 1, listOf(FloorInfo(Access.STAIRS, 3), FloorInfo()), cfg)
+        val con2 = LoadTime.calculate(kangoo, 2, listOf(FloorInfo(Access.STAIRS, 3), FloorInfo()), cfg)
+        assertEquals(50, solo.stops[0].minutes) // 30 + 3 × 6 = 48 → 50
+        assertEquals(30, solo.stops[1].minutes)
+        assertEquals(40, con1.stops[0].minutes) // 18 + 18 = 36 → 40
+        assertEquals(20, con1.stops[1].minutes) // 18 → 20
+        assertTrue(con2.totalMinutes < con1.totalMinutes && con1.totalMinutes < solo.totalMinutes)
+        assertTrue(solo.stops[0].detail.contains("3 pisos por escalera"))
+    }
+
+    @Test fun `ascensor y paradas intermedias`() {
+        val lt = LoadTime.calculate(kangoo, 0, listOf(FloorInfo(), FloorInfo(Access.ELEVATOR, 5), FloorInfo()), cfg)
+        assertEquals(30, lt.stops[0].minutes)
+        assertEquals(25, lt.stops[1].minutes) // 15 (mitad) + 10 ascensor
+        assertEquals(30, lt.stops[2].minutes)
+        assertEquals(85, lt.totalMinutes)
+        assertEquals("1 h 25 min", LoadTime.format(85))
+        assertEquals("2 h", LoadTime.format(120))
+        assertEquals("45 min", LoadTime.format(45))
+    }
+}
+
 class OwnerNotesTest {
     @Test fun `la comision solo aparece en el mensaje privado`() {
         val cfg = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.2, commissionPct = 0.15)

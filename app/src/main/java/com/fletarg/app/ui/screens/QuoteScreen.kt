@@ -42,6 +42,7 @@ import com.fletarg.app.ui.components.PrimaryButton
 import com.fletarg.app.ui.components.StepScaffold
 import com.fletarg.app.ui.components.VehicleIcon
 import com.fletarg.core.ArgentinePhone
+import com.fletarg.core.LoadTime
 import com.fletarg.core.Money
 import com.fletarg.core.OrderMessage
 
@@ -123,6 +124,51 @@ fun QuoteScreen(vm: OrderViewModel, step: Int, total: Int) {
                 if (p.extraStopCount > 0) {
                     HorizontalDivider(color = colors.outlineVariant)
                     BreakdownRow("${p.extraStopCount} parada${if (p.extraStopCount > 1) "s" else ""} adicional${if (p.extraStopCount > 1) "es" else ""}", p.extraStops)
+                }
+            }
+        }
+
+        // Tiempo incluido: útil para el cliente y para el conductor
+        val lt = vm.loadTime
+        val waitFee = vm.config.times.waitFeePer15Min
+        Spacer(Modifier.height(14.dp))
+        Surface(
+            shape = MaterialTheme.shapes.large,
+            color = colors.primaryContainer.copy(alpha = 0.35f),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Tiempo de carga y descarga incluido", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            "Con ${lt.people} persona${if (lt.people > 1) "s" else ""} trabajando" +
+                                (vm.route?.durationMin?.let { " · viaje ~${LoadTime.format(it)}" } ?: ""),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.onSurfaceVariant,
+                        )
+                    }
+                    Text("hasta ${LoadTime.format(lt.totalMinutes)}", style = MaterialTheme.typography.titleLarge, color = colors.primary)
+                }
+                Spacer(Modifier.height(10.dp))
+                lt.stops.forEach { st ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.size(22.dp).clip(CircleShape).background(stopColor(st.index, lt.stops.size)),
+                            contentAlignment = Alignment.Center,
+                        ) { Text(('A' + st.index).toString(), style = MaterialTheme.typography.labelSmall, color = Color.White) }
+                        Spacer(Modifier.width(10.dp))
+                        Text(st.detail.replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f), color = colors.onSurfaceVariant)
+                        Text(LoadTime.format(st.minutes), style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+                if (waitFee > 0) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Si se excede, la espera se cobra ${Money.formatArs(waitFee)} cada 15 minutos.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant,
+                    )
                 }
             }
         }

@@ -25,6 +25,9 @@ data class OrderSummary(
     val schedule: Schedule,
     val distanceKm: Double,
     val price: PriceBreakdown,
+    val loadTime: LoadTimeBreakdown? = null,
+    val waitFeePer15Min: Int = 0,
+    val travelMinutes: Int? = null,
 ) {
     companion object {
         const val MAX_STOPS = 6 // origen + hasta 5 paradas
@@ -64,6 +67,14 @@ object OrderMessage {
         appendLine("📦 Qué lleva: ${o.cargo.trim().ifBlank { "(no indicado)" }}")
         appendLine("📅 Cuándo: ${o.schedule.describe(today)}")
         appendLine("📏 Distancia aprox.: ${Money.formatKm(o.distanceKm)}")
+        o.travelMinutes?.let { appendLine("🚗 Viaje aprox.: ${LoadTime.format(it)}") }
+        o.loadTime?.let { lt ->
+            appendLine("⏱ Carga y descarga incluidas: hasta ${LoadTime.format(lt.totalMinutes)} (${lt.people} persona${if (lt.people > 1) "s" else ""})")
+            lt.stops.forEach { st ->
+                appendLine("   ${stopTitle(st.index, lt.stops.size)}: ${LoadTime.format(st.minutes)} · ${st.detail}")
+            }
+            if (o.waitFeePer15Min > 0) appendLine("   Espera extra: ${Money.formatArs(o.waitFeePer15Min)} cada 15 min")
+        }
         appendLine()
         append("💰 Precio aproximado: ${Money.formatArs(o.price.total)}")
         if (ownerNotes && o.price.commission > 0) {

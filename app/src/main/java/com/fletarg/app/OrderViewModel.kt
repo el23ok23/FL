@@ -22,6 +22,8 @@ import com.fletarg.app.data.StaticMapService
 import com.fletarg.core.AddressPoint
 import com.fletarg.core.ArgentinePhone
 import com.fletarg.core.FloorInfo
+import com.fletarg.core.LoadTime
+import com.fletarg.core.LoadTimeBreakdown
 import com.fletarg.core.OrderSummary
 import com.fletarg.core.PriceBreakdown
 import com.fletarg.core.PriceCalculator
@@ -279,6 +281,10 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     val price: PriceBreakdown
         get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, config.pricing)
 
+    /** Tiempo de carga y descarga incluido en el precio, parada por parada. */
+    val loadTime: LoadTimeBreakdown
+        get() = LoadTime.calculate(vehicle, helpers, stops.map { it.floor }, config.times)
+
     // ---- Contacto y envío --------------------------------------------------------------------
     var customerName by mutableStateOf("")
         private set
@@ -310,6 +316,9 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             schedule = schedule,
             distanceKm = distanceKm,
             price = price,
+            loadTime = loadTime,
+            waitFeePer15Min = config.times.waitFeePer15Min,
+            travelMinutes = route?.durationMin,
         )
         sending = true
         viewModelScope.launch {

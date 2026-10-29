@@ -1,13 +1,11 @@
 {
   "_ayuda": "Archivo de configuración de Fletarg. Editá los valores y volvé a generar la app. Los montos son en pesos argentinos, sin puntos ni decimales. No cambies las claves (los nombres antes de los dos puntos).",
-
   "negocio": {
     "nombre": "Fletarg",
     "whatsapp_dueno": "COMPLETAR_549XXXXXXXXXX",
     "_whatsapp_dueno": "Tu número de WhatsApp en formato internacional sin '+': 549 + código de área sin 0 + número sin 15. Ejemplo CABA: 5491123456789",
     "politica_privacidad_url": "COMPLETAR_URL_POLITICA"
   },
-
   "envio_pedido": {
     "_ayuda": "Cómo te llega el pedido. Se intenta en este orden: 1) webhook_url, 2) CallMeBot, 3) abrir WhatsApp con el mensaje armado hacia tu número. Dejá vacío lo que no uses.",
     "webhook_url": "",
@@ -15,14 +13,12 @@
     "callmebot_apikey": "",
     "_callmebot_apikey": "Opcional y gratis. Clave de api.callmebot.com para que el pedido te llegue solo a tu WhatsApp, sin que el cliente abra nada. Ver docs/CONFIGURACION.md"
   },
-
   "google": {
     "api_key": "",
     "_api_key": "Opcional. Clave de Google Cloud con 'Places API (New)', 'Routes API' y 'Maps Static API' habilitadas. Con la clave: autocompletado de Google en todo el país, distancia real por calle con todas las paradas y mapa real del recorrido. Sin la clave: la app usa el geocodificador del teléfono, estima la distancia y dibuja un mapa esquemático (sigue funcionando).",
     "static_maps_key": "",
     "_static_maps_key": "Opcional. Solo si querés una clave distinta para el mapa (Maps Static API no admite restricción por app Android). Vacío = usa api_key."
   },
-
   "precios": {
     "_ayuda": "Precio = tarifa_base del vehículo + por_km × km del recorrido completo + ayudantes × (por_ayudante + por_ayudante_km × km) + por_piso_escalera × pisos por escalera (en todas las paradas) + por_parada_extra × paradas intermedias. El total se redondea hacia arriba al múltiplo de 'redondeo'.",
     "por_ayudante": 15000,
@@ -39,15 +35,21 @@
     "recargo_operativo_porcentaje": 20,
     "_recargo_operativo_porcentaje": "Colchón para nafta, seguro, peajes y desgaste, como porcentaje sobre el costo base (tarifas + km + ayudantes + pisos + paradas). También invisible para el cliente. Cómo se calcula el precio final: costo base × (1 + recargo operativo) ÷ (1 − comisión)."
   },
-
+  "tiempos": {
+    "_ayuda": "Tiempo de carga y descarga INCLUIDO en el precio (le sirve al cliente y al conductor). Cada vehículo tiene 'minutos_carga': lo que tarda una persona en cargarlo lleno; se aplica en origen y en destino, y una fracción en cada parada intermedia. Con ayudantes el tiempo baja (2 personas: 60 %, 3 personas: 45 %). La escalera suma minutos por piso y el ascensor un fijo. Pasado el tiempo incluido se cobra espera.",
+    "minutos_por_piso_escalera": 6,
+    "minutos_ascensor": 10,
+    "factor_parada_intermedia": 0.5,
+    "espera_por_15_min": 6000
+  },
   "vehiculos": [
-    { "id": "kangoo", "nombre": "Kangoo", "descripcion": "Utilitario chico", "medidas": "1,8 × 1,2 × 1,1 m", "carga": "Hasta 650 kg · 3 m³", "tarifa_base": 25000, "por_km": 1800 },
-    { "id": "furgon_mediano", "nombre": "Furgón mediano", "descripcion": "Tipo Sprinter", "medidas": "3,2 × 1,7 × 1,8 m", "carga": "Hasta 1.500 kg · 10 m³", "tarifa_base": 35000, "por_km": 2300 },
-    { "id": "furgon_grande", "nombre": "Furgón grande", "descripcion": "Techo alto", "medidas": "4,3 × 1,8 × 2,0 m", "carga": "Hasta 1.800 kg · 15 m³", "tarifa_base": 45000, "por_km": 2800 },
-    { "id": "pickup", "nombre": "Camioneta pickup", "descripcion": "Caja abierta", "medidas": "Caja 1,5 × 1,5 × 0,5 m", "carga": "Hasta 1.000 kg", "tarifa_base": 30000, "por_km": 2000 },
-    { "id": "camion_3_4", "nombre": "Camión 3/4", "descripcion": "Caja cerrada chica", "medidas": "4,5 × 2,2 × 2,2 m", "carga": "Hasta 3.500 kg · 22 m³", "tarifa_base": 65000, "por_km": 3500 },
-    { "id": "camion_mediano_cerrado", "nombre": "Camión mediano", "descripcion": "Caja cerrada", "medidas": "6,0 × 2,4 × 2,4 m", "carga": "Hasta 6.000 kg · 35 m³", "tarifa_base": 90000, "por_km": 4500 },
-    { "id": "camion_grande_cerrado", "nombre": "Camión grande", "descripcion": "Caja cerrada", "medidas": "8,0 × 2,5 × 2,6 m", "carga": "Hasta 10.000 kg · 52 m³", "tarifa_base": 130000, "por_km": 6000 },
-    { "id": "camion_playo", "nombre": "Camión playo", "descripcion": "Caja abierta", "medidas": "7,0 × 2,5 m de plataforma", "carga": "Hasta 8.000 kg", "tarifa_base": 100000, "por_km": 5000 }
+    { "id": "kangoo", "nombre": "Kangoo", "descripcion": "Utilitario chico", "medidas": "1,8 × 1,2 × 1,1 m", "carga": "Hasta 650 kg · 3 m³", "tarifa_base": 25000, "por_km": 1800, "minutos_carga": 30 },
+    { "id": "furgon_mediano", "nombre": "Furgón mediano", "descripcion": "Tipo Sprinter", "medidas": "3,2 × 1,7 × 1,8 m", "carga": "Hasta 1.500 kg · 10 m³", "tarifa_base": 35000, "por_km": 2300, "minutos_carga": 45 },
+    { "id": "furgon_grande", "nombre": "Furgón grande", "descripcion": "Techo alto", "medidas": "4,3 × 1,8 × 2,0 m", "carga": "Hasta 1.800 kg · 15 m³", "tarifa_base": 45000, "por_km": 2800, "minutos_carga": 60 },
+    { "id": "pickup", "nombre": "Camioneta pickup", "descripcion": "Caja abierta", "medidas": "Caja 1,5 × 1,5 × 0,5 m", "carga": "Hasta 1.000 kg", "tarifa_base": 30000, "por_km": 2000, "minutos_carga": 30 },
+    { "id": "camion_3_4", "nombre": "Camión 3/4", "descripcion": "Caja cerrada chica", "medidas": "4,5 × 2,2 × 2,2 m", "carga": "Hasta 3.500 kg · 22 m³", "tarifa_base": 65000, "por_km": 3500, "minutos_carga": 75 },
+    { "id": "camion_mediano_cerrado", "nombre": "Camión mediano", "descripcion": "Caja cerrada", "medidas": "6,0 × 2,4 × 2,4 m", "carga": "Hasta 6.000 kg · 35 m³", "tarifa_base": 90000, "por_km": 4500, "minutos_carga": 100 },
+    { "id": "camion_grande_cerrado", "nombre": "Camión grande", "descripcion": "Caja cerrada", "medidas": "8,0 × 2,5 × 2,6 m", "carga": "Hasta 10.000 kg · 52 m³", "tarifa_base": 130000, "por_km": 6000, "minutos_carga": 140 },
+    { "id": "camion_playo", "nombre": "Camión playo", "descripcion": "Caja abierta", "medidas": "7,0 × 2,5 m de plataforma", "carga": "Hasta 8.000 kg", "tarifa_base": 100000, "por_km": 5000, "minutos_carga": 90 }
   ]
 }

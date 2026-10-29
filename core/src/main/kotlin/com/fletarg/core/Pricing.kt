@@ -40,6 +40,8 @@ data class VehicleSpec(
     val capacity: String,
     val baseFare: Int,
     val perKm: Int,
+    /** Minutos para cargar (o descargar) el vehículo lleno con una sola persona. */
+    val loadMinutes: Int = 45,
 )
 
 /** Valores generales de la tarifa (config.json → "precios"). */

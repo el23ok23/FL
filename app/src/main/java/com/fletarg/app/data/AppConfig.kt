@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.fletarg.core.ArgentinePhone
 import com.fletarg.core.PricingConfig
+import com.fletarg.core.TimeConfig
 import com.fletarg.core.VehicleKind
 import com.fletarg.core.VehicleSpec
 import org.json.JSONObject
@@ -22,6 +23,7 @@ data class AppConfig(
     /** Clave para Maps Static API (si está vacía se usa googleApiKey). */
     val staticMapsKey: String?,
     val pricing: PricingConfig,
+    val times: TimeConfig,
     val vehicles: List<VehicleSpec>,
 ) {
     companion object {
@@ -41,6 +43,7 @@ data class AppConfig(
             val envio = root.optJSONObject("envio_pedido") ?: JSONObject()
             val google = root.optJSONObject("google") ?: JSONObject()
             val precios = root.optJSONObject("precios") ?: JSONObject()
+            val tiempos = root.optJSONObject("tiempos") ?: JSONObject()
 
             val vehicles = ArrayList<VehicleSpec>()
             root.optJSONArray("vehiculos")?.let { arr ->
@@ -55,6 +58,7 @@ data class AppConfig(
                         capacity = v.optString("carga", ""),
                         baseFare = v.optInt("tarifa_base", 0),
                         perKm = v.optInt("por_km", 0),
+                        loadMinutes = v.optInt("minutos_carga", DEFAULT_LOAD_MINUTES[kind] ?: 45),
                     )
                 }
             }
@@ -81,9 +85,21 @@ data class AppConfig(
                     operatingPct = precios.optDouble("recargo_operativo_porcentaje", 20.0) / 100.0,
                     commissionPct = precios.optDouble("comision_porcentaje", 15.0) / 100.0,
                 ),
+                times = TimeConfig(
+                    stairMinutesPerFloor = tiempos.optInt("minutos_por_piso_escalera", 6),
+                    elevatorMinutes = tiempos.optInt("minutos_ascensor", 10),
+                    intermediateFactor = tiempos.optDouble("factor_parada_intermedia", 0.5),
+                    waitFeePer15Min = tiempos.optInt("espera_por_15_min", 6000),
+                ),
                 vehicles = vehicles.ifEmpty { defaults().vehicles },
             )
         }
+
+        private val DEFAULT_LOAD_MINUTES = mapOf(
+            VehicleKind.KANGOO to 30, VehicleKind.FURGON_MEDIANO to 45, VehicleKind.FURGON_GRANDE to 60,
+            VehicleKind.PICKUP to 30, VehicleKind.CAMION_3_4 to 75, VehicleKind.CAMION_MEDIANO_CERRADO to 100,
+            VehicleKind.CAMION_GRANDE_CERRADO to 140, VehicleKind.CAMION_PLAYO to 90,
+        )
 
         /** Valores vacíos o marcados como "COMPLETAR_..." cuentan como no configurados. */
         private fun clean(value: String?): String? =
@@ -98,15 +114,16 @@ data class AppConfig(
             googleApiKey = null,
             staticMapsKey = null,
             pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.20, commissionPct = 0.15),
+            times = TimeConfig(6, 10, 0.5, 6000),
             vehicles = listOf(
-                VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800),
-                VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "Tipo Sprinter", "3,2 × 1,7 × 1,8 m", "Hasta 1.500 kg · 10 m³", 35000, 2300),
-                VehicleSpec(VehicleKind.FURGON_GRANDE, "Furgón grande", "Techo alto", "4,3 × 1,8 × 2,0 m", "Hasta 1.800 kg · 15 m³", 45000, 2800),
-                VehicleSpec(VehicleKind.PICKUP, "Camioneta pickup", "Caja abierta", "Caja 1,5 × 1,5 × 0,5 m", "Hasta 1.000 kg", 30000, 2000),
-                VehicleSpec(VehicleKind.CAMION_3_4, "Camión 3/4", "Caja cerrada chica", "4,5 × 2,2 × 2,2 m", "Hasta 3.500 kg · 22 m³", 65000, 3500),
-                VehicleSpec(VehicleKind.CAMION_MEDIANO_CERRADO, "Camión mediano", "Caja cerrada", "6,0 × 2,4 × 2,4 m", "Hasta 6.000 kg · 35 m³", 90000, 4500),
-                VehicleSpec(VehicleKind.CAMION_GRANDE_CERRADO, "Camión grande", "Caja cerrada", "8,0 × 2,5 × 2,6 m", "Hasta 10.000 kg · 52 m³", 130000, 6000),
-                VehicleSpec(VehicleKind.CAMION_PLAYO, "Camión playo", "Caja abierta", "7,0 × 2,5 m de plataforma", "Hasta 8.000 kg", 100000, 5000),
+                VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800, 30),
+                VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "Tipo Sprinter", "3,2 × 1,7 × 1,8 m", "Hasta 1.500 kg · 10 m³", 35000, 2300, 45),
+                VehicleSpec(VehicleKind.FURGON_GRANDE, "Furgón grande", "Techo alto", "4,3 × 1,8 × 2,0 m", "Hasta 1.800 kg · 15 m³", 45000, 2800, 60),
+                VehicleSpec(VehicleKind.PICKUP, "Camioneta pickup", "Caja abierta", "Caja 1,5 × 1,5 × 0,5 m", "Hasta 1.000 kg", 30000, 2000, 30),
+                VehicleSpec(VehicleKind.CAMION_3_4, "Camión 3/4", "Caja cerrada chica", "4,5 × 2,2 × 2,2 m", "Hasta 3.500 kg · 22 m³", 65000, 3500, 75),
+                VehicleSpec(VehicleKind.CAMION_MEDIANO_CERRADO, "Camión mediano", "Caja cerrada", "6,0 × 2,4 × 2,4 m", "Hasta 6.000 kg · 35 m³", 90000, 4500, 100),
+                VehicleSpec(VehicleKind.CAMION_GRANDE_CERRADO, "Camión grande", "Caja cerrada", "8,0 × 2,5 × 2,6 m", "Hasta 10.000 kg · 52 m³", 130000, 6000, 140),
+                VehicleSpec(VehicleKind.CAMION_PLAYO, "Camión playo", "Caja abierta", "7,0 × 2,5 m de plataforma", "Hasta 8.000 kg", 100000, 5000, 90),
             ),
         )
     }
