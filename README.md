@@ -20,7 +20,7 @@ El pedido te llega a tu WhatsApp con todas las paradas, vehículo, ayudantes, pi
 app/                           App Android (Compose)
 app/src/main/assets/config.json  WhatsApp, canal de envío, clave de Google y precios (editable)
 core/                          Lógica pura (precios, cobertura, teléfonos, fechas, mensaje) con tests
-docs/                          Configuración, política de privacidad y guía de Google Play
+docs/                          Versión web (index.html), política de privacidad y guía de Google Play
 store/                         Ícono 512 px y gráfico destacado para la ficha de Play
 ```
 
@@ -30,6 +30,12 @@ store/                         Ícono 512 px y gráfico destacado para la ficha 
 - **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba) o `./gradlew :app:bundleRelease` (AAB).
 - **GitHub Actions**: cada push compila y publica el APK con enlace directo en *Releases* (`ultima-version`), además de dejar APK y AAB en *Actions → Artifacts*.
 - Solo los tests de lógica, sin SDK de Android: `./gradlew :core:test -PcoreOnly`.
+
+## Versión web
+
+`docs/index.html` es la app completa en versión web (misma fórmula de precio y tiempos, mapa OpenStreetMap, envío por WhatsApp).
+Se publica gratis con GitHub Pages: *Settings → Pages → Deploy from a branch → esta rama, carpeta `/docs`*. Queda en `https://el23ok23.github.io/FL/`.
+El número de WhatsApp y los precios se editan en el bloque `CONFIG` al principio del archivo.
 
 ## Qué completar antes de publicar
 

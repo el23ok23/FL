@@ -25,7 +25,7 @@ Antes de cada versión nueva subí `versionCode` (y `versionName`) en `app/build
 
 ## 3. Política de privacidad
 
-Play exige una URL pública. Publicá `docs/politica-de-privacidad.html` (completá los datos de contacto marcados) en cualquier hosting, por ejemplo GitHub Pages: *Settings → Pages → Deploy from a branch → carpeta /docs*. La URL queda como `https://TU_USUARIO.github.io/NOMBRE_DEL_REPO/politica-de-privacidad.html`. Pegala también en `config.json` (`politica_privacidad_url`).
+Play exige una URL pública. Publicá `docs/politica-de-privacidad.html` (completá los datos de contacto marcados) con GitHub Pages: *Settings → Pages → Deploy from a branch → esta rama, carpeta /docs*. La URL queda como `https://el23ok23.github.io/FL/politica-de-privacidad.html` (y la versión web de la app en `https://el23ok23.github.io/FL/`). Pegala también en `config.json` (`politica_privacidad_url`).
 
 ## 4. Ficha de la tienda
 
