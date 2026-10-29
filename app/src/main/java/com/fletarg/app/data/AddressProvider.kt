@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Geocoder
 import com.fletarg.core.AddressPoint
 import com.fletarg.core.Argentina
+import com.fletarg.core.CabaZone
 import com.fletarg.core.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,6 +19,7 @@ data class AddressSuggestion(
     val secondary: String,
     val location: LatLng? = null,
     val countryCode: String? = null,
+    val adminTexts: List<String> = emptyList(),
 )
 
 interface AddressProvider {
@@ -97,15 +99,25 @@ class GooglePlacesProvider(
             val loc = obj.getJSONObject("location")
             val point = LatLng(loc.getDouble("latitude"), loc.getDouble("longitude"))
             var country: String? = null
+            val admin = ArrayList<String>()
             obj.optJSONArray("addressComponents")?.let { comps ->
                 for (i in 0 until comps.length()) {
                     val c = comps.optJSONObject(i) ?: continue
                     val types = c.optJSONArray("types")?.let { t -> (0 until t.length()).map { t.optString(it) } }.orEmpty()
                     if ("country" in types) country = c.optString("shortText")
+                    if ("administrative_area_level_1" in types || "administrative_area_level_2" in types || "locality" in types) {
+                        admin += c.optString("longText")
+                        admin += c.optString("shortText")
+                    }
                 }
             }
             val inside = Argentina.isInside(country, point)
-            AddressPoint(buildLabel(suggestion.primary, suggestion.secondary), point, inside)
+            AddressPoint(
+                label = buildLabel(suggestion.primary, suggestion.secondary),
+                location = point,
+                insideCoverage = inside,
+                insideCaba = inside && CabaZone.isInside(point, admin),
+            )
         }.getOrNull()
     }
 }
@@ -153,6 +165,7 @@ class GeocoderProvider(context: Context) : AddressProvider {
                             secondary = secondary,
                             location = LatLng(a.latitude, a.longitude),
                             countryCode = a.countryCode,
+                            adminTexts = listOfNotNull(a.adminArea, a.subAdminArea, a.locality),
                         ),
                     )
                 }
@@ -163,6 +176,11 @@ class GeocoderProvider(context: Context) : AddressProvider {
     override suspend fun resolve(suggestion: AddressSuggestion, sessionToken: String): AddressPoint? {
         val point = suggestion.location ?: return null
         val inside = Argentina.isInside(suggestion.countryCode, point)
-        return AddressPoint(buildLabel(suggestion.primary, suggestion.secondary), point, inside)
+        return AddressPoint(
+            label = buildLabel(suggestion.primary, suggestion.secondary),
+            location = point,
+            insideCoverage = inside,
+            insideCaba = inside && CabaZone.isInside(point, suggestion.adminTexts),
+        )
     }
 }

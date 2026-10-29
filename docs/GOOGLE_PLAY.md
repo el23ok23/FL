@@ -30,8 +30,8 @@ Play exige una URL pública. Publicá `docs/politica-de-privacidad.html` (comple
 ## 4. Ficha de la tienda
 
 - **Nombre**: Fletarg
-- **Descripción breve** (80): Pedí tu flete en toda la Argentina y conocé el precio al toque.
-- **Descripción completa**: Elegí origen, destino y hasta 4 paradas, el vehículo (de Kangoo a camión grande), ayudantes, pisos y cuándo lo necesitás, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Cobertura en toda la Argentina.
+- **Descripción breve** (80): Fletes desde Capital Federal a todo el país. Precio al toque.
+- **Descripción completa**: Elegí origen, destino y hasta 4 paradas, el vehículo (de Kangoo a camión grande), ayudantes, pisos y cuándo lo necesitás, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Salimos desde Capital Federal a cualquier punto de la Argentina.
 - **Ícono**: `store/icono-512.png`.
 - **Gráfico destacado**: `store/grafico-destacado-1024x500.png`.
 - **Capturas**: al menos 2 del teléfono (sacalas desde el emulador o un celular: recorrido con paradas, carrusel de vehículos, precio, confirmación).

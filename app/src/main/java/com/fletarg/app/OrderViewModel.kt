@@ -202,8 +202,11 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     val allResolved: Boolean get() = stops.all { it.point != null }
     val allInside: Boolean get() = stops.all { it.point?.insideCoverage == true }
     val outOfCoverage: Boolean get() = stops.any { it.point?.insideCoverage == false }
+    /** El origen está resuelto pero fuera de Capital Federal. */
+    val originOutsideCaba: Boolean get() = stops.firstOrNull()?.point?.let { it.insideCoverage && !it.insideCaba } == true
     val canContinueRoute: Boolean
-        get() = allResolved && allInside && stops.map { it.point!!.location }.distinct().size == stops.size
+        get() = allResolved && allInside && !originOutsideCaba &&
+            stops.map { it.point!!.location }.distinct().size == stops.size
 
     /** Puntos ya resueltos, en orden (para el mapa). */
     val resolvedPoints: List<AddressPoint?> get() = stops.map { it.point }

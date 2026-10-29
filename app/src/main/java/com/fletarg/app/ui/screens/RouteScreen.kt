@@ -74,7 +74,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         step = step,
         totalSteps = total,
         title = "¿A dónde va el flete?",
-        subtitle = "Origen, destino y hasta ${OrderSummary.MAX_STOPS - 2} paradas en el medio. En toda la Argentina.",
+        subtitle = "Salimos desde Capital Federal a cualquier punto del país. Podés sumar hasta ${OrderSummary.MAX_STOPS - 2} paradas en el medio.",
         centered = false,
         bottomBar = {
             PrimaryButton(
@@ -87,11 +87,13 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         Column(Modifier.animateContentSize()) {
             stops.forEachIndexed { index, draft ->
                 val isLast = index == count - 1
+                val originProblem = index == 0 && draft.point?.let { it.insideCoverage && !it.insideCaba } == true
                 StopField(
                     letter = ('A' + index).toString(),
-                    label = OrderMessage.stopTitle(index, count),
+                    label = if (index == 0) "Origen (Capital Federal)" else OrderMessage.stopTitle(index, count),
                     value = draft.query,
                     inside = draft.point?.insideCoverage,
+                    originProblem = originProblem,
                     color = stopColor(index, count),
                     removable = index != 0 && !isLast,
                     onValueChange = { vm.onQueryChange(index, it) },
@@ -124,7 +126,11 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
             }
         }
 
-        AnimatedVisibility(visible = vm.outOfCoverage, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+        AnimatedVisibility(
+            visible = vm.outOfCoverage || vm.originOutsideCaba,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+        ) {
             Column {
                 Spacer(Modifier.height(14.dp))
                 Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
@@ -132,7 +138,8 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                         Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Esa dirección queda fuera de la Argentina. Por ahora solo hacemos fletes dentro del país.",
+                            if (vm.outOfCoverage) "Esa dirección queda fuera de la Argentina. Por ahora solo hacemos fletes dentro del país."
+                            else "El origen tiene que estar en Capital Federal. Las paradas y el destino pueden ser en cualquier lugar del país.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                         )
@@ -151,7 +158,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
             Column {
                 MiniMap(
                     points = vm.resolvedPoints.map { it?.location },
-                    insideFlags = vm.resolvedPoints.map { it?.insideCoverage != false },
+                    insideFlags = vm.resolvedPoints.mapIndexed { i, p -> p?.insideCoverage != false && !(i == 0 && p != null && !p.insideCaba) },
                     path = vm.route?.path.orEmpty(),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -164,6 +171,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                 val info = when {
                     resolvedCount < 2 -> "Elegí las direcciones para ver el recorrido."
                     vm.outOfCoverage -> "Recorrido no disponible fuera del país."
+                    vm.originOutsideCaba -> "El origen tiene que estar en Capital Federal."
                     vm.route != null -> buildString {
                         append("${Money.formatKm(km)} en total")
                         vm.route?.durationMin?.let { append(" · ~${formatMinutes(it)}") }
@@ -190,6 +198,7 @@ private fun StopField(
     label: String,
     value: String,
     inside: Boolean?,
+    originProblem: Boolean,
     color: Color,
     removable: Boolean,
     onValueChange: (String) -> Unit,
@@ -199,9 +208,10 @@ private fun StopField(
     imeAction: ImeAction,
     onDone: () -> Unit,
 ) {
-    val isError = inside == false
+    val isError = inside == false || originProblem
     val support: (@Composable () -> Unit)? = when {
-        isError -> { { Text("Fuera de la Argentina") } }
+        inside == false -> { { Text("Fuera de la Argentina") } }
+        originProblem -> { { Text("Tiene que ser en Capital Federal") } }
         inside == true -> { { Text("Dirección confirmada ✓") } }
         else -> null
     }
@@ -213,7 +223,7 @@ private fun StopField(
                 .weight(1f)
                 .onFocusChanged { if (it.isFocused) onFocus() },
             label = { Text(label) },
-            placeholder = { Text("Calle, altura y localidad") },
+            placeholder = { Text(if (letter == "A") "Calle y altura, CABA" else "Calle, altura y localidad") },
             singleLine = true,
             isError = isError,
             shape = MaterialTheme.shapes.medium,

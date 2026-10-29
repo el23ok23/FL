@@ -23,6 +23,24 @@ class ArgentinaTest {
     }
 }
 
+class CabaZoneTest {
+    @Test fun `puntos dentro y fuera de capital federal`() {
+        assertTrue(CabaZone.contains(LatLng(-34.6037, -58.3816))) // Obelisco
+        assertTrue(CabaZone.contains(LatLng(-34.5875, -58.4300))) // Palermo
+        assertTrue(CabaZone.contains(LatLng(-34.6500, -58.4900))) // Mataderos
+        assertFalse(CabaZone.contains(LatLng(-34.5260, -58.4800))) // Vicente López
+        assertFalse(CabaZone.contains(LatLng(-34.6600, -58.3650))) // Avellaneda
+        assertFalse(CabaZone.contains(LatLng(-31.4201, -64.1888))) // Córdoba
+    }
+
+    @Test fun `texto administrativo manda sobre el poligono`() {
+        val obelisco = LatLng(-34.6037, -58.3816)
+        assertFalse(CabaZone.isInside(obelisco, listOf("Provincia de Buenos Aires")))
+        assertTrue(CabaZone.isInside(LatLng(-34.6600, -58.3650), listOf("Cdad. Autónoma de Buenos Aires")))
+        assertTrue(CabaZone.isInside(obelisco, listOf(null, "")))
+    }
+}
+
 class GeoTest {
     @Test fun `haversine obelisco a aeroparque`() {
         val km = Geo.haversineKm(LatLng(-34.6037, -58.3816), LatLng(-34.5592, -58.4156))

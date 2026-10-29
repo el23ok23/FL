@@ -1,12 +1,12 @@
 # Fletarg
 
-App Android nativa (Kotlin + Jetpack Compose) para pedir fletes en toda la Argentina.
+App Android nativa (Kotlin + Jetpack Compose) para pedir fletes desde Capital Federal a toda la Argentina.
 Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque.
 Funciona en Android 5.0 o más nuevo.
 
 ## Qué hace (5 pantallas)
 
-1. **Recorrido**: origen, destino y hasta 4 paradas intermedias, con autocompletado y un mapa que dibuja el recorrido. Avisa si una dirección queda fuera del país.
+1. **Recorrido**: origen en Capital Federal, destino en cualquier punto del país y hasta 4 paradas intermedias, con autocompletado y un mapa que dibuja el recorrido. Avisa si el origen no está en Capital o una dirección queda fuera del país.
 2. **Vehículo y ayudantes**: carrusel con 8 vehículos (Kangoo, furgones, pickup, camiones) y 0, 1 o 2 ayudantes.
 3. **Detalles**: pisos en cada parada (planta baja, ascensor o escalera), qué lleva y cuándo (día y franja horaria).
 4. **Precio y contacto**: precio aproximado con desglose, nombre y WhatsApp argentino válido, enviar. No se paga nada en la app.

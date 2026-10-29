@@ -2,7 +2,7 @@
 
 **Última actualización:** 29 de octubre de 2026
 
-Fletarg (la "app") permite pedir un presupuesto de flete en toda la Argentina. Esta política explica qué datos se usan y para qué.
+Fletarg (la "app") permite pedir un presupuesto de flete desde Capital Federal a toda la Argentina. Esta política explica qué datos se usan y para qué.
 
 ## Datos que pedimos
 

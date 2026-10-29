@@ -124,7 +124,7 @@ fun IntroScreen(title: String, onFinished: () -> Unit) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Fletes en toda la Argentina",
+                        "Desde Capital Federal a todo el país",
                         style = MaterialTheme.typography.titleMedium,
                         color = FletargOrange,
                     )

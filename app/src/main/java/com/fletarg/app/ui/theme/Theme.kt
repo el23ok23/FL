@@ -13,30 +13,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Marca Fletarg: azul profundo + naranja de acento. Sin tipografías externas (más liviano).
-val FletargBlue = Color(0xFF1F4FD8)
-val FletargBlueDark = Color(0xFF9DB7FF)
-val FletargOrange = Color(0xFFFF6A1A)
-val FletargOrangeDark = Color(0xFFFF9A5C)
+// Marca Fletarg: los colores del logo. Celeste profundo (camión y fondo) y dorado del sol.
+// Sin tipografías externas (más liviano).
+val FletargBlue = Color(0xFF1B7BE0)
+val FletargBlueDark = Color(0xFF8FC4FF)
+val FletargOrange = Color(0xFFE8A317)      // dorado del sol (acento)
+val FletargOrangeDark = Color(0xFFF6C453)
 
 private val LightColors = lightColorScheme(
     primary = FletargBlue,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFDCE5FF),
-    onPrimaryContainer = Color(0xFF0B1F5C),
+    primaryContainer = Color(0xFFD6E9FF),
+    onPrimaryContainer = Color(0xFF07305E),
     secondary = Color(0xFF1F2937),
     onSecondary = Color.White,
     secondaryContainer = Color(0xFFE5E7EB),
     onSecondaryContainer = Color(0xFF111827),
     tertiary = FletargOrange,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFFFE1D0),
-    onTertiaryContainer = Color(0xFF5A1E00),
-    background = Color(0xFFF7F8FC),
+    tertiaryContainer = Color(0xFFFFEFC2),
+    onTertiaryContainer = Color(0xFF4A3300),
+    background = Color(0xFFF4F8FE),
     onBackground = Color(0xFF0F172A),
     surface = Color(0xFFFFFFFF),
     onSurface = Color(0xFF0F172A),
-    surfaceVariant = Color(0xFFEEF1F8),
+    surfaceVariant = Color(0xFFE9F0FA),
     onSurfaceVariant = Color(0xFF64748B),
     surfaceContainer = Color(0xFFF1F3F9),
     surfaceContainerHigh = Color(0xFFE9ECF5),
@@ -52,16 +53,16 @@ private val LightColors = lightColorScheme(
 private val DarkColors = darkColorScheme(
     primary = FletargBlueDark,
     onPrimary = Color(0xFF07194A),
-    primaryContainer = Color(0xFF17337F),
-    onPrimaryContainer = Color(0xFFDCE5FF),
+    primaryContainer = Color(0xFF0F4A8A),
+    onPrimaryContainer = Color(0xFFD6E9FF),
     secondary = Color(0xFFCBD5E1),
     onSecondary = Color(0xFF0F172A),
     secondaryContainer = Color(0xFF273244),
     onSecondaryContainer = Color(0xFFE2E8F0),
     tertiary = FletargOrangeDark,
     onTertiary = Color(0xFF3A1200),
-    tertiaryContainer = Color(0xFF6B2A05),
-    onTertiaryContainer = Color(0xFFFFDBC9),
+    tertiaryContainer = Color(0xFF5C4200),
+    onTertiaryContainer = Color(0xFFFFEFC2),
     background = Color(0xFF0B0F1A),
     onBackground = Color(0xFFE6EAF2),
     surface = Color(0xFF131927),

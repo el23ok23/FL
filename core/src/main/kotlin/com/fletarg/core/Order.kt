@@ -4,7 +4,10 @@ package com.fletarg.core
 data class AddressPoint(
     val label: String,
     val location: LatLng,
+    /** Dentro de la Argentina. */
     val insideCoverage: Boolean,
+    /** Dentro de Capital Federal (obligatorio para el origen). */
+    val insideCaba: Boolean = false,
 )
 
 /** Una parada del recorrido: dirección más acceso (piso / ascensor / escalera). */

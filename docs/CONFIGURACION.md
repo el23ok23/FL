@@ -60,7 +60,7 @@ Cada vehículo tiene `tarifa_base`, `por_km`, `nombre`, `descripcion`, `medidas`
 
 ## 5. Cobertura
 
-La app cubre toda la Argentina: cualquier dirección del país vale como origen, parada o destino. Si el servicio de direcciones informa otro país, la app avisa y no deja seguir. No hay nada que configurar.
+Todo flete **sale de Capital Federal**: el origen tiene que estar dentro de la Ciudad Autónoma de Buenos Aires (la app lo verifica con el límite de la Ciudad y con lo que informa el servicio de direcciones). Las paradas y el destino pueden ser en cualquier punto de la Argentina. Si una dirección queda fuera del país, o el origen fuera de Capital, la app avisa y no deja seguir. No hay nada que configurar.
 
 ## 6. Política de privacidad
 
