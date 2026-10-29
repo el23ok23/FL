@@ -15,11 +15,11 @@ val keystoreProps = Properties().apply {
 val hasSigning = keystoreProps.getProperty("storeFile")?.isNotBlank() == true
 
 android {
-    namespace = "com.fletarg.app"
+    namespace = "com.fletaba.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.fletarg.app"
+        applicationId = "com.fletaba.app"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

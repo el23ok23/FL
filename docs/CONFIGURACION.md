@@ -1,4 +1,4 @@
-# Configuración de Fletarg
+# Configuración de Fletaba
 
 Todo lo que se personaliza está en **un solo archivo**: `app/src/main/assets/config.json`.
 Abrilo con cualquier editor de texto, cambiá los valores (no las claves) y volvé a generar la app.
@@ -39,7 +39,7 @@ Sin clave la app **funciona igual**: usa el geocodificador del teléfono para la
 1. Entrá a [console.cloud.google.com](https://console.cloud.google.com), creá un proyecto y asociá facturación (Google da crédito mensual gratuito; para el volumen de una app de fletes normalmente no se paga).
 2. En *APIs y servicios → Biblioteca* habilitá **Places API (New)**, **Routes API** y **Maps Static API** (esta última es la que muestra el mapa real del recorrido dentro de la app).
 3. En *Credenciales → Crear credenciales → Clave de API*, copiá la clave y pegala en `"api_key": "AIza..."`.
-4. Restringí la clave. Lo más simple: en *Restricciones de API* dejá solo las tres APIs de arriba y no pongas restricción de aplicación (Maps Static API no acepta la restricción "Apps para Android"). Si preferís restringir por app (`com.fletarg.app` + huella SHA-1 de tu clave de firma), creá una segunda clave solo para Maps Static API y pegala en `"static_maps_key"`.
+4. Restringí la clave. Lo más simple: en *Restricciones de API* dejá solo las tres APIs de arriba y no pongas restricción de aplicación (Maps Static API no acepta la restricción "Apps para Android"). Si preferís restringir por app (`com.fletaba.app` + huella SHA-1 de tu clave de firma), creá una segunda clave solo para Maps Static API y pegala en `"static_maps_key"`.
 
 ## 4. Precios
 

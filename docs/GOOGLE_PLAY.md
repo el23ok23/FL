@@ -1,11 +1,11 @@
 # Publicar en Google Play
 
-La app en Play Console es **Fletarg** (`com.fletarg.app`).
+La app en Play Console es **Fletaba** (`com.fletaba.app`).
 
 ## 1. Clave de firma (una sola vez, guardala bien)
 
 ```bash
-keytool -genkeypair -v -keystore fletarg.jks -alias fletarg \
+keytool -genkeypair -v -keystore fletaba.jks -alias fletaba \
   -keyalg RSA -keysize 2048 -validity 10000
 ```
 
@@ -13,13 +13,13 @@ Guardá el archivo `.jks` y las contraseñas en un lugar seguro: si se pierden n
 Después copiá `keystore.properties.example` como `keystore.properties` (en la raíz del proyecto) y completalo. Ese archivo no se sube al repositorio.
 
 Para que GitHub Actions firme el bundle por vos, cargá en *Settings → Secrets and variables → Actions* estos secrets:
-`KEYSTORE_BASE64` (resultado de `base64 -w0 fletarg.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+`KEYSTORE_BASE64` (resultado de `base64 -w0 fletaba.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
 
 ## 2. Generar el archivo para subir (.aab)
 
 - Android Studio: *Build → Generate Signed App Bundle / APK → Android App Bundle*.
 - Terminal: `./gradlew :app:bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`.
-- GitHub Actions: *Actions → Android → la última ejecución → Artifacts → fletarg-release-aab*.
+- GitHub Actions: *Actions → Android → la última ejecución → Artifacts → fletaba-release-aab*.
 
 Antes de cada versión nueva subí `versionCode` (y `versionName`) en `app/build.gradle.kts`.
 
@@ -29,7 +29,7 @@ Play exige una URL pública. Publicá `docs/politica-de-privacidad.html` (comple
 
 ## 4. Ficha de la tienda
 
-- **Nombre**: Fletarg
+- **Nombre**: Fletaba
 - **Descripción breve** (80): Fletes desde Capital Federal a todo el país. Precio al toque.
 - **Descripción completa**: Elegí origen, destino y hasta 4 paradas, el vehículo (de Kangoo a camión grande), ayudantes, pisos y cuándo lo necesitás, y mirá un precio aproximado al instante. Dejanos tu nombre y WhatsApp y te contactamos para confirmar. Sin pagos en la app. Salimos desde Capital Federal a cualquier punto de la Argentina.
 - **Ícono**: `store/icono-512.png`.

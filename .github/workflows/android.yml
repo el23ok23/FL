@@ -52,22 +52,22 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: fletarg-debug-apk
+          name: fletaba-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: fletarg-release-aab
+          name: fletaba-release-aab
           path: app/build/outputs/bundle/release/*.aab
 
       # Publica el APK de prueba como archivo directo (sin zip) en la sección Releases del repo,
-      # siempre con el mismo enlace: https://github.com/el23ok23/FL/releases/download/ultima-version/Fletarg.apk
+      # siempre con el mismo enlace: https://github.com/el23ok23/FL/releases/download/ultima-version/Fletaba.apk
       - name: Preparar archivos para Releases
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp app/build/outputs/apk/debug/app-debug.apk release/Fletarg.apk
-          cp app/build/outputs/bundle/release/app-release.aab release/Fletarg-release.aab
+          cp app/build/outputs/apk/debug/app-debug.apk release/Fletaba.apk
+          cp app/build/outputs/bundle/release/app-release.aab release/Fletaba-release.aab
 
       - uses: softprops/action-gh-release@v2
         if: github.event_name != 'pull_request'
@@ -76,7 +76,7 @@ jobs:
           name: Última versión de prueba
           body: |
             APK de prueba generado automáticamente desde la rama `${{ github.ref_name }}` (commit ${{ github.sha }}).
-            Instalá **Fletarg.apk** en el celular. El `.aab` es para Google Play.
+            Instalá **Fletaba.apk** en el celular. El `.aab` es para Google Play.
           files: |
-            release/Fletarg.apk
-            release/Fletarg-release.aab
+            release/Fletaba.apk
+            release/Fletaba-release.aab

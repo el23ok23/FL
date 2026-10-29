@@ -1,7 +1,7 @@
 {
-  "_ayuda": "Archivo de configuración de Fletarg. Editá los valores y volvé a generar la app. Los montos son en pesos argentinos, sin puntos ni decimales. No cambies las claves (los nombres antes de los dos puntos).",
+  "_ayuda": "Archivo de configuración de Fletaba. Editá los valores y volvé a generar la app. Los montos son en pesos argentinos, sin puntos ni decimales. No cambies las claves (los nombres antes de los dos puntos). En cada vehículo, 'm3' es el volumen útil para sugerir el tamaño según lo que se lleva.",
   "negocio": {
-    "nombre": "Fletarg",
+    "nombre": "Fletaba",
     "whatsapp_dueno": "COMPLETAR_549XXXXXXXXXX",
     "_whatsapp_dueno": "Tu número de WhatsApp en formato internacional sin '+': 549 + código de área sin 0 + número sin 15. Ejemplo CABA: 5491123456789",
     "politica_privacidad_url": "COMPLETAR_URL_POLITICA"
@@ -43,13 +43,13 @@
     "espera_por_15_min": 6000
   },
   "vehiculos": [
-    { "id": "kangoo", "nombre": "Kangoo", "descripcion": "Utilitario chico", "medidas": "1,8 × 1,2 × 1,1 m", "carga": "Hasta 650 kg · 3 m³", "tarifa_base": 25000, "por_km": 1800, "minutos_carga": 30 },
-    { "id": "furgon_mediano", "nombre": "Furgón mediano", "descripcion": "Tipo Sprinter", "medidas": "3,2 × 1,7 × 1,8 m", "carga": "Hasta 1.500 kg · 10 m³", "tarifa_base": 35000, "por_km": 2300, "minutos_carga": 45 },
-    { "id": "furgon_grande", "nombre": "Furgón grande", "descripcion": "Techo alto", "medidas": "4,3 × 1,8 × 2,0 m", "carga": "Hasta 1.800 kg · 15 m³", "tarifa_base": 45000, "por_km": 2800, "minutos_carga": 60 },
-    { "id": "pickup", "nombre": "Camioneta pickup", "descripcion": "Caja abierta", "medidas": "Caja 1,5 × 1,5 × 0,5 m", "carga": "Hasta 1.000 kg", "tarifa_base": 30000, "por_km": 2000, "minutos_carga": 30 },
-    { "id": "camion_3_4", "nombre": "Camión 3/4", "descripcion": "Caja cerrada chica", "medidas": "4,5 × 2,2 × 2,2 m", "carga": "Hasta 3.500 kg · 22 m³", "tarifa_base": 65000, "por_km": 3500, "minutos_carga": 75 },
-    { "id": "camion_mediano_cerrado", "nombre": "Camión mediano", "descripcion": "Caja cerrada", "medidas": "6,0 × 2,4 × 2,4 m", "carga": "Hasta 6.000 kg · 35 m³", "tarifa_base": 90000, "por_km": 4500, "minutos_carga": 100 },
-    { "id": "camion_grande_cerrado", "nombre": "Camión grande", "descripcion": "Caja cerrada", "medidas": "8,0 × 2,5 × 2,6 m", "carga": "Hasta 10.000 kg · 52 m³", "tarifa_base": 130000, "por_km": 6000, "minutos_carga": 140 },
-    { "id": "camion_playo", "nombre": "Camión playo", "descripcion": "Caja abierta", "medidas": "7,0 × 2,5 m de plataforma", "carga": "Hasta 8.000 kg", "tarifa_base": 100000, "por_km": 5000, "minutos_carga": 90 }
+    { "id": "kangoo", "nombre": "Kangoo", "descripcion": "Utilitario chico", "medidas": "1,8 × 1,2 × 1,1 m", "carga": "Hasta 650 kg · 3 m³", "tarifa_base": 25000, "por_km": 1800, "minutos_carga": 30, "m3": 3 },
+    { "id": "furgon_mediano", "nombre": "Furgón mediano", "descripcion": "Tipo Sprinter", "medidas": "3,2 × 1,7 × 1,8 m", "carga": "Hasta 1.500 kg · 10 m³", "tarifa_base": 35000, "por_km": 2300, "minutos_carga": 45, "m3": 10 },
+    { "id": "furgon_grande", "nombre": "Furgón grande", "descripcion": "Techo alto", "medidas": "4,3 × 1,8 × 2,0 m", "carga": "Hasta 1.800 kg · 15 m³", "tarifa_base": 45000, "por_km": 2800, "minutos_carga": 60, "m3": 15 },
+    { "id": "pickup", "nombre": "Camioneta pickup", "descripcion": "Caja abierta", "medidas": "Caja 1,5 × 1,5 × 0,5 m", "carga": "Hasta 1.000 kg", "tarifa_base": 30000, "por_km": 2000, "minutos_carga": 30, "m3": 2.5 },
+    { "id": "camion_3_4", "nombre": "Camión 3/4", "descripcion": "Caja cerrada chica", "medidas": "4,5 × 2,2 × 2,2 m", "carga": "Hasta 3.500 kg · 22 m³", "tarifa_base": 65000, "por_km": 3500, "minutos_carga": 75, "m3": 22 },
+    { "id": "camion_mediano_cerrado", "nombre": "Camión mediano", "descripcion": "Caja cerrada", "medidas": "6,0 × 2,4 × 2,4 m", "carga": "Hasta 6.000 kg · 35 m³", "tarifa_base": 90000, "por_km": 4500, "minutos_carga": 100, "m3": 35 },
+    { "id": "camion_grande_cerrado", "nombre": "Camión grande", "descripcion": "Caja cerrada", "medidas": "8,0 × 2,5 × 2,6 m", "carga": "Hasta 10.000 kg · 52 m³", "tarifa_base": 130000, "por_km": 6000, "minutos_carga": 140, "m3": 52 },
+    { "id": "camion_playo", "nombre": "Camión playo", "descripcion": "Caja abierta", "medidas": "7,0 × 2,5 m de plataforma", "carga": "Hasta 8.000 kg", "tarifa_base": 100000, "por_km": 5000, "minutos_carga": 90, "m3": 20 }
   ]
 }

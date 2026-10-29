@@ -1,4 +1,4 @@
-# Fletarg
+# Fletaba
 
 App Android nativa (Kotlin + Jetpack Compose) para pedir fletes desde Capital Federal a toda la Argentina.
 Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque.
