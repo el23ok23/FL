@@ -31,8 +31,13 @@ android {
     }
 
     signingConfigs {
-        // APK de prueba: firma v1 + v2 para que instale en cualquier Android desde 5.0.
+        // APK de prueba: clave fija guardada en el repo (app/debug.keystore) para que cada
+        // compilación nueva se instale encima de la anterior sin desinstalar. No sirve para Play.
         getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
             enableV1Signing = true
             enableV2Signing = true
         }

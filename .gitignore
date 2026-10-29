@@ -12,7 +12,9 @@ captures/
 .externalNativeBuild/
 .cxx/
 
-# Firma (nunca subir claves)
+# Firma (nunca subir claves de release)
 keystore.properties
 *.jks
 *.keystore
+# Excepción: clave de PRUEBA fija para que las compilaciones de GitHub se actualicen entre sí
+!app/debug.keystore
