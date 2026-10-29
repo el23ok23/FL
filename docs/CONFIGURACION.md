@@ -45,7 +45,8 @@ Sin clave la app **funciona igual**: usa el geocodificador del teléfono para la
 
 ```json
 "precios": {
-  "por_ayudante": 25000,
+  "por_ayudante": 15000,
+  "por_ayudante_km": 500,
   "por_piso_escalera": 6000,
   "por_parada_extra": 8000,
   "redondeo": 500,
@@ -54,7 +55,9 @@ Sin clave la app **funciona igual**: usa el geocodificador del teléfono para la
 }
 ```
 
-Fórmula: **tarifa_base del vehículo + por_km × km del recorrido completo + por_ayudante × ayudantes + por_piso_escalera × pisos por escalera (sumando todas las paradas) + por_parada_extra × paradas intermedias**, redondeado hacia arriba al múltiplo de `redondeo`.
+Fórmula: **tarifa_base del vehículo + por_km × km del recorrido completo + ayudantes × (por_ayudante + por_ayudante_km × km) + por_piso_escalera × pisos por escalera (sumando todas las paradas) + por_parada_extra × paradas intermedias**, redondeado hacia arriba al múltiplo de `redondeo`.
+
+Cada ayudante tiene una base fija (`por_ayudante`) más un valor por kilómetro (`por_ayudante_km`): para 3 km cuesta $16.500 y para 40 km, $35.000 con los valores de ejemplo.
 
 Cada vehículo tiene `tarifa_base`, `por_km`, `nombre`, `descripcion`, `medidas` y `carga`. Podés cambiar textos y montos; el `id` no se toca. Los valores que vienen cargados corresponden al tramo alto del mercado del AMBA; para viajes largos entre ciudades conviene revisar el valor por km.
 

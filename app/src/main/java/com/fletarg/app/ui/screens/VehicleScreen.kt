@@ -52,6 +52,7 @@ import com.fletarg.app.ui.components.PriceBar
 import com.fletarg.app.ui.components.StepScaffold
 import com.fletarg.app.ui.components.VehicleIcon
 import com.fletarg.core.Money
+import com.fletarg.core.PriceCalculator
 import kotlin.math.absoluteValue
 
 @Composable
@@ -191,15 +192,15 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
         )
+        val helperCost = PriceCalculator.helperCost(vm.distanceKm, vm.config.pricing)
         Text(
-            "Para cargar y descargar. El chofer va incluido.",
+            "Para cargar y descargar. El chofer va incluido. Cada ayudante: ${Money.formatArs(helperCost)} para este recorrido.",
             style = MaterialTheme.typography.bodySmall,
             color = colors.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))
-        val perHelper = vm.config.pricing.perHelper
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             for (n in 0..2) {
                 val selected = vm.helpers == n
@@ -225,7 +226,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
                             color = if (selected) colors.primary else colors.onSurface,
                         )
                         Text(
-                            if (n == 0) "Sin cargo" else "+ ${Money.formatArs(perHelper * n)}",
+                            if (n == 0) "Sin cargo" else "+ ${Money.formatArs(helperCost * n)}",
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant,
                             textAlign = TextAlign.Center,

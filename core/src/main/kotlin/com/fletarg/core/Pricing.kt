@@ -44,7 +44,10 @@ data class VehicleSpec(
 
 /** Valores generales de la tarifa (config.json → "precios"). */
 data class PricingConfig(
+    /** Base por ayudante (lo que cobra por presentarse). */
     val perHelper: Int,
+    /** Lo que suma cada ayudante por cada km del recorrido. */
+    val perHelperKm: Int,
     val perStairFloor: Int,
     val perExtraStop: Int,
     val roundTo: Int,
@@ -80,7 +83,8 @@ data class PriceBreakdown(
 
 object PriceCalculator {
     /**
-     * Precio = tarifa base del vehículo + valor por km (recorrido completo) + monto por ayudante
+     * Precio = tarifa base del vehículo + valor por km (recorrido completo)
+     *          + por cada ayudante: base + valor por km (acompaña la distancia del viaje)
      *          + recargo por cada piso por escalera (en todas las paradas)
      *          + recargo por cada parada adicional (más allá de origen y destino).
      */
@@ -94,7 +98,7 @@ object PriceCalculator {
         val km = max(config.minKm, distanceKm)
         val distanceCost = (km * vehicle.perKm).roundToInt()
         val helperCount = helpers.coerceIn(0, 2)
-        val helpersCost = helperCount * config.perHelper
+        val helpersCost = helperCount * helperCost(km, config)
         val stairFloors = floors.sumOf { it.stairFloors }
         val stairsCost = stairFloors * config.perStairFloor
         val extraStopCount = max(0, floors.size - 2)
@@ -113,6 +117,10 @@ object PriceCalculator {
             total = roundUp(raw, config.roundTo),
         )
     }
+
+    /** Costo de un ayudante para un recorrido de [km] kilómetros: base + valor por km. */
+    fun helperCost(km: Double, config: PricingConfig): Int =
+        config.perHelper + (max(config.minKm, km) * config.perHelperKm).roundToInt()
 
     /** Distancia total de un recorrido con varias paradas, estimada por calle. */
     fun estimateRoadKm(points: List<LatLng>, config: PricingConfig): Double =

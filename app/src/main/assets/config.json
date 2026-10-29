@@ -22,8 +22,10 @@
   },
 
   "precios": {
-    "_ayuda": "Precio = tarifa_base del vehículo + por_km × km del recorrido completo + por_ayudante × ayudantes + por_piso_escalera × pisos por escalera (en todas las paradas) + por_parada_extra × paradas intermedias. El total se redondea hacia arriba al múltiplo de 'redondeo'.",
-    "por_ayudante": 25000,
+    "_ayuda": "Precio = tarifa_base del vehículo + por_km × km del recorrido completo + ayudantes × (por_ayudante + por_ayudante_km × km) + por_piso_escalera × pisos por escalera (en todas las paradas) + por_parada_extra × paradas intermedias. El total se redondea hacia arriba al múltiplo de 'redondeo'.",
+    "por_ayudante": 15000,
+    "_por_ayudante": "Base fija por cada ayudante. A eso se le suma por_ayudante_km por cada km del recorrido: un ayudante para 3 km cuesta mucho menos que para 40 km.",
+    "por_ayudante_km": 500,
     "por_piso_escalera": 6000,
     "por_parada_extra": 8000,
     "redondeo": 500,

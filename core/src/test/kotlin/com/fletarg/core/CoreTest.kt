@@ -58,7 +58,7 @@ class GeoTest {
 }
 
 class PriceCalculatorTest {
-    private val config = PricingConfig(perHelper = 25000, perStairFloor = 6000, perExtraStop = 8000, roundTo = 500, urbanDistanceFactor = 1.3, minKm = 2.0)
+    private val config = PricingConfig(perHelper = 15000, perHelperKm = 500, perStairFloor = 6000, perExtraStop = 8000, roundTo = 500, urbanDistanceFactor = 1.3, minKm = 2.0)
     private val kangoo = VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", baseFare = 25000, perKm = 1800)
 
     @Test fun `formula completa`() {
@@ -72,11 +72,11 @@ class PriceCalculatorTest {
         assertEquals(25000, p.base)
         assertEquals(0, p.extraStopCount)
         assertEquals(14040, p.distance)
-        assertEquals(25000, p.helpers)
+        assertEquals(15000 + 3900, p.helpers) // base + 7,8 km × 500
         assertEquals(3, p.stairFloors)
         assertEquals(18000, p.stairs)
-        // 82040 redondeado hacia arriba a 500
-        assertEquals(82500, p.total)
+        // 25000 + 14040 + 18900 + 18000 = 75940 → redondeado hacia arriba a 500
+        assertEquals(76000, p.total)
     }
 
     @Test fun `km minimo y sin extras`() {
@@ -89,6 +89,15 @@ class PriceCalculatorTest {
     @Test fun `ayudantes se limitan a dos`() {
         val p = PriceCalculator.calculate(kangoo, 2.0, 7, listOf(FloorInfo(), FloorInfo()), config)
         assertEquals(2, p.helperCount)
+    }
+
+    @Test fun `el ayudante cuesta mas cuanto mas lejos`() {
+        assertEquals(16500, PriceCalculator.helperCost(3.0, config))
+        assertEquals(35000, PriceCalculator.helperCost(40.0, config))
+        assertEquals(16000, PriceCalculator.helperCost(0.5, config)) // aplica el km mínimo
+        val cerca = PriceCalculator.calculate(kangoo, 3.0, 1, listOf(FloorInfo(), FloorInfo()), config)
+        val lejos = PriceCalculator.calculate(kangoo, 40.0, 1, listOf(FloorInfo(), FloorInfo()), config)
+        assertTrue(lejos.helpers > cerca.helpers)
     }
 
     @Test fun `paradas adicionales y escaleras en todas`() {
@@ -186,7 +195,7 @@ class ScheduleTest {
 
 class OrderMessageTest {
     @Test fun `mensaje contiene todos los datos`() {
-        val config = PricingConfig(25000, 6000, 8000, 500, 1.3, 2.0)
+        val config = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0)
         val vehicle = VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano (Sprinter)", "", "", "", 35000, 2300)
         val price = PriceCalculator.calculate(vehicle, 7.8, 1, listOf(FloorInfo(Access.STAIRS, 3), FloorInfo(), FloorInfo()), config)
         val msg = OrderMessage.build(

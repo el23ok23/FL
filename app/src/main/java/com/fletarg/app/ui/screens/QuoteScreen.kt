@@ -111,7 +111,7 @@ fun QuoteScreen(vm: OrderViewModel, step: Int, total: Int) {
                 BreakdownRow("Recorrido · ${Money.formatKm(p.km)}", p.distance)
                 HorizontalDivider(color = colors.outlineVariant)
                 BreakdownRow(
-                    if (p.helperCount == 0) "Sin ayudantes" else "${p.helperCount} ayudante${if (p.helperCount > 1) "s" else ""}",
+                    if (p.helperCount == 0) "Sin ayudantes" else "${p.helperCount} ayudante${if (p.helperCount > 1) "s" else ""} · ${Money.formatKm(p.km)}",
                     p.helpers,
                 )
                 HorizontalDivider(color = colors.outlineVariant)

@@ -68,7 +68,8 @@ data class AppConfig(
                 callMeBotKey = clean(envio.optString("callmebot_apikey")),
                 googleApiKey = clean(google.optString("api_key")),
                 pricing = PricingConfig(
-                    perHelper = precios.optInt("por_ayudante", 25000),
+                    perHelper = precios.optInt("por_ayudante", 15000),
+                    perHelperKm = precios.optInt("por_ayudante_km", 500),
                     perStairFloor = precios.optInt("por_piso_escalera", 6000),
                     perExtraStop = precios.optInt("por_parada_extra", 8000),
                     roundTo = precios.optInt("redondeo", 500),
@@ -90,7 +91,7 @@ data class AppConfig(
             webhookUrl = null,
             callMeBotKey = null,
             googleApiKey = null,
-            pricing = PricingConfig(25000, 6000, 8000, 500, 1.3, 2.0),
+            pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0),
             vehicles = listOf(
                 VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800),
                 VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "Tipo Sprinter", "3,2 × 1,7 × 1,8 m", "Hasta 1.500 kg · 10 m³", 35000, 2300),
