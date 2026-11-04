@@ -1,6 +1,6 @@
 # Publicar en Google Play
 
-La app en Play Console es **Fletaba** (`com.fletaba.app`).
+Son dos apps en Play Console: **Fletaba** (`com.fletaba.app`) y **Fletaba Salto** (`com.fletaba.salto`). Podés usar la misma clave de firma para las dos; cada una tiene su ficha y su `.aab` (`fletaba-release-aab` y `fletaba-salto-release-aab` en Artifacts, o `./gradlew :app:bundleCabaRelease` / `:app:bundleSaltoRelease`).
 
 ## 1. Clave de firma (una sola vez, guardala bien)
 

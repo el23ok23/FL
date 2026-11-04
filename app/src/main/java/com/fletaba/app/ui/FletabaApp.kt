@@ -56,7 +56,11 @@ fun FletabaApp(vm: OrderViewModel = viewModel()) {
         label = "steps",
     ) { current ->
         when (current) {
-            Step.INTRO -> IntroScreen(title = vm.config.businessName, onFinished = { vm.finishIntro() })
+            Step.INTRO -> IntroScreen(
+                title = vm.config.businessName,
+                subtitle = "Desde ${vm.config.origin.name} a todo el país",
+                onFinished = { vm.finishIntro() },
+            )
             Step.ROUTE -> RouteScreen(vm, step = 1, total = TOTAL_STEPS)
             Step.VEHICLE -> VehicleScreen(vm, step = 2, total = TOTAL_STEPS)
             Step.DETAILS -> DetailsScreen(vm, step = 3, total = TOTAL_STEPS)

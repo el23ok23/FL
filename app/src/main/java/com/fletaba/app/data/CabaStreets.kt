@@ -72,12 +72,12 @@ object CabaStreets {
     private fun norm(s: String): String =
         Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{Mn}+"), "").lowercase().trim()
 
-    /** Hasta [max] calles que empiezan por (o contienen) lo escrito, cuando todavía no hay altura. */
-    fun suggest(query: String, max: Int = 6): List<String> {
+    /** Hasta [max] calles de [list] que empiezan por (o contienen) lo escrito, cuando todavía no hay altura. */
+    fun suggest(query: String, max: Int = 6, list: List<String> = names): List<String> {
         val q = norm(query.removePrefix("av.").removePrefix("av").trim())
         if (q.length < 2 || query.any { it.isDigit() }) return emptyList()
-        val starts = names.filter { n -> norm(n).removePrefix("av. ").startsWith(q) || norm(n).startsWith(q) }
-        val contains = names.filter { n -> n !in starts && norm(n).contains(q) }
+        val starts = list.filter { n -> norm(n).removePrefix("av. ").startsWith(q) || norm(n).startsWith(q) }
+        val contains = list.filter { n -> n !in starts && norm(n).contains(q) }
         return (starts + contains).take(max)
     }
 }

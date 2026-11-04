@@ -6,8 +6,8 @@ data class AddressPoint(
     val location: LatLng,
     /** Dentro de la Argentina. */
     val insideCoverage: Boolean,
-    /** Dentro de Capital Federal (obligatorio para el origen). */
-    val insideCaba: Boolean = false,
+    /** Dentro de la zona de origen configurada (obligatorio para el origen). */
+    val insideOrigin: Boolean = false,
 )
 
 /** Una parada del recorrido: dirección más acceso (piso / ascensor / escalera). */

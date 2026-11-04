@@ -3,6 +3,8 @@ package com.fletaba.app.data
 import android.content.Context
 import android.util.Log
 import com.fletaba.core.ArgentinePhone
+import com.fletaba.core.LatLng
+import com.fletaba.core.OriginZone
 import com.fletaba.core.PricingConfig
 import com.fletaba.core.TimeConfig
 import com.fletaba.core.VehicleKind
@@ -25,6 +27,8 @@ data class AppConfig(
     val pricing: PricingConfig,
     val times: TimeConfig,
     val vehicles: List<VehicleSpec>,
+    /** De dónde salen los fletes (Capital Federal, Salto…). */
+    val origin: OriginZone,
 ) {
     companion object {
         private const val TAG = "AppConfig"
@@ -44,6 +48,7 @@ data class AppConfig(
             val google = root.optJSONObject("google") ?: JSONObject()
             val precios = root.optJSONObject("precios") ?: JSONObject()
             val tiempos = root.optJSONObject("tiempos") ?: JSONObject()
+            val origen = root.optJSONObject("origen")
 
             val vehicles = ArrayList<VehicleSpec>()
             root.optJSONArray("vehiculos")?.let { arr ->
@@ -93,6 +98,37 @@ data class AppConfig(
                     waitFeePer15Min = tiempos.optInt("espera_por_15_min", 6000),
                 ),
                 vehicles = vehicles.ifEmpty { defaults().vehicles },
+                origin = origen?.let(::parseOrigin) ?: OriginZone.CABA,
+            )
+        }
+
+        private fun parseOrigin(z: JSONObject): OriginZone? {
+            // "preset": "caba" o "salto" usa las zonas incorporadas; "poligono" permite una propia.
+            val preset = when (z.optString("preset").lowercase()) {
+                "caba" -> OriginZone.CABA
+                "salto" -> OriginZone.SALTO
+                else -> null
+            }
+            fun words(key: String): List<String> {
+                val arr = z.optJSONArray(key) ?: return emptyList()
+                return (0 until arr.length()).map { arr.optString(it) }.filter { it.isNotBlank() }
+            }
+            val polygon = ArrayList<LatLng>()
+            z.optJSONArray("poligono")?.let { arr ->
+                for (i in 0 until arr.length()) {
+                    val pt = arr.optJSONArray(i) ?: continue
+                    if (pt.length() >= 2) polygon += LatLng(pt.getDouble(0), pt.getDouble(1))
+                }
+            }
+            if (preset == null && polygon.size < 3) return null
+            return OriginZone(
+                name = z.optString("nombre").ifBlank { preset?.name ?: "la zona de origen" },
+                shortName = z.optString("nombre_corto").ifBlank { preset?.shortName ?: "" },
+                searchHint = z.optString("busqueda_extra").ifBlank { preset?.searchHint ?: "" },
+                polygon = if (polygon.size >= 3) polygon else preset!!.polygon,
+                insideKeywords = words("palabras_dentro").ifEmpty { preset?.insideKeywords ?: emptyList() },
+                outsideKeywords = words("palabras_fuera").ifEmpty { preset?.outsideKeywords ?: emptyList() },
+                streets = words("calles").ifEmpty { preset?.streets ?: emptyList() },
             )
         }
 
@@ -121,6 +157,7 @@ data class AppConfig(
             staticMapsKey = null,
             pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.20, commissionPct = 0.15),
             times = TimeConfig(6, 10, 0.5, 6000),
+            origin = OriginZone.CABA,
             vehicles = listOf(
                 VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario chico", "1,8 × 1,2 × 1,1 m", "Hasta 650 kg · 3 m³", 25000, 1800, 30, 3.0),
                 VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "Tipo Sprinter", "3,2 × 1,7 × 1,8 m", "Hasta 1.500 kg · 10 m³", 35000, 2300, 45, 10.0),

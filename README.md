@@ -1,6 +1,7 @@
 # Fletaba
 
-App Android nativa (Kotlin + Jetpack Compose) para pedir fletes desde Capital Federal a toda la Argentina.
+App Android nativa (Kotlin + Jetpack Compose) para pedir fletes desde una ciudad de origen a toda la Argentina.
+Un mismo proyecto genera dos apps: **Fletaba** (origen en Capital Federal, `com.fletaba.app`) y **Fletaba Salto** (origen en Salto, Provincia de Buenos Aires, `com.fletaba.salto`). Cada una tiene su `config.json` con su zona de origen y sus precios.
 Liviana, abre al instante, animaciones fluidas, modo claro/oscuro automático y precio al toque.
 Funciona en Android 5.0 o más nuevo.
 
@@ -18,7 +19,8 @@ El pedido te llega a tu WhatsApp con todas las paradas, vehículo, ayudantes, pi
 
 ```
 app/                           App Android (Compose)
-app/src/main/assets/config.json  WhatsApp, canal de envío, clave de Google y precios (editable)
+app/src/caba/assets/config.json    Fletaba: WhatsApp, canal de envío, clave de Google, zona de origen y precios
+app/src/salto/assets/config.json   Fletaba Salto: ídem, con origen en Salto
 core/                          Lógica pura (precios, cobertura, teléfonos, fechas, mensaje) con tests
 docs/                          Versión web (index.html), política de privacidad y guía de Google Play
 store/                         Ícono 512 px y gráfico destacado para la ficha de Play
@@ -28,13 +30,13 @@ store/                         Ícono 512 px y gráfico destacado para la ficha 
 
 - **Android Studio** (Ladybug o más nuevo): abrir la carpeta, esperar la sincronización y ejecutar. Para el bundle de Play: *Build → Generate Signed App Bundle*.
 - **Línea de comandos**: `./gradlew :app:assembleDebug` (APK de prueba) o `./gradlew :app:bundleRelease` (AAB).
-- **GitHub Actions**: cada push compila y publica el APK con enlace directo en *Releases* (`ultima-version`), además de dejar APK y AAB en *Actions → Artifacts*.
+- **GitHub Actions**: cada push compila las dos apps y publica los APK con enlace directo en *Releases* (`ultima-version`: `Fletaba.apk` y `FletabaSalto.apk`), además de dejar APK y AAB en *Actions → Artifacts*.
 - Solo los tests de lógica, sin SDK de Android: `./gradlew :core:test -PcoreOnly`.
 
 ## Versión web
 
-`docs/index.html` es la app completa en versión web (misma fórmula de precio y tiempos, mapa OpenStreetMap, envío por WhatsApp).
-Se publica gratis con GitHub Pages: *Settings → Pages → Deploy from a branch → esta rama, carpeta `/docs`*. Queda en `https://el23ok23.github.io/FL/`.
+`docs/index.html` (Capital Federal) y `docs/salto/index.html` (Salto) son la app completa en versión web (misma fórmula de precio y tiempos, mapa OpenStreetMap, envío por WhatsApp).
+Se publican gratis con GitHub Pages: *Settings → Pages → Deploy from a branch → esta rama, carpeta `/docs`*. Quedan en `https://el23ok23.github.io/FL/` y `https://el23ok23.github.io/FL/salto/`.
 El número de WhatsApp y los precios se editan en el bloque `CONFIG` al principio del archivo.
 
 ## Qué completar antes de publicar

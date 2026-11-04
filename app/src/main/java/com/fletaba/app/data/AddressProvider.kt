@@ -4,7 +4,7 @@ import android.content.Context
 import android.location.Geocoder
 import com.fletaba.core.AddressPoint
 import com.fletaba.core.Argentina
-import com.fletaba.core.CabaZone
+import com.fletaba.core.OriginZone
 import com.fletaba.core.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,8 +22,8 @@ data class AddressSuggestion(
     val adminTexts: List<String> = emptyList(),
 )
 
-/** Dónde buscar: el origen solo en Capital Federal; paradas y destino en todo el país. */
-enum class SearchScope { CABA, ARGENTINA }
+/** Dónde buscar: el origen solo en su zona; paradas y destino en todo el país. */
+enum class SearchScope { ORIGIN, ARGENTINA }
 
 interface AddressProvider {
     suspend fun suggest(query: String, sessionToken: String, scope: SearchScope): List<AddressSuggestion>
@@ -44,6 +44,7 @@ class GooglePlacesProvider(
     private val apiKey: String,
     private val packageName: String,
     private val certSha1: String,
+    private val origin: OriginZone,
 ) : AddressProvider {
 
     private val headers: Map<String, String>
@@ -67,9 +68,9 @@ class GooglePlacesProvider(
             .put("regionCode", "ar")
             .put("includedRegionCodes", JSONArray().put("ar"))
             .put("sessionToken", sessionToken)
-        if (scope == SearchScope.CABA) {
-            // Solo resultados dentro de Capital Federal.
-            body.put("locationRestriction", rect(CabaZone.minLat, CabaZone.minLng, CabaZone.maxLat, CabaZone.maxLng))
+        if (scope == SearchScope.ORIGIN) {
+            // Solo resultados dentro de la zona de origen.
+            body.put("locationRestriction", rect(origin.minLat, origin.minLng, origin.maxLat, origin.maxLng))
         } else {
             body.put("locationBias", rect(Argentina.MIN_LAT, Argentina.MIN_LNG, Argentina.MAX_LAT, Argentina.MAX_LNG))
         }
@@ -125,7 +126,7 @@ class GooglePlacesProvider(
                 label = buildLabel(suggestion.primary, suggestion.secondary),
                 location = point,
                 insideCoverage = inside,
-                insideCaba = inside && CabaZone.isInside(point, admin),
+                insideOrigin = inside && origin.isInside(point, admin),
             )
         }.getOrNull()
     }
@@ -135,7 +136,7 @@ class GooglePlacesProvider(
  * Respaldo sin clave: el geocodificador del propio Android (en la mayoría de los teléfonos lo
  * provee Google Play Services). No es un autocompletado real, funciona mejor con calle, altura y localidad.
  */
-class GeocoderProvider(context: Context) : AddressProvider {
+class GeocoderProvider(context: Context, private val origin: OriginZone) : AddressProvider {
     private val appContext = context.applicationContext
     private val locale = Locale("es", "AR")
 
@@ -143,11 +144,12 @@ class GeocoderProvider(context: Context) : AddressProvider {
         val q = query.trim()
         if (q.length < 4 || !Geocoder.isPresent()) return emptyList()
         val lower = q.lowercase()
-        return if (scope == SearchScope.CABA) {
-            // Origen: solo Capital Federal. Se busca acotado a la Ciudad y se descarta lo que quede afuera.
-            val withCity = if ("caba" in lower || "buenos aires" in lower || "capital" in lower) q else "$q, Ciudad Autónoma de Buenos Aires"
+        return if (scope == SearchScope.ORIGIN) {
+            // Origen: solo la zona configurada. Se busca acotado a ella y se descarta lo que quede afuera.
+            val hint = origin.searchHint
+            val withCity = if (hint.isBlank() || hint.lowercase() in lower || origin.name.lowercase() in lower) q else "$q, $hint"
             geocode(withCity, scope).ifEmpty { geocode(q, scope) }
-                .filter { s -> s.location != null && CabaZone.isInside(s.location, s.adminTexts) }
+                .filter { s -> s.location != null && origin.isInside(s.location, s.adminTexts) }
         } else {
             geocode(q, scope).ifEmpty { if ("argentina" in lower) emptyList() else geocode("$q, Argentina", scope) }
         }
@@ -157,8 +159,8 @@ class GeocoderProvider(context: Context) : AddressProvider {
     private suspend fun geocode(q: String, scope: SearchScope): List<AddressSuggestion> = withContext(Dispatchers.IO) {
         runCatching {
             val geocoder = Geocoder(appContext, locale)
-            val addresses = if (scope == SearchScope.CABA) {
-                geocoder.getFromLocationName(q, 6, CabaZone.minLat - 0.01, CabaZone.minLng - 0.01, CabaZone.maxLat + 0.01, CabaZone.maxLng + 0.01)
+            val addresses = if (scope == SearchScope.ORIGIN) {
+                geocoder.getFromLocationName(q, 6, origin.minLat - 0.01, origin.minLng - 0.01, origin.maxLat + 0.01, origin.maxLng + 0.01)
             } else {
                 geocoder.getFromLocationName(q, 6, Argentina.MIN_LAT, Argentina.MIN_LNG, Argentina.MAX_LAT, Argentina.MAX_LNG)
             }.orEmpty()
@@ -196,7 +198,7 @@ class GeocoderProvider(context: Context) : AddressProvider {
             label = buildLabel(suggestion.primary, suggestion.secondary),
             location = point,
             insideCoverage = inside,
-            insideCaba = inside && CabaZone.isInside(point, suggestion.adminTexts),
+            insideOrigin = inside && origin.isInside(point, suggestion.adminTexts),
         )
     }
 }

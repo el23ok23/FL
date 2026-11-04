@@ -23,7 +23,9 @@ class ArgentinaTest {
     }
 }
 
-class CabaZoneTest {
+class OriginZoneTest {
+    private val CabaZone = OriginZone.CABA
+
     @Test fun `puntos dentro y fuera de capital federal`() {
         assertTrue(CabaZone.contains(LatLng(-34.6037, -58.3816))) // Obelisco
         assertTrue(CabaZone.contains(LatLng(-34.5875, -58.4300))) // Palermo
@@ -38,6 +40,16 @@ class CabaZoneTest {
         assertFalse(CabaZone.isInside(obelisco, listOf("Provincia de Buenos Aires")))
         assertTrue(CabaZone.isInside(LatLng(-34.6600, -58.3650), listOf("Cdad. Autónoma de Buenos Aires")))
         assertTrue(CabaZone.isInside(obelisco, listOf(null, "")))
+    }
+
+    @Test fun `zona de salto`() {
+        val salto = OriginZone.SALTO
+        assertTrue(salto.contains(LatLng(-34.2925, -60.2550))) // Salto centro
+        assertTrue(salto.contains(LatLng(-34.3764, -60.2664))) // Berdier
+        assertFalse(salto.contains(LatLng(-33.8900, -60.5700))) // Pergamino
+        assertFalse(salto.contains(LatLng(-34.6037, -58.3816))) // Obelisco
+        // En Salto, "Provincia de Buenos Aires" no es motivo para quedar afuera.
+        assertTrue(salto.isInside(LatLng(-34.2925, -60.2550), listOf("Provincia de Buenos Aires")))
     }
 }
 
@@ -258,7 +270,7 @@ class OwnerNotesTest {
         val order = OrderSummary(
             "Fletaba", "Ana", "5491123456789",
             listOf(
-                Stop(AddressPoint("Lima 29, Monserrat", LatLng(-34.61, -58.38), true, true), FloorInfo()),
+                Stop(AddressPoint("Lima 29, Monserrat", LatLng(-34.61, -58.38), true, insideOrigin = true), FloorInfo()),
                 Stop(AddressPoint("Av. Cabildo 2000", LatLng(-34.56, -58.45), true), FloorInfo()),
             ),
             vehicle, 0, "", Schedule(), 10.0, price,

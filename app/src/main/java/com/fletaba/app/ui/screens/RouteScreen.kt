@@ -84,6 +84,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
     val stops = vm.stops
     val count = stops.size
     val requesters = remember { mutableMapOf<Long, FocusRequester>() }
+    val origin = vm.config.origin
 
     // Cuando se confirma una dirección, el foco salta solo al siguiente campo vacío.
     LaunchedEffect(vm.focusRequestId) {
@@ -97,7 +98,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         step = step,
         totalSteps = total,
         title = "¿A dónde va el flete?",
-        subtitle = "Salimos desde Capital Federal a cualquier punto del país. Podés sumar hasta ${OrderSummary.MAX_STOPS - 2} paradas en el medio.",
+        subtitle = "Salimos desde ${origin.name} a cualquier punto del país. Podés sumar hasta ${OrderSummary.MAX_STOPS - 2} paradas en el medio.",
         stepName = "Recorrido",
         centered = false,
         bottomBar = {
@@ -121,13 +122,14 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                             .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)),
                     )
                 }
-                val originProblem = index == 0 && draft.point?.let { it.insideCoverage && !it.insideCaba } == true
+                val originProblem = index == 0 && draft.point?.let { it.insideCoverage && !it.insideOrigin } == true
                 StopField(
                     letter = ('A' + index).toString(),
-                    label = if (index == 0) "Origen (Capital Federal)" else OrderMessage.stopTitle(index, count),
+                    label = if (index == 0) "Origen (${origin.name})" else OrderMessage.stopTitle(index, count),
                     value = draft.query,
                     inside = draft.point?.insideCoverage,
                     originProblem = originProblem,
+                    originShort = origin.shortName.ifBlank { origin.name },
                     focusRequester = requesters.getOrPut(draft.id) { FocusRequester() },
                     color = stopColor(index, count),
                     removable = index != 0 && !isLast,
@@ -193,7 +195,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                         Spacer(Modifier.width(12.dp))
                         Text(
                             if (vm.outOfCoverage) "Esa dirección queda fuera de la Argentina. Por ahora solo hacemos fletes dentro del país."
-                            else "El origen tiene que estar en Capital Federal. Las paradas y el destino pueden ser en cualquier lugar del país.",
+                            else "El origen tiene que estar en ${origin.name}. Las paradas y el destino pueden ser en cualquier lugar del país.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                         )
@@ -208,7 +210,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         val km = vm.distanceKm
         val caption = when {
             vm.outOfCoverage -> "Fuera del país"
-            vm.originOutsideCaba -> "Origen fuera de Capital"
+            vm.originOutsideCaba -> "Origen fuera de ${origin.shortName.ifBlank { origin.name }}"
             vm.route != null -> buildString {
                 append(Money.formatKm(km))
                 vm.route?.durationMin?.let { append(" · ~${formatMinutes(it)}") }
@@ -259,7 +261,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         ) {
             MapCard(
                 points = resolvedPoints.map { it?.location },
-                insideFlags = resolvedPoints.mapIndexed { i, p -> p?.insideCoverage != false && !(i == 0 && p != null && !p.insideCaba) },
+                insideFlags = resolvedPoints.mapIndexed { i, p -> p?.insideCoverage != false && !(i == 0 && p != null && !p.insideOrigin) },
                 path = vm.route?.path.orEmpty(),
                 image = image,
                 osm = osm,
@@ -288,6 +290,7 @@ private fun StopField(
     value: String,
     inside: Boolean?,
     originProblem: Boolean,
+    originShort: String,
     focusRequester: FocusRequester,
     color: Color,
     removable: Boolean,
@@ -301,7 +304,7 @@ private fun StopField(
     val isError = inside == false || originProblem
     val support: (@Composable () -> Unit)? = when {
         inside == false -> { { Text("Fuera de la Argentina") } }
-        originProblem -> { { Text("Tiene que ser en Capital Federal") } }
+        originProblem -> { { Text("Tiene que ser en $originShort") } }
         inside == true -> { { Text("Dirección confirmada ✓") } }
         else -> null
     }
@@ -314,7 +317,7 @@ private fun StopField(
                 .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) onFocus() },
             label = { Text(label) },
-            placeholder = { Text(if (letter == "A") "Calle y altura, CABA" else "Calle, altura y localidad") },
+            placeholder = { Text(if (letter == "A") "Calle y altura, $originShort" else "Calle, altura y localidad") },
             singleLine = true,
             isError = isError,
             shape = MaterialTheme.shapes.medium,

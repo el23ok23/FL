@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
  * un pequeño rebote y "deja" el nombre. Dura ~1,3 s y pasa sola (o antes, si se toca).
  */
 @Composable
-fun IntroScreen(title: String, onFinished: () -> Unit) {
+fun IntroScreen(title: String, subtitle: String, onFinished: () -> Unit) {
     val finish by rememberUpdatedState(onFinished)
     val truckX = remember { Animatable(-1.2f) } // en fracciones del ancho
     val wheel = remember { Animatable(0f) }
@@ -124,7 +124,7 @@ fun IntroScreen(title: String, onFinished: () -> Unit) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Desde Capital Federal a todo el país",
+                        subtitle,
                         style = MaterialTheme.typography.titleMedium,
                         color = FletabaOrange,
                     )

@@ -1,6 +1,10 @@
 # Configuración de Fletaba
 
-Todo lo que se personaliza está en **un solo archivo**: `app/src/main/assets/config.json`.
+Todo lo que se personaliza está en **un archivo por app**:
+
+- Fletaba (origen Capital Federal): `app/src/caba/assets/config.json`
+- Fletaba Salto (origen Salto): `app/src/salto/assets/config.json`
+
 Abrilo con cualquier editor de texto, cambiá los valores (no las claves) y volvé a generar la app.
 Los montos van en pesos, sin puntos ni decimales (`25000`, no `25.000`).
 
@@ -90,7 +94,7 @@ Cada vehículo tiene `tarifa_base`, `por_km`, `nombre`, `descripcion`, `medidas`
 
 ## 5. Cobertura
 
-Todo flete **sale de Capital Federal**: el origen tiene que estar dentro de la Ciudad Autónoma de Buenos Aires (la app lo verifica con el límite de la Ciudad y con lo que informa el servicio de direcciones). Las paradas y el destino pueden ser en cualquier punto de la Argentina. Si una dirección queda fuera del país, o el origen fuera de Capital, la app avisa y no deja seguir. No hay nada que configurar.
+Todo flete **sale de la ciudad de origen** configurada en la sección `origen` del `config.json` (`"preset": "caba"` o `"preset": "salto"`; para otra ciudad dejá el preset vacío y cargá `nombre`, `nombre_corto`, `busqueda_extra`, el `poligono` con puntos `[latitud, longitud]` y, si querés, `calles` para autocompletar sin internet). La app verifica el origen con ese límite y con lo que informa el servicio de direcciones. Las paradas y el destino pueden ser en cualquier punto de la Argentina. Si una dirección queda fuera del país, o el origen fuera de la zona, la app avisa y no deja seguir.
 
 ## 6. Política de privacidad
 

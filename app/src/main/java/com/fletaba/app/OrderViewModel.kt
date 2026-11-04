@@ -56,7 +56,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     private val signature = AppSignature.sha1(app)
     private val addresses: AddressProvider =
-        config.googleApiKey?.let { GooglePlacesProvider(it, app.packageName, signature) } ?: GeocoderProvider(app)
+        config.googleApiKey?.let { GooglePlacesProvider(it, app.packageName, signature, config.origin) } ?: GeocoderProvider(app, config.origin)
     private val routes: RoutesService? =
         config.googleApiKey?.let { RoutesService(it, app.packageName, signature) }
     private val sender = OrderSender(app, config)
@@ -107,7 +107,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     var focusRequestId by mutableIntStateOf(0)
         private set
 
-    private fun scopeFor(index: Int) = if (index == 0) SearchScope.CABA else SearchScope.ARGENTINA
+    private fun scopeFor(index: Int) = if (index == 0) SearchScope.ORIGIN else SearchScope.ARGENTINA
 
     val canAddStop: Boolean get() = stops.size < OrderSummary.MAX_STOPS
 
@@ -117,7 +117,9 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             if (activeStop != 0) return emptyList()
             val s = stops.firstOrNull() ?: return emptyList()
             if (s.point != null) return emptyList()
-            return CabaStreets.suggest(s.query)
+            val list = config.origin.streets.ifEmpty { if (config.origin.shortName == "CABA") CabaStreets.names else emptyList() }
+            if (list.isEmpty()) return emptyList()
+            return CabaStreets.suggest(s.query, list = list)
         }
 
     /** Completa el origen con la calle elegida; falta escribir la altura. */
@@ -265,8 +267,8 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     val allResolved: Boolean get() = stops.all { it.point != null }
     val allInside: Boolean get() = stops.all { it.point?.insideCoverage == true }
     val outOfCoverage: Boolean get() = stops.any { it.point?.insideCoverage == false }
-    /** El origen está resuelto pero fuera de Capital Federal. */
-    val originOutsideCaba: Boolean get() = stops.firstOrNull()?.point?.let { it.insideCoverage && !it.insideCaba } == true
+    /** El origen está resuelto pero fuera de la zona de origen configurada. */
+    val originOutsideCaba: Boolean get() = stops.firstOrNull()?.point?.let { it.insideCoverage && !it.insideOrigin } == true
     val canContinueRoute: Boolean
         get() = allResolved && allInside && !originOutsideCaba &&
             stops.map { it.point!!.location }.distinct().size == stops.size

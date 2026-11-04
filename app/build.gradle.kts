@@ -30,6 +30,22 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    // Una app por ciudad de origen. Cada variante tiene su nombre, su id y su config.json
+    // (app/src/<variante>/assets/config.json). Para agregar otra ciudad, copiá un bloque.
+    flavorDimensions += "origen"
+    productFlavors {
+        create("caba") {
+            dimension = "origen"
+            applicationId = "com.fletaba.app"
+            resValue("string", "app_name", "Fletaba")
+        }
+        create("salto") {
+            dimension = "origen"
+            applicationId = "com.fletaba.salto"
+            resValue("string", "app_name", "Fletaba Salto")
+        }
+    }
+
     signingConfigs {
         // APK de prueba: clave fija guardada en el repo (app/debug.keystore) para que cada
         // compilación nueva se instale encima de la anterior sin desinstalar. No sirve para Play.
