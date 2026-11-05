@@ -14,9 +14,9 @@
   "origen": {
     "_ayuda": "De dónde salen los fletes. 'preset' puede ser 'caba' o 'salto' (zonas ya cargadas). Para otra ciudad: dejá 'preset' vacío y completá nombre, nombre_corto, busqueda_extra, poligono (puntos [lat, lng]) y, si querés, calles para autocompletar sin internet.",
     "preset": "salto",
-    "nombre": "Salto",
+    "nombre": "Salto y alrededores",
     "nombre_corto": "Salto",
-    "busqueda_extra": "Salto, Buenos Aires",
+    "busqueda_extra": "Buenos Aires",
     "palabras_fuera": [],
     "palabras_dentro": [],
     "poligono": [],
