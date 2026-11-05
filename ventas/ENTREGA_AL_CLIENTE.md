@@ -4,9 +4,13 @@ Todo se cambia **desde la misma app, en tu teléfono**, con tu PIN. No hace falt
 
 ## Entrar al panel
 
+**Desde la app**
 1. Abrí la app y esperá la primera pantalla ("¿A dónde va el flete?").
 2. **Mantené apretado el título** un segundo.
 3. Escribí tu PIN y tocá **Entrar**. El teléfono lo recuerda; con el candado de arriba a la derecha cerrás la sesión.
+
+**Desde la web (computadora o celular)**
+Abrí tu dirección web con `?panel` al final (por ejemplo `https://el23ok23.github.io/FL/salto/?panel`), o bajá hasta el pie de la página y tocá "Panel del dueño". Es el mismo panel, con el mismo PIN.
 
 ## Qué podés cambiar
 
