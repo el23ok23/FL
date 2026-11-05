@@ -101,11 +101,45 @@ private val AppTypography: Typography = Typography().let { base ->
     )
 }
 
+/** Aclara un color mezclándolo con blanco (para la variante del modo oscuro). */
+private fun lighten(c: Color, amount: Float): Color = Color(
+    red = c.red + (1f - c.red) * amount,
+    green = c.green + (1f - c.green) * amount,
+    blue = c.blue + (1f - c.blue) * amount,
+    alpha = 1f,
+)
+
+/** Oscurece un color mezclándolo con negro. */
+private fun darken(c: Color, amount: Float): Color = Color(c.red * (1f - amount), c.green * (1f - amount), c.blue * (1f - amount), 1f)
+
+private fun luminance(c: Color): Float = 0.2126f * c.red + 0.7152f * c.green + 0.0722f * c.blue
+
+/**
+ * Tema con los colores de la marca del cliente: [primary] para botones, origen y precio;
+ * [accent] para destino y detalles. Con los valores por defecto es la paleta de Fletaba.
+ */
 @Composable
-fun FletabaTheme(content: @Composable () -> Unit) {
+fun FletabaTheme(primary: Color = FletabaBlue, accent: Color = FletargOrangeDefault, content: @Composable () -> Unit) {
     val dark = isSystemInDarkTheme()
+    val scheme = if (primary == FletabaBlue && accent == FletargOrangeDefault) {
+        if (dark) DarkColors else LightColors
+    } else if (dark) {
+        val p = lighten(primary, 0.45f)
+        val a = lighten(accent, 0.3f)
+        DarkColors.copy(
+            primary = p, onPrimary = darken(primary, 0.75f), primaryContainer = darken(primary, 0.45f), onPrimaryContainer = lighten(primary, 0.8f),
+            tertiary = a, onTertiary = darken(accent, 0.75f), tertiaryContainer = darken(accent, 0.55f), onTertiaryContainer = lighten(accent, 0.8f),
+        )
+    } else {
+        LightColors.copy(
+            primary = primary, onPrimary = if (luminance(primary) > 0.6f) Color(0xFF0F172A) else Color.White,
+            primaryContainer = lighten(primary, 0.82f), onPrimaryContainer = darken(primary, 0.6f),
+            tertiary = accent, onTertiary = if (luminance(accent) > 0.6f) Color(0xFF3B2A00) else Color.White,
+            tertiaryContainer = lighten(accent, 0.75f), onTertiaryContainer = darken(accent, 0.65f),
+        )
+    }
     MaterialTheme(
-        colorScheme = if (dark) DarkColors else LightColors,
+        colorScheme = scheme,
         typography = AppTypography,
         shapes = AppShapes,
         content = content,

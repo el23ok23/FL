@@ -6,6 +6,11 @@
     "_whatsapp_dueno": "Tu número de WhatsApp en formato internacional sin '+': 549 + código de área sin 0 + número sin 15. Ejemplo CABA: 5491123456789",
     "politica_privacidad_url": "COMPLETAR_URL_POLITICA"
   },
+  "marca": {
+    "_ayuda": "Colores de la app del cliente, en formato #RRGGBB. color_principal: botones, origen, precio. color_acento: destino y detalles. El ícono de la app se cambia en app/src/<variante>/res/values/colors.xml (ic_launcher_background).",
+    "color_principal": "#1B7BE0",
+    "color_acento": "#F6B40E"
+  },
   "origen": {
     "_ayuda": "De dónde salen los fletes. 'preset' puede ser 'caba' o 'salto' (zonas ya cargadas). Para otra ciudad: dejá 'preset' vacío y completá nombre, nombre_corto, busqueda_extra, poligono (puntos [lat, lng]) y, si querés, calles para autocompletar sin internet.",
     "preset": "caba",

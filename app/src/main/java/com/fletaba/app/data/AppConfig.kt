@@ -11,6 +11,9 @@ import com.fletaba.core.VehicleKind
 import com.fletaba.core.VehicleSpec
 import org.json.JSONObject
 
+/** Colores de la marca del cliente (config.json → "marca"). */
+data class BrandColors(val primary: Long, val accent: Long)
+
 /**
  * Configuración de la app, leída de assets/config.json.
  * Si el archivo tiene un error, se usan valores por defecto para que la app siga andando.
@@ -29,16 +32,23 @@ data class AppConfig(
     val vehicles: List<VehicleSpec>,
     /** De dónde salen los fletes (Capital Federal, Salto…). */
     val origin: OriginZone,
+    val brand: BrandColors = DEFAULT_BRAND,
 ) {
     companion object {
         private const val TAG = "AppConfig"
+        val DEFAULT_BRAND = BrandColors(primary = 0xFF1B7BE0, accent = 0xFFF6B40E)
 
-        fun load(context: Context): AppConfig = try {
-            val text = context.assets.open("config.json").bufferedReader().use { it.readText() }
-            parse(text)
-        } catch (e: Exception) {
-            Log.e(TAG, "No se pudo leer config.json, se usan valores por defecto", e)
-            defaults()
+        @Volatile private var cached: AppConfig? = null
+
+        /** Se lee una sola vez por proceso (el archivo es chico y el parseo tarda menos de un milisegundo). */
+        fun load(context: Context): AppConfig = cached ?: synchronized(this) {
+            cached ?: try {
+                val text = context.assets.open("config.json").bufferedReader().use { it.readText() }
+                parse(text)
+            } catch (e: Exception) {
+                Log.e(TAG, "No se pudo leer config.json, se usan valores por defecto", e)
+                defaults()
+            }.also { cached = it }
         }
 
         fun parse(json: String): AppConfig {
@@ -49,6 +59,7 @@ data class AppConfig(
             val precios = root.optJSONObject("precios") ?: JSONObject()
             val tiempos = root.optJSONObject("tiempos") ?: JSONObject()
             val origen = root.optJSONObject("origen")
+            val marca = root.optJSONObject("marca") ?: JSONObject()
 
             val vehicles = ArrayList<VehicleSpec>()
             root.optJSONArray("vehiculos")?.let { arr ->
@@ -99,7 +110,18 @@ data class AppConfig(
                 ),
                 vehicles = vehicles.ifEmpty { defaults().vehicles },
                 origin = origen?.let(::parseOrigin) ?: OriginZone.CABA,
+                brand = BrandColors(
+                    primary = parseColor(marca.optString("color_principal"), DEFAULT_BRAND.primary),
+                    accent = parseColor(marca.optString("color_acento"), DEFAULT_BRAND.accent),
+                ),
             )
+        }
+
+        /** "#1B7BE0" → 0xFF1B7BE0; si no es válido, devuelve el color por defecto. */
+        private fun parseColor(hex: String?, fallback: Long): Long {
+            val h = hex?.trim()?.removePrefix("#") ?: return fallback
+            if (h.length != 6 || !h.all { it.isLetterOrDigit() }) return fallback
+            return (0xFF000000L or h.toLong(16))
         }
 
         private fun parseOrigin(z: JSONObject): OriginZone? {

@@ -22,7 +22,9 @@ app/                           App Android (Compose)
 app/src/caba/assets/config.json    Fletaba: WhatsApp, canal de envío, clave de Google, zona de origen y precios
 app/src/salto/assets/config.json   Fletaba Salto: ídem, con origen en Salto
 core/                          Lógica pura (precios, cobertura, teléfonos, fechas, mensaje) con tests
-docs/                          Versión web (index.html), política de privacidad y guía de Google Play
+docs/                          Versión web (index.html, salto/), política de privacidad y guía de Google Play
+scripts/nueva_empresa.py       Alta de una empresa nueva (marca blanca): crea app, web y publicación
+ventas/                        Kit para vender la app a empresas de fletes: propuesta, guion, contrato, folleto
 store/                         Ícono 512 px y gráfico destacado para la ficha de Play
 ```
 
