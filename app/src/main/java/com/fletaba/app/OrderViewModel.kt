@@ -190,6 +190,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
                 RemotePrices.Status.WRONG_PIN -> { adminMessage = "PIN incorrecto"; remotePrices.rememberPin(null) }
                 RemotePrices.Status.OFFLINE -> adminMessage = "Sin conexión. Hace falta internet para entrar."
                 RemotePrices.Status.NOT_CONFIGURED -> adminMessage = "El panel todavía no está configurado."
+                else -> adminMessage = "No se pudo entrar. Probá de nuevo."
             }
             adminBusy = false
         }
@@ -282,6 +283,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
                 RemotePrices.Status.WRONG_PIN -> { adminMessage = "PIN incorrecto"; adminUnlocked = false; remotePrices.rememberPin(null) }
                 RemotePrices.Status.OFFLINE -> adminMessage = "Sin conexión. No se pudo guardar; probá de nuevo."
                 RemotePrices.Status.NOT_CONFIGURED -> adminMessage = "El panel todavía no está configurado."
+                else -> adminMessage = "No se pudo guardar. Probá de nuevo."
             }
             adminBusy = false
         }
