@@ -19,6 +19,7 @@ val FletabaBlue = Color(0xFF1B7BE0)
 val FletabaBlueDark = Color(0xFF8FC4FF)
 val FletabaOrange = Color(0xFFE8A317)      // dorado del sol (acento)
 val FletabaOrangeDark = Color(0xFFF6C453)
+val FletabaOrangeDefault = Color(0xFFF6B40E) // dorado del logo (acento por defecto)
 
 private val LightColors = lightColorScheme(
     primary = FletabaBlue,
@@ -119,9 +120,9 @@ private fun luminance(c: Color): Float = 0.2126f * c.red + 0.7152f * c.green + 0
  * [accent] para destino y detalles. Con los valores por defecto es la paleta de Fletaba.
  */
 @Composable
-fun FletabaTheme(primary: Color = FletabaBlue, accent: Color = FletargOrangeDefault, content: @Composable () -> Unit) {
+fun FletabaTheme(primary: Color = FletabaBlue, accent: Color = FletabaOrangeDefault, content: @Composable () -> Unit) {
     val dark = isSystemInDarkTheme()
-    val scheme = if (primary == FletabaBlue && accent == FletargOrangeDefault) {
+    val scheme = if (primary == FletabaBlue && accent == FletabaOrangeDefault) {
         if (dark) DarkColors else LightColors
     } else if (dark) {
         val p = lighten(primary, 0.45f)
