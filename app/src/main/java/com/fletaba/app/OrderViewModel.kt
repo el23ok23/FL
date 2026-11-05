@@ -16,6 +16,7 @@ import com.fletaba.app.data.AddressSuggestion
 import com.fletaba.app.data.AppConfig
 import com.fletaba.app.data.AppSignature
 import com.fletaba.app.data.BrandColors
+import com.fletaba.app.data.LocationHelper
 import com.fletaba.app.data.Logo
 import com.fletaba.app.data.CabaStreets
 import com.fletaba.app.data.GeocoderProvider
@@ -33,6 +34,7 @@ import com.fletaba.core.CargoItems
 import com.fletaba.core.FloorInfo
 import com.fletaba.core.LoadTime
 import com.fletaba.core.LoadTimeBreakdown
+import com.fletaba.core.OrderMessage
 import com.fletaba.core.OrderSummary
 import com.fletaba.core.PriceBreakdown
 import com.fletaba.core.PriceCalculator
@@ -85,7 +87,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     // ---- Marca (también editable por el dueño) -------------------------------------------------
     var businessName: String by mutableStateOf(config.businessName)
         private set
-    var ownerWhatsApp: String? by mutableStateOf(config.ownerWhatsApp)
+    var ownerWhatsApps: List<String> by mutableStateOf(config.ownerWhatsApps)
         private set
     var brand: BrandColors by mutableStateOf(config.brand)
         private set
@@ -109,7 +111,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     private fun applyBranding(b: PriceSheet.Branding) {
         branding = b
         businessName = b.name ?: config.businessName
-        ownerWhatsApp = b.whatsapp ?: config.ownerWhatsApp
+        ownerWhatsApps = b.whatsapps.ifEmpty { config.ownerWhatsApps }
         brand = BrandColors(
             primary = AppConfig.parseColor(b.primary, config.brand.primary),
             accent = AppConfig.parseColor(b.accent, config.brand.accent),
@@ -478,16 +480,18 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Precio aproximado, siempre al día con las elecciones actuales. */
     val price: PriceBreakdown
-        get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, pricing)
+        get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, pricing, weekend = schedule.isWeekend())
 
     /** Tiempo de carga y descarga incluido en el precio, parada por parada. */
     val loadTime: LoadTimeBreakdown
         get() = LoadTime.calculate(vehicle, helpers, stops.map { it.floor }, times)
 
     // ---- Contacto y envío --------------------------------------------------------------------
-    var customerName by mutableStateOf("")
+    private val customerPrefs = app.getSharedPreferences("fletaba_cliente", android.content.Context.MODE_PRIVATE)
+    /** Nombre y WhatsApp quedan recordados en el teléfono para el próximo pedido. */
+    var customerName by mutableStateOf(customerPrefs.getString("nombre", "") ?: "")
         private set
-    var customerPhone by mutableStateOf("")
+    var customerPhone by mutableStateOf(customerPrefs.getString("whatsapp", "") ?: "")
         private set
     fun setName(text: String) { customerName = text.take(60) }
     fun setPhone(text: String) { customerPhone = text.filter { it.isDigit() || it in " +-()" }.take(24) }
@@ -500,6 +504,45 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var sendResult by mutableStateOf<OrderSender.Result?>(null)
         private set
+    /** Último pedido armado, para abrir WhatsApp con otro de los números del dueño. */
+    var lastMessage: String = ""
+        private set
+    fun openWhatsApp(number: String) { sender.openWhatsApp(number, lastMessage) }
+
+    // ---- Ubicación actual como origen ---------------------------------------------------------
+    var locating by mutableStateOf(false)
+        private set
+    var locationMessage by mutableStateOf<String?>(null)
+        private set
+    fun clearLocationMessage() { locationMessage = null }
+    fun useMyLocationDenied() { locationMessage = "Sin permiso de ubicación. Escribí la dirección de salida." }
+
+    /** Usa la ubicación del teléfono como origen (ya con el permiso concedido). */
+    fun useMyLocation() {
+        if (locating) return
+        locating = true; locationMessage = null
+        viewModelScope.launch {
+            val here = LocationHelper.current(getApplication())
+            if (here == null) {
+                locationMessage = "No pudimos obtener tu ubicación. Activá el GPS y probá de nuevo."
+                locating = false; return@launch
+            }
+            if (!config.origin.contains(here)) {
+                locationMessage = "Tu ubicación no está en ${config.origin.name}. Escribí la dirección de salida."
+                locating = false; return@launch
+            }
+            val label = LocationHelper.describe(getApplication(), here)
+                ?: "Mi ubicación (%.4f, %.4f)".format(java.util.Locale.US, here.lat, here.lng)
+            val point = AddressPoint(label = label, location = here, insideCoverage = true, insideOrigin = true)
+            val s = stops.firstOrNull() ?: return@launch
+            stops[0] = s.copy(query = label, point = point)
+            activeStop = 0
+            clearSuggestions()
+            invalidateRoute()
+            advanceFocus()
+            locating = false
+        }
+    }
 
     fun send() {
         val phone = phoneNormalized ?: return
@@ -519,9 +562,11 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             waitFeePer15Min = times.waitFeePer15Min,
             travelMinutes = route?.durationMin,
         )
+        customerPrefs.edit().putString("nombre", customerName.trim()).putString("whatsapp", customerPhone).apply()
+        lastMessage = OrderMessage.build(summary)
         sending = true
         viewModelScope.launch {
-            sendResult = sender.send(summary, ownerWhatsApp)
+            sendResult = sender.send(summary, ownerWhatsApps, config.remotePricesUrl)
             sending = false
             step = Step.DONE
         }
@@ -537,7 +582,6 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         helpers = 0
         cargoCounts.clear(); cargoNote = ""
         schedule = Schedule()
-        customerName = ""; customerPhone = ""
         sending = false; sendResult = null
         sessionToken = UUID.randomUUID().toString()
         step = Step.ROUTE

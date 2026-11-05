@@ -125,6 +125,10 @@ fun QuoteScreen(vm: OrderViewModel, step: Int, total: Int) {
                     HorizontalDivider(color = colors.outlineVariant)
                     BreakdownRow("${p.extraStopCount} parada${if (p.extraStopCount > 1) "s" else ""} adicional${if (p.extraStopCount > 1) "es" else ""}", p.extraStops)
                 }
+                if (p.weekend > 0) {
+                    HorizontalDivider(color = colors.outlineVariant)
+                    BreakdownRow("Sábado o domingo · ${(vm.pricing.weekendPct * 100).toInt()} %", p.weekend)
+                }
             }
         }
 

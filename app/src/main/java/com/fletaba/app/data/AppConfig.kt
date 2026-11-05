@@ -5,6 +5,7 @@ import android.util.Log
 import com.fletaba.core.ArgentinePhone
 import com.fletaba.core.LatLng
 import com.fletaba.core.OriginZone
+import com.fletaba.core.PriceSheet
 import com.fletaba.core.PricingConfig
 import com.fletaba.core.TimeConfig
 import com.fletaba.core.VehicleKind
@@ -20,10 +21,12 @@ data class BrandColors(val primary: Long, val accent: Long)
  */
 data class AppConfig(
     val businessName: String,
-    val ownerWhatsApp: String?,
+    /** Números del dueño (549…) donde llegan los pedidos; el primero es el principal. */
+    val ownerWhatsApps: List<String>,
     val privacyUrl: String?,
     val webhookUrl: String?,
-    val callMeBotKey: String?,
+    /** Claves de CallMeBot por número (para que el pedido llegue solo a ese WhatsApp). */
+    val callMeBotKeys: Map<String, String>,
     val googleApiKey: String?,
     /** Clave para Maps Static API (si está vacía se usa googleApiKey). */
     val staticMapsKey: String?,
@@ -85,15 +88,20 @@ data class AppConfig(
                 }
             }
 
-            val ownerRaw = clean(negocio.optString("whatsapp_dueno"))
-            val owner = ownerRaw?.let { ArgentinePhone.normalize(it) ?: it.filter(Char::isDigit).ifBlank { null } }
+            // Uno o varios números: "5491122334455, 5492474123456" o la lista "whatsapps".
+            val owners = ArrayList<String>()
+            clean(negocio.optString("whatsapp_dueno"))?.let { owners += PriceSheet.splitPhones(it) }
+            negocio.optJSONArray("whatsapps")?.let { arr -> for (i in 0 until arr.length()) owners += PriceSheet.splitPhones(arr.optString(i)) }
+            val botKeys = LinkedHashMap<String, String>()
+            envio.optJSONObject("callmebot_keys")?.let { o -> o.keys().forEach { k -> PriceSheet.splitPhones(k).firstOrNull()?.let { n -> clean(o.optString(k))?.let { botKeys[n] = it } } } }
+            clean(envio.optString("callmebot_apikey"))?.let { key -> owners.firstOrNull()?.let { if (!botKeys.containsKey(it)) botKeys[it] = key } }
 
             return AppConfig(
                 businessName = clean(negocio.optString("nombre")) ?: "Fletaba",
-                ownerWhatsApp = owner,
+                ownerWhatsApps = owners.distinct(),
                 privacyUrl = clean(negocio.optString("politica_privacidad_url")),
                 webhookUrl = clean(envio.optString("webhook_url"))?.takeIf { it.startsWith("https://") },
-                callMeBotKey = clean(envio.optString("callmebot_apikey")),
+                callMeBotKeys = botKeys,
                 googleApiKey = clean(google.optString("api_key")),
                 staticMapsKey = clean(google.optString("static_maps_key")) ?: clean(google.optString("api_key")),
                 pricing = PricingConfig(
@@ -106,6 +114,7 @@ data class AppConfig(
                     minKm = precios.optDouble("km_minimo", 2.0),
                     operatingPct = precios.optDouble("recargo_operativo_porcentaje", 20.0) / 100.0,
                     commissionPct = precios.optDouble("comision_porcentaje", 15.0) / 100.0,
+                    weekendPct = precios.optDouble("recargo_fin_de_semana_porcentaje", 0.0) / 100.0,
                 ),
                 times = TimeConfig(
                     stairMinutesPerFloor = tiempos.optInt("minutos_por_piso_escalera", 6),
@@ -178,10 +187,10 @@ data class AppConfig(
 
         fun defaults(): AppConfig = AppConfig(
             businessName = "Fletaba",
-            ownerWhatsApp = null,
+            ownerWhatsApps = emptyList(),
             privacyUrl = null,
             webhookUrl = null,
-            callMeBotKey = null,
+            callMeBotKeys = emptyMap(),
             googleApiKey = null,
             staticMapsKey = null,
             pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.20, commissionPct = 0.15),

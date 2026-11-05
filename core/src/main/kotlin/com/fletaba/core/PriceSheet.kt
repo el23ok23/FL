@@ -46,6 +46,7 @@ object PriceSheet {
             minKm = dbl("km_minimo", pricing.minKm),
             operatingPct = dbl("recargo_operativo_porcentaje", pricing.operatingPct * 100) / 100,
             commissionPct = dbl("comision_porcentaje", pricing.commissionPct * 100) / 100,
+            weekendPct = dbl("recargo_fin_de_semana_porcentaje", pricing.weekendPct * 100) / 100,
         )
         val t = times.copy(
             stairMinutesPerFloor = int("minutos_por_piso_escalera", times.stairMinutesPerFloor),
@@ -83,8 +84,8 @@ object PriceSheet {
     /** Lo que el dueño puede cambiar de su marca desde la app. null = sin cambio. */
     data class Branding(
         val name: String? = null,
-        /** 549 + área + número, solo dígitos. */
-        val whatsapp: String? = null,
+        /** Números donde llegan los pedidos (549 + área + número, solo dígitos). Vacío = los del config. */
+        val whatsapps: List<String> = emptyList(),
         /** "#RRGGBB" */
         val primary: String? = null,
         val accent: String? = null,
@@ -95,11 +96,19 @@ object PriceSheet {
 
     fun branding(values: Map<String, String>): Branding = Branding(
         name = values[KEY_NAME]?.takeIf { it.isNotBlank() },
-        whatsapp = values[KEY_WHATSAPP]?.filter { it.isDigit() }?.takeIf { it.length >= 10 },
+        whatsapps = splitPhones(values[KEY_WHATSAPP] ?: ""),
         primary = values[KEY_PRIMARY]?.let { hex(it) },
         accent = values[KEY_ACCENT]?.let { hex(it) },
         logoUrl = values[KEY_LOGO]?.trim()?.takeIf { it.startsWith("https://") || it.startsWith("file:") || it == "local" },
     )
+
+    /** "5491122334455, 549 2474 12-3456 / 54 9 11 2222 3333" → números normalizados (549…), sin repetir. */
+    fun splitPhones(text: String): List<String> = text
+        .split(',', ';', '/', '\n')
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+        .mapNotNull { raw -> ArgentinePhone.normalize(raw) ?: raw.filter { it.isDigit() }.takeIf { it.length in 10..15 } }
+        .distinct()
 
     /** "#1b7be0", "1B7BE0" → "#1B7BE0"; otra cosa → null. */
     fun hex(text: String): String? {
@@ -119,7 +128,7 @@ object PriceSheet {
             "Tu negocio",
             listOf(
                 Field(KEY_NAME, "Nombre que ve el cliente", text = true, unit = ""),
-                Field(KEY_WHATSAPP, "WhatsApp donde llegan los pedidos", text = true, unit = ""),
+                Field(KEY_WHATSAPP, "WhatsApp donde llegan los pedidos (varios: separalos con coma)", text = true, unit = ""),
             ),
         )
         vehicles.forEach { v ->
@@ -137,6 +146,7 @@ object PriceSheet {
                 Field("por_piso_escalera", "Por piso por escalera"),
                 Field("por_parada_extra", "Por parada en el medio"),
                 Field("espera_por_15_min", "Espera, cada 15 minutos"),
+                Field("recargo_fin_de_semana_porcentaje", "Sábados y domingos", decimal = true, unit = "%"),
             ),
         )
         out += Group(
@@ -162,7 +172,7 @@ object PriceSheet {
 
     /** Valores actuales de marca con las claves de la planilla (vacío = el de fábrica). */
     fun brandingValues(b: Branding): Map<String, String> = linkedMapOf(
-        KEY_NAME to (b.name ?: ""), KEY_WHATSAPP to (b.whatsapp ?: ""),
+        KEY_NAME to (b.name ?: ""), KEY_WHATSAPP to b.whatsapps.joinToString(", "),
         KEY_PRIMARY to (b.primary ?: ""), KEY_ACCENT to (b.accent ?: ""), KEY_LOGO to (b.logoUrl ?: ""),
     )
 
@@ -171,8 +181,8 @@ object PriceSheet {
 
     /** true si el valor sirve para esa clave (número, o texto no vacío en las claves de texto). */
     fun isValid(key: String, value: String): Boolean = when (key) {
-        KEY_NAME -> value.trim().length in 2..40
-        KEY_WHATSAPP -> value.isBlank() || value.filter { it.isDigit() }.length in 10..15
+        KEY_NAME -> value.isBlank() || value.trim().length in 2..40
+        KEY_WHATSAPP -> value.isBlank() || value.split(',', ';', '/', '\n').filter { it.isNotBlank() }.all { ArgentinePhone.normalize(it) != null || it.filter { c -> c.isDigit() }.length in 10..15 }
         KEY_PRIMARY, KEY_ACCENT -> value.isBlank() || hex(value) != null
         KEY_LOGO -> true
         else -> isNumber(value)
@@ -215,6 +225,7 @@ object PriceSheet {
         appendLine("espera_por_15_min,${times.waitFeePer15Min}")
         appendLine("comision_porcentaje,${num(pricing.commissionPct * 100)}")
         appendLine("recargo_operativo_porcentaje,${num(pricing.operatingPct * 100)}")
+        appendLine("recargo_fin_de_semana_porcentaje,${num(pricing.weekendPct * 100)}")
         vehicles.forEach { v ->
             val id = v.kind.name.lowercase()
             appendLine("$id.tarifa_base,${v.baseFare}")

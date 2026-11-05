@@ -76,6 +76,14 @@ Cada ayudante tiene una base fija (`por_ayudante`) más un valor por kilómetro 
 
 Cada vehículo tiene `minutos_carga`: lo que tarda **una persona** en cargarlo lleno (Kangoo 30, furgón mediano 45, camión grande 140…). El presupuesto incluye ese tiempo en el origen y en el destino (y la mitad en cada parada intermedia), dividido por la cantidad de personas (chofer solo: 100 %, con 1 ayudante: 60 %, con 2: 45 %), más los minutos de escalera por piso o el fijo de ascensor. El resultado se muestra al cliente parada por parada y va en el pedido para el conductor; pasado ese tiempo se cobra `espera_por_15_min`.
 
+### Varios números de WhatsApp
+
+`negocio.whatsapp_dueno` admite varios números separados por coma (o la lista `negocio.whatsapps`). El primero es el principal; en la pantalla final el cliente ve un botón por cada número. Para que el pedido llegue solo a cada uno, cargar su clave de CallMeBot en `envio_pedido.callmebot_keys` o, mejor, en el `CALLMEBOT` del Apps Script del dueño, que además anota cada pedido en la hoja "pedidos" y manda un correo.
+
+### Recargo de fin de semana
+
+`precios.recargo_fin_de_semana_porcentaje`: porcentaje que se suma al costo del flete los sábados y domingos (según la fecha elegida; "lo antes posible" cuenta como hoy). Se muestra al cliente como línea aparte. 0 = sin recargo.
+
 ### Panel del dueño (precios, nombre, colores y logo desde la app)
 
 Se abre manteniendo apretado el título de la primera pantalla y pide un PIN.

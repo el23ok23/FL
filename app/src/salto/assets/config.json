@@ -3,7 +3,7 @@
   "negocio": {
     "nombre": "Fletaba Salto",
     "whatsapp_dueno": "COMPLETAR_549XXXXXXXXXX",
-    "_whatsapp_dueno": "Tu número de WhatsApp en formato internacional sin '+': 549 + código de área sin 0 + número sin 15. Ejemplo Salto (código de área 2474): 5492474123456",
+    "_whatsapp_dueno": "Tu número de WhatsApp en formato internacional sin '+': 549 + código de área sin 0 + número sin 15. Ejemplo CABA: 5491123456789. Podés poner varios separados por coma (el primero es el principal); también se cambian desde el panel del dueño.",
     "politica_privacidad_url": "COMPLETAR_URL_POLITICA"
   },
   "marca": {
@@ -27,6 +27,8 @@
     "webhook_url": "",
     "_webhook_url": "Opcional. Una URL https a la que la app manda el pedido en JSON (Make, Zapier, Google Apps Script, tu servidor). Ver docs/CONFIGURACION.md",
     "callmebot_apikey": "",
+    "callmebot_keys": {},
+    "_callmebot_keys": "Opcional. Clave de CallMeBot por número cuando hay varios: {\"5491122334455\": \"123456\", \"5492474123456\": \"654321\"}. Si usás el Apps Script del dueño, las claves van allá (CALLMEBOT) y acá no hace falta nada.",
     "_callmebot_apikey": "Opcional y gratis. Clave de api.callmebot.com para que el pedido te llegue solo a tu WhatsApp, sin que el cliente abra nada. Ver docs/CONFIGURACION.md"
   },
   "google": {
@@ -46,6 +48,8 @@
     "km_minimo": 2,
     "factor_distancia_urbana": 1.25,
     "_factor_distancia_urbana": "Solo se usa sin clave de Google: multiplica la distancia en línea recta para aproximar el recorrido por calle.",
+    "recargo_fin_de_semana_porcentaje": 0,
+    "_recargo_fin_de_semana_porcentaje": "Recargo por sábado o domingo sobre el costo del flete (0 = sin recargo). Se muestra al cliente como línea aparte.",
     "comision_porcentaje": 15,
     "_comision_porcentaje": "Tu comisión, como porcentaje del precio BRUTO que paga el cliente. El cliente nunca la ve: el precio final ya la incluye. En el pedido que te llega por webhook o CallMeBot aparece aparte, en la sección 'Solo para vos'.",
     "recargo_operativo_porcentaje": 20,

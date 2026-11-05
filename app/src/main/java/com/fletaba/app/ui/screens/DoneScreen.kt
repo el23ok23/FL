@@ -5,6 +5,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +38,7 @@ import com.fletaba.app.data.OrderSender
 import com.fletaba.app.ui.components.AnimatedCheck
 import com.fletaba.app.ui.components.Confetti
 import com.fletaba.app.ui.components.PrimaryButton
+import com.fletaba.core.ArgentinePhone
 import com.fletaba.core.Money
 import kotlinx.coroutines.delay
 
@@ -92,6 +99,30 @@ fun DoneScreen(vm: OrderViewModel) {
                 }
             }
             Spacer(Modifier.weight(1f))
+            // Escribirle directo por WhatsApp a cualquiera de los números del dueño.
+            val numbers = vm.ownerWhatsApps
+            if (numbers.isNotEmpty() && vm.sendResult != OrderSender.Result.NOT_CONFIGURED) {
+                Text(
+                    if (vm.sendResult == OrderSender.Result.OPENED_WHATSAPP) "¿No se abrió WhatsApp? Tocá un número:" else "¿Querés escribirnos directo por WhatsApp?",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                ) {
+                    numbers.forEach { n ->
+                        SuggestionChip(
+                            onClick = { vm.openWhatsApp(n) },
+                            label = { Text(if (numbers.size == 1) "Abrir WhatsApp" else ArgentinePhone.format(n)) },
+                            shape = MaterialTheme.shapes.small,
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
             PrimaryButton(text = "Hacer otro pedido", onClick = { vm.reset() })
             Spacer(Modifier.height(16.dp))
         }

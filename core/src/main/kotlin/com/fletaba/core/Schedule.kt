@@ -68,6 +68,9 @@ data class DayDate(val year: Int, val month: Int, val day: Int) {
 
 /** Cuándo quiere el flete el cliente. date null = lo antes posible. */
 data class Schedule(val date: DayDate? = null, val slot: TimeSlot = TimeSlot.ANY) {
+    /** true si el flete cae en sábado o domingo ("lo antes posible" cuenta como hoy). */
+    fun isWeekend(today: DayDate = DayDate.today()): Boolean = (date ?: today).dayOfWeek >= 5
+
     fun describe(today: DayDate = DayDate.today()): String {
         val when_ = when (date) {
             null -> "lo antes posible"

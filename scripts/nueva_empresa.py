@@ -41,8 +41,8 @@ def main():
     slug = a.slug.lower()
     if not re.fullmatch(r"[a-z][a-z0-9]{1,20}", slug): die("el slug debe ser minúsculas/números, empezar con letra (ej. donpedro)")
     if not re.fullmatch(r"#[0-9A-Fa-f]{6}", a.color) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", a.acento): die("colores en formato #RRGGBB")
-    wa = re.sub(r"\D", "", a.whatsapp)
-    if not wa.startswith("549") or len(wa) != 13: die("WhatsApp en formato 549 + área + número, 13 dígitos (ej. 5492474123456)")
+    wa = ", ".join(n for n in (re.sub(r"\D", "", x) for x in a.whatsapp.split(",")) if n)
+    if not wa or any(not n.startswith("549") or len(n) != 13 for n in wa.split(", ")): die("WhatsApp en formato 549 + área + número, 13 dígitos (ej. 5492474123456); varios separados por coma")
     base = a.precios_de or a.origen
     app_id = f"com.fletaba.{slug}"
     release_name = re.sub(r"[^A-Za-z0-9]", "", a.nombre) or slug.capitalize()

@@ -61,6 +61,8 @@ data class PricingConfig(
     val operatingPct: Double = 0.0,
     /** Comisión del dueño de la app sobre el precio bruto, p. ej. 0.15 = 15 %. Invisible para el cliente. */
     val commissionPct: Double = 0.0,
+    /** Recargo por sábado o domingo sobre el costo del flete, p. ej. 0.15 = 15 %. Se muestra como línea aparte. */
+    val weekendPct: Double = 0.0,
 )
 
 enum class Access { GROUND, ELEVATOR, STAIRS }
@@ -87,6 +89,8 @@ data class PriceBreakdown(
     val helpers: Int,
     val stairs: Int,
     val extraStops: Int,
+    /** Recargo de fin de semana (0 si no aplica). */
+    val weekend: Int = 0,
     val km: Double,
     val stairFloors: Int,
     val helperCount: Int,
@@ -111,6 +115,7 @@ object PriceCalculator {
         helpers: Int,
         floors: List<FloorInfo>,
         config: PricingConfig,
+        weekend: Boolean = false,
     ): PriceBreakdown {
         val km = max(config.minKm, distanceKm)
         val distanceCost = (km * vehicle.perKm).roundToInt()
@@ -120,7 +125,9 @@ object PriceCalculator {
         val stairsCost = stairFloors * config.perStairFloor
         val extraStopCount = max(0, floors.size - 2)
         val extraStopsCost = extraStopCount * config.perExtraStop
-        val subtotal = vehicle.baseFare + distanceCost + helpersCost + stairsCost + extraStopsCost
+        val beforeWeekend = vehicle.baseFare + distanceCost + helpersCost + stairsCost + extraStopsCost
+        val weekendCost = if (weekend && config.weekendPct > 0) (beforeWeekend * config.weekendPct).roundToInt() else 0
+        val subtotal = beforeWeekend + weekendCost
 
         // Bruto = subtotal × (1 + operativo) / (1 − comisión): así la comisión es exactamente
         // el porcentaje pedido del precio final que paga el cliente.
@@ -134,7 +141,8 @@ object PriceCalculator {
         val helpersShown = (helpersCost * scale).roundToInt()
         val stairsShown = (stairsCost * scale).roundToInt()
         val extraStopsShown = (extraStopsCost * scale).roundToInt()
-        val baseShown = total - distanceShown - helpersShown - stairsShown - extraStopsShown
+        val weekendShown = (weekendCost * scale).roundToInt()
+        val baseShown = total - distanceShown - helpersShown - stairsShown - extraStopsShown - weekendShown
 
         return PriceBreakdown(
             base = baseShown,
@@ -142,6 +150,7 @@ object PriceCalculator {
             helpers = helpersShown,
             stairs = stairsShown,
             extraStops = extraStopsShown,
+            weekend = weekendShown,
             km = km,
             stairFloors = stairFloors,
             helperCount = helperCount,

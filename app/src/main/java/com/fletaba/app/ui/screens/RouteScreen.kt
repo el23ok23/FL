@@ -24,6 +24,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.platform.LocalContext
+import com.fletaba.app.data.LocationHelper
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -142,6 +149,28 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
                     onSubmit = { vm.submitActive() },
                 )
                 if (index == 0) {
+                    // Usar la ubicación del teléfono como origen (pide el permiso la primera vez).
+                    val ctx = LocalContext.current
+                    val askLocation = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+                        if (granted) vm.useMyLocation() else vm.useMyLocationDenied()
+                    }
+                    AnimatedVisibility(visible = draft.point == null && draft.query.isBlank(), enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.Start) {
+                            SuggestionChip(
+                                onClick = {
+                                    focus.clearFocus()
+                                    if (LocationHelper.hasPermission(ctx)) vm.useMyLocation() else askLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                },
+                                enabled = !vm.locating,
+                                icon = { if (vm.locating) CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp) else Icon(Icons.Filled.LocationOn, contentDescription = null, Modifier.size(16.dp)) },
+                                label = { Text(if (vm.locating) "Buscando tu ubicación…" else "Usar mi ubicación") },
+                                shape = MaterialTheme.shapes.small,
+                            )
+                        }
+                    }
+                    vm.locationMessage?.let { msg ->
+                        Text(msg, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 6.dp, start = 4.dp))
+                    }
                     val hints = vm.streetHints
                     AnimatedVisibility(visible = hints.isNotEmpty(), enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                         Row(

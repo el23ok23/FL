@@ -22,10 +22,26 @@ class OrderSender(context: Context, private val config: AppConfig) {
 
     enum class Result { SENT, OPENED_WHATSAPP, NOT_CONFIGURED }
 
-    suspend fun send(order: OrderSummary, ownerWhatsApp: String? = config.ownerWhatsApp): Result {
+    /**
+     * Envía el pedido por el primer canal que funcione:
+     *  1. El backend del dueño (Apps Script): lo anota en su planilla, le manda un correo y lo reparte
+     *     por WhatsApp a los números que tengan CallMeBot. → SENT
+     *  2. Webhook propio (si está). → SENT
+     *  3. CallMeBot desde la app a cada número con clave. → SENT si al menos uno llegó
+     *  4. Abrir WhatsApp con el mensaje armado hacia el primer número. → OPENED_WHATSAPP
+     */
+    suspend fun send(order: OrderSummary, numbers: List<String>, backendUrl: String?): Result {
         // Con la parte privada (comisión y neto) solo en los canales que no pasan por el teléfono del cliente.
         val message = OrderMessage.build(order)
         val ownerMessage = OrderMessage.build(order, ownerNotes = true)
+
+        backendUrl?.let { url ->
+            val body = toJson(order, ownerMessage).put("accion", "pedido").put("numeros", JSONArray(numbers))
+            val ok = Http.request(url, "POST", body.toString(), headers = mapOf("Content-Type" to "text/plain; charset=utf-8"))
+                ?.let { runCatching { JSONObject(it).optBoolean("ok") }.getOrDefault(false) } == true
+            if (ok) return Result.SENT
+            Log.w(TAG, "Falló el backend del dueño, se prueba el siguiente canal")
+        }
 
         config.webhookUrl?.let { url ->
             val ok = Http.request(url, "POST", toJson(order, ownerMessage).toString()) != null
@@ -33,24 +49,27 @@ class OrderSender(context: Context, private val config: AppConfig) {
             Log.w(TAG, "Falló el webhook, se prueba el siguiente canal")
         }
 
-        val owner = ownerWhatsApp
-        val botKey = config.callMeBotKey
-        if (owner != null && botKey != null) {
-            val url = "https://api.callmebot.com/whatsapp.php?phone=%2B$owner" +
-                "&text=${encode(ownerMessage)}&apikey=${encode(botKey)}"
-            if (Http.request(url) != null) return Result.SENT
-            Log.w(TAG, "Falló CallMeBot, se abre WhatsApp")
+        var delivered = 0
+        numbers.forEach { n ->
+            val key = config.callMeBotKeys[n] ?: return@forEach
+            val url = "https://api.callmebot.com/whatsapp.php?phone=%2B$n&text=${encode(ownerMessage)}&apikey=${encode(key)}"
+            if (Http.request(url) != null) delivered++ else Log.w(TAG, "Falló CallMeBot para $n")
         }
+        if (delivered > 0) return Result.SENT
 
-        if (owner != null) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$owner?text=${encode(message)}"))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            val opened = runCatching { appContext.startActivity(intent) }.isSuccess
-            if (opened) return Result.OPENED_WHATSAPP
+        numbers.firstOrNull()?.let { n ->
+            if (openWhatsApp(n, message)) return Result.OPENED_WHATSAPP
         }
 
         Log.i(TAG, "Pedido sin canal configurado:\n$message")
         return Result.NOT_CONFIGURED
+    }
+
+    /** Abre WhatsApp con el mensaje armado hacia ese número. */
+    fun openWhatsApp(number: String, message: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number?text=${encode(message)}"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return runCatching { appContext.startActivity(intent) }.isSuccess
     }
 
     private fun toJson(o: OrderSummary, message: String): JSONObject {
@@ -78,6 +97,7 @@ class OrderSender(context: Context, private val config: AppConfig) {
             .put("cuando", o.schedule.describe())
             .put("distancia_km", o.distanceKm)
             .put("precio", o.price.total)
+            .put("recargo_finde", o.price.weekend)
             .put("tiempo_incluido_min", o.loadTime?.totalMinutes ?: 0)
             .put("espera_por_15_min", o.waitFeePer15Min)
             .put("viaje_min", o.travelMinutes ?: -1)

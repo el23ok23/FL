@@ -288,11 +288,39 @@ class PriceSheetTest {
     }
 
     @Test
+    fun severalWhatsApps() {
+        assertEquals(listOf("5491122334455", "5492474123456"), PriceSheet.splitPhones("5491122334455, 549 2474 12-3456; 5491122334455"))
+        assertTrue(PriceSheet.isValid("whatsapp", "5491122334455, 5492474123456"))
+        assertFalse(PriceSheet.isValid("whatsapp", "5491122334455, 12"))
+        val b = PriceSheet.branding("whatsapp,5491122334455 / 5492474123456")
+        assertEquals(2, b.whatsapps.size)
+        assertEquals("5491122334455, 5492474123456", PriceSheet.brandingValues(b)["whatsapp"])
+    }
+
+    @Test
+    fun weekendSurcharge() {
+        val cfg = PricingConfig(perHelper = 0, perHelperKm = 0, perStairFloor = 0, perExtraStop = 0, roundTo = 1, urbanDistanceFactor = 1.0, minKm = 1.0, weekendPct = 0.20)
+        val v = VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", baseFare = 10000, perKm = 1000)
+        val weekday = PriceCalculator.calculate(v, 10.0, 0, listOf(FloorInfo(), FloorInfo()), cfg, weekend = false)
+        val weekend = PriceCalculator.calculate(v, 10.0, 0, listOf(FloorInfo(), FloorInfo()), cfg, weekend = true)
+        assertEquals(20000, weekday.total); assertEquals(0, weekday.weekend)
+        assertEquals(24000, weekend.total); assertEquals(4000, weekend.weekend)
+        assertEquals(weekend.total, weekend.base + weekend.distance + weekend.helpers + weekend.stairs + weekend.extraStops + weekend.weekend)
+        // Planilla
+        val r = PriceSheet.apply("recargo_fin_de_semana_porcentaje,15", cfg, listOf(v), TimeConfig(6, 10, 0.5, 6000))
+        assertEquals(0.15, r.pricing.weekendPct, 1e-9)
+        // Sábado 8/11/2025 y domingo; lunes no
+        assertTrue(Schedule(DayDate(2025, 11, 8)).isWeekend()); assertTrue(Schedule(DayDate(2025, 11, 9)).isWeekend())
+        assertFalse(Schedule(DayDate(2025, 11, 10)).isWeekend())
+        assertTrue(Schedule(null).isWeekend(today = DayDate(2025, 11, 9))); assertFalse(Schedule(null).isWeekend(today = DayDate(2025, 11, 5)))
+    }
+
+    @Test
     fun brandingKeys() {
         val csv = "clave,valor\nnombre,Fletes Don Pedro, Salto\nwhatsapp,+54 9 2474 12-3456\ncolor_primario,0e7c4a\ncolor_acento,#ZZZ\nlogo_url,https://x/y.png\nkangoo.por_km,1500\n"
         val b = PriceSheet.branding(csv)
         assertEquals("Fletes Don Pedro, Salto", b.name)
-        assertEquals("5492474123456", b.whatsapp)
+        assertEquals(listOf("5492474123456"), b.whatsapps)
         assertEquals("#0E7C4A", b.primary)
         assertNull(b.accent)
         assertEquals("https://x/y.png", b.logoUrl)
@@ -300,7 +328,7 @@ class PriceSheetTest {
         val out = PriceSheet.toCsv(linkedMapOf("nombre" to "Don Pedro", "kangoo.por_km" to "1.500", "color_primario" to "", "por_ayudante" to "x"))
         assertTrue(out.contains("nombre,Don Pedro")); assertTrue(out.contains("kangoo.por_km,1.500"))
         assertFalse(out.contains("color_primario")); assertFalse(out.contains("por_ayudante"))
-        assertTrue(PriceSheet.isValid("nombre", "Fletes Pepe")); assertFalse(PriceSheet.isValid("nombre", "F"))
+        assertTrue(PriceSheet.isValid("nombre", "Fletes Pepe")); assertFalse(PriceSheet.isValid("nombre", "F")); assertTrue(PriceSheet.isValid("nombre", ""))
         assertTrue(PriceSheet.isValid("whatsapp", "")); assertFalse(PriceSheet.isValid("whatsapp", "123"))
         assertTrue(PriceSheet.form(emptyList(), advanced = false).first().fields.all { it.text })
     }
