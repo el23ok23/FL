@@ -47,6 +47,7 @@ object PriceSheet {
             operatingPct = dbl("recargo_operativo_porcentaje", pricing.operatingPct * 100) / 100,
             commissionPct = dbl("comision_porcentaje", pricing.commissionPct * 100) / 100,
             weekendPct = dbl("recargo_fin_de_semana_porcentaje", pricing.weekendPct * 100) / 100,
+            roundTripDiscountPct = dbl("descuento_ida_vuelta_porcentaje", pricing.roundTripDiscountPct * 100) / 100,
         )
         val t = times.copy(
             stairMinutesPerFloor = int("minutos_por_piso_escalera", times.stairMinutesPerFloor),
@@ -61,6 +62,7 @@ object PriceSheet {
                 perKm = int("$id.por_km", veh.perKm),
                 loadMinutes = int("$id.minutos_carga", veh.loadMinutes),
                 volumeM3 = dbl("$id.m3", veh.volumeM3),
+                minFare = int("$id.precio_minimo", veh.minFare),
             )
         }
         return Result(p, v, t, applied)
@@ -136,7 +138,7 @@ object PriceSheet {
             out += Group(
                 title = v.name,
                 subtitle = v.dimensions,
-                fields = listOf(Field("$id.tarifa_base", "Tarifa base"), Field("$id.por_km", "Por kilómetro")),
+                fields = listOf(Field("$id.tarifa_base", "Tarifa base"), Field("$id.por_km", "Por kilómetro"), Field("$id.precio_minimo", "Precio mínimo del viaje")),
             )
         }
         out += Group("Ayudantes", listOf(Field("por_ayudante", "Por ayudante (base)"), Field("por_ayudante_km", "Por ayudante, por km")))
@@ -147,6 +149,7 @@ object PriceSheet {
                 Field("por_parada_extra", "Por parada en el medio"),
                 Field("espera_por_15_min", "Espera, cada 15 minutos"),
                 Field("recargo_fin_de_semana_porcentaje", "Sábados y domingos", decimal = true, unit = "%"),
+                Field("descuento_ida_vuelta_porcentaje", "Descuento en la vuelta (ida y vuelta)", decimal = true, unit = "%"),
             ),
         )
         out += Group(
@@ -226,10 +229,12 @@ object PriceSheet {
         appendLine("comision_porcentaje,${num(pricing.commissionPct * 100)}")
         appendLine("recargo_operativo_porcentaje,${num(pricing.operatingPct * 100)}")
         appendLine("recargo_fin_de_semana_porcentaje,${num(pricing.weekendPct * 100)}")
+        appendLine("descuento_ida_vuelta_porcentaje,${num(pricing.roundTripDiscountPct * 100)}")
         vehicles.forEach { v ->
             val id = v.kind.name.lowercase()
             appendLine("$id.tarifa_base,${v.baseFare}")
             appendLine("$id.por_km,${v.perKm}")
+            appendLine("$id.precio_minimo,${v.minFare}")
         }
     }
 

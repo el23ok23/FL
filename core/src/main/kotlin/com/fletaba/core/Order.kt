@@ -28,9 +28,29 @@ data class OrderSummary(
     val loadTime: LoadTimeBreakdown? = null,
     val waitFeePer15Min: Int = 0,
     val travelMinutes: Int? = null,
+    /** El flete vuelve al origen con carga (se cobra el regreso con descuento). */
+    val roundTrip: Boolean = false,
+    /** Cantidad de fotos de la carga adjuntas. */
+    val photoCount: Int = 0,
 ) {
     companion object {
         const val MAX_STOPS = 6 // origen + hasta 5 paradas
+    }
+}
+
+/** Estado de un pedido, tal como lo marca el dueño en su planilla. */
+enum class OrderStatus(val key: String, val label: String, val detail: String) {
+    NEW("nuevo", "Recibido", "Lo estamos revisando. Te escribimos por WhatsApp para confirmar."),
+    CONFIRMED("confirmado", "Confirmado", "El flete está confirmado. Te avisamos cuando salga."),
+    ON_THE_WAY("en_camino", "En camino", "El vehículo va para el origen."),
+    DONE("hecho", "Realizado", "Flete realizado. ¡Gracias!"),
+    CANCELLED("cancelado", "Cancelado", "Este pedido fue cancelado. Si no fuiste vos, escribinos.");
+
+    companion object {
+        fun parse(text: String?): OrderStatus? {
+            val t = text?.trim()?.lowercase()?.replace(' ', '_') ?: return null
+            return entries.firstOrNull { it.key == t || it.label.lowercase() == t }
+        }
     }
 }
 
@@ -66,7 +86,8 @@ object OrderMessage {
         appendLine("🧑‍🔧 Ayudantes: ${o.helpers}")
         appendLine("📦 Qué lleva: ${o.cargo.trim().ifBlank { "(no indicado)" }}")
         appendLine("📅 Cuándo: ${o.schedule.describe(today)}")
-        appendLine("📏 Distancia aprox.: ${Money.formatKm(o.distanceKm)}")
+        appendLine("📏 Distancia aprox.: ${Money.formatKm(o.distanceKm)}${if (o.roundTrip) " (ida y vuelta)" else ""}")
+        if (o.photoCount > 0) appendLine("📷 Fotos de la carga: ${o.photoCount}")
         o.travelMinutes?.let { appendLine("🚗 Viaje aprox.: ${LoadTime.format(it)}") }
         o.loadTime?.let { lt ->
             appendLine("⏱ Carga y descarga incluidas: hasta ${LoadTime.format(lt.totalMinutes)} (${lt.people} persona${if (lt.people > 1) "s" else ""})")

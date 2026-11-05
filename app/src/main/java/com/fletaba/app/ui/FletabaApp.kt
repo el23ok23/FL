@@ -38,7 +38,7 @@ private const val TOTAL_STEPS = 4
 @Composable
 fun FletabaApp(vm: OrderViewModel = viewModel()) {
     // El tema sale del estado: si el dueño cambia los colores desde el panel, la app cambia al instante.
-    FletabaTheme(primary = Color(vm.brand.primary), accent = Color(vm.brand.accent)) {
+    FletabaTheme(primary = Color(vm.brandShown.primary), accent = Color(vm.brandShown.accent)) {
         FletabaFlow(vm)
     }
 }

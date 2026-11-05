@@ -61,6 +61,9 @@ import com.fletaba.app.data.AppConfig
 import com.fletaba.app.ui.components.PrimaryButton
 import com.fletaba.app.ui.components.SecondaryButton
 import com.fletaba.app.ui.components.VehicleIcon
+import androidx.compose.foundation.horizontalScroll
+import com.fletaba.core.OrderStatus
+import com.fletaba.core.Money
 import com.fletaba.core.PriceSheet
 import com.fletaba.core.VehicleKind
 
@@ -149,6 +152,20 @@ private fun OwnerPanel(vm: OrderViewModel) {
             IconButton(onClick = { vm.lockAdmin() }) { Icon(Icons.Filled.Lock, contentDescription = "Cerrar sesión", tint = colors.onSurfaceVariant) }
         }
 
+        // Pestañas
+        Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("Ajustes", "Pedidos").forEachIndexed { i, title ->
+                val on = vm.adminTab == i
+                Surface(
+                    shape = CircleShape,
+                    color = if (on) colors.primary else colors.surfaceVariant,
+                    modifier = Modifier.weight(1f).clickable { vm.selectAdminTab(i) },
+                ) {
+                    Text(title, style = MaterialTheme.typography.labelLarge, color = if (on) colors.onPrimary else colors.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 10.dp))
+                }
+            }
+        }
+
         Column(
             Modifier
                 .weight(1f)
@@ -157,17 +174,21 @@ private fun OwnerPanel(vm: OrderViewModel) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Spacer(Modifier.height(2.dp))
-            LogoCard(vm, onPick = { pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) })
-            ColorsCard(vm)
-            vm.adminForm.forEach { group -> GroupCard(vm, group) }
-            SecurityCard(vm)
-            Spacer(Modifier.height(4.dp))
-            SecondaryButton(text = "Volver a los valores originales", onClick = { vm.resetAdminValues() })
+            if (vm.adminTab == 1) {
+                OrdersList(vm)
+            } else {
+                LogoCard(vm, onPick = { pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) })
+                ColorsCard(vm)
+                vm.adminForm.forEach { group -> GroupCard(vm, group) }
+                SecurityCard(vm)
+                Spacer(Modifier.height(4.dp))
+                SecondaryButton(text = "Volver a los valores originales", onClick = { vm.resetAdminValues() })
+            }
             Spacer(Modifier.height(8.dp))
         }
 
         // Barra inferior
-        Surface(color = colors.surface, tonalElevation = 3.dp, shadowElevation = 10.dp) {
+        if (vm.adminTab == 0) Surface(color = colors.surface, tonalElevation = 3.dp, shadowElevation = 10.dp) {
             Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
                 val msg = vm.adminMessage
                 if (msg != null) {
@@ -234,6 +255,57 @@ private fun SecurityCard(vm: OrderViewModel) {
             style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp),
         )
     }
+}
+
+/** Pedidos recibidos (del backend del dueño o, en modo local, los hechos desde este teléfono). */
+@Composable
+private fun OrdersList(vm: OrderViewModel) {
+    val colors = MaterialTheme.colorScheme
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            if (vm.adminSynced) "Los pedidos de la app y la web, con su estado." else "Modo local: solo los pedidos hechos desde este teléfono.",
+            style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant, modifier = Modifier.weight(1f),
+        )
+        SecondaryButton(text = if (vm.ordersLoading) "Cargando…" else "Actualizar", onClick = { vm.loadOrders() }, modifier = Modifier.width(120.dp))
+    }
+    vm.ordersMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }
+    vm.adminOrders.forEach { o ->
+        val st = OrderStatus.parse(o.optString("estado")) ?: OrderStatus.NEW
+        PanelCard("${o.optString("cliente").ifBlank { "Cliente" }} · ${Money.formatArs(o.optDouble("precio", 0.0).toInt())}", "${formatDate(o.opt("fecha"))} · pedido ${o.optString("id")}") {
+            Text("${o.optString("origen")} → ${o.optString("destino")}", style = MaterialTheme.typography.bodyMedium, color = colors.onSurface)
+            Text("${o.optString("vehiculo")} · ${o.optInt("ayudantes")} ayud. · ${o.optString("cuando")}", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+            val wa = o.optString("whatsapp").filter { it.isDigit() }
+            if (wa.length >= 10) {
+                SecondaryButton(text = "Escribirle por WhatsApp", onClick = { vm.openWhatsAppTo(wa, "Hola ${o.optString("cliente")}, te escribimos por tu pedido de flete ${o.optString("id")}.") })
+            }
+            Spacer(Modifier.height(6.dp))
+            Text("Estado", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                OrderStatus.entries.forEach { option ->
+                    val on = option == st
+                    Surface(
+                        shape = CircleShape,
+                        color = if (on) colors.primary else colors.surfaceVariant,
+                        modifier = Modifier.clickable(enabled = !on) { vm.setOrderStatus(o.optString("id"), option) },
+                    ) {
+                        Text(option.label, style = MaterialTheme.typography.labelMedium, color = if (on) colors.onPrimary else colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun formatDate(raw: Any?): String {
+    val t = raw?.toString() ?: return ""
+    // Del backend viene ISO ("2026-11-05T13:20:00.000Z"); en modo local ya viene "dd/MM/yyyy HH:mm".
+    val m = Regex("""^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})""").find(t) ?: return t
+    return runCatching {
+        val utc = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
+            clear(); set(m.groupValues[1].toInt(), m.groupValues[2].toInt() - 1, m.groupValues[3].toInt(), m.groupValues[4].toInt(), m.groupValues[5].toInt())
+        }
+        java.text.SimpleDateFormat("dd/MM HH:mm", java.util.Locale("es", "AR")).apply { timeZone = java.util.TimeZone.getTimeZone("America/Argentina/Buenos_Aires") }.format(utc.time)
+    }.getOrDefault(t)
 }
 
 @Composable

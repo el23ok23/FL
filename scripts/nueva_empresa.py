@@ -108,6 +108,7 @@ def main():
     w = re.sub(r"comision_porcentaje: [\d.]+", f"comision_porcentaje: {a.comision:g}", w)
     w = re.sub(r"recargo_operativo_porcentaje: [\d.]+", f"recargo_operativo_porcentaje: {a.operativo:g}", w)
     w = re.sub(r'precios_remotos_url: "[^"]*"', f'precios_remotos_url: {json.dumps(a.precios_url)}', w)
+    w = re.sub(r'pin_local: "[^"]*"', f'pin_local: {json.dumps(a.pin)}', w)
     web_dir = os.path.join(ROOT, "docs", slug); os.makedirs(web_dir, exist_ok=True)
     open(os.path.join(web_dir, "index.html"), "w").write(w)
 

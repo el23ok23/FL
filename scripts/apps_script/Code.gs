@@ -7,8 +7,11 @@
  *  - POST {pin, accion:"guardar", csv}        → reemplaza la planilla con los valores nuevos.
  *  - POST {pin, accion:"logo", imagen, tipo}  → guarda el logo en Drive y devuelve su enlace público.
  *  - POST {accion:"pedido", ...}              → (sin PIN: lo mandan los clientes) anota el pedido en la hoja
- *                                               "pedidos", manda un correo al dueño y lo reparte por WhatsApp
- *                                               a cada número que tenga clave de CallMeBot.
+ *                                               "pedidos" con un id, guarda las fotos en Drive, manda un correo
+ *                                               al dueño y lo reparte por WhatsApp a cada número con CallMeBot.
+ *  - GET  url?pedido=ID                       → estado de ese pedido (lo consulta la app del cliente).
+ *  - POST {pin, accion:"pedidos"}             → últimos pedidos (para el panel del dueño).
+ *  - POST {pin, accion:"estado", id, estado}  → cambia el estado de un pedido (nuevo, confirmado, en_camino, hecho, cancelado).
  *
  * Cómo se instala (una sola vez por empresa, lo hacemos nosotros en la entrega): ver
  * ventas/CONFIGURAR_PANEL_DEL_DUENO.md
@@ -33,7 +36,9 @@ const CORREO = '';
 
 const HOJA = 'precios';
 
-function doGet() {
+function doGet(e) {
+  const id = e && e.parameter && e.parameter.pedido;
+  if (id) return estadoPedido_(String(id));
   const hoja = hojaPrecios_();
   const filas = hoja.getDataRange().getValues();
   const csv = filas
@@ -54,6 +59,14 @@ function doPost(e) {
   if (String(body.pin || '') !== pinActual_()) return json_({ ok: false, error: 'pin' });
 
   if (accion === 'verificar') return json_({ ok: true, correo: enmascarar_(correoRecuperacion_()) });
+
+  if (accion === 'pedidos') return json_({ ok: true, pedidos: listarPedidos_(Number(body.limite || 60)) });
+
+  if (accion === 'estado') {
+    const estado = String(body.estado || '').trim().toLowerCase();
+    if (['nuevo', 'confirmado', 'en_camino', 'hecho', 'cancelado'].indexOf(estado) < 0) return json_({ ok: false, error: 'estado' });
+    return json_({ ok: cambiarEstado_(String(body.id || ''), estado) });
+  }
 
   if (accion === 'cambiar_pin') {
     const nuevo = String(body.nuevo_pin || '').trim();
@@ -142,8 +155,24 @@ function recuperar_() {
 // ---- Pedidos ----------------------------------------------------------------------------------
 
 function pedido_(b) {
-  const mensaje = String(b.mensaje || '').slice(0, 4000);
+  let mensaje = String(b.mensaje || '').slice(0, 4000);
   if (!mensaje) return json_({ ok: false, error: 'mensaje' });
+  const id = Utilities.getUuid().slice(0, 8).toUpperCase();
+
+  // Fotos de la carga (base64) → Drive, con enlace público.
+  const fotos = [];
+  (Array.isArray(b.imagenes) ? b.imagenes.slice(0, 3) : []).forEach((b64, i) => {
+    try {
+      const bytes = Utilities.base64Decode(String(b64));
+      if (!bytes.length || bytes.length > 2 * 1024 * 1024) return;
+      const f = carpeta_('Pedidos ' + SpreadsheetApp.getActiveSpreadsheet().getName()).createFile(Utilities.newBlob(bytes, 'image/jpeg', 'pedido-' + id + '-' + (i + 1) + '.jpg'));
+      f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      fotos.push('https://drive.google.com/uc?export=view&id=' + f.getId());
+    } catch (err) { /* una foto que falla no frena el pedido */ }
+  });
+  if (fotos.length) mensaje += '\n\n📷 Fotos: ' + fotos.join(' ');
+  mensaje += '\n🆔 Pedido ' + id;
+
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
@@ -151,7 +180,7 @@ function pedido_(b) {
     hoja.appendRow([
       new Date(), String(b.nombre || ''), "'" + String(b.whatsapp || ''), String(b.origen || ''), String(b.destino || ''),
       String(b.vehiculo || ''), Number(b.ayudantes || 0), String(b.que_lleva || ''), String(b.cuando || ''),
-      Number(b.distancia_km || 0), Number(b.precio || 0), Number(b.neto_fletero || b.precio || 0), 'nuevo', mensaje,
+      Number(b.distancia_km || 0), Number(b.precio || 0), Number(b.neto_fletero || b.precio || 0), 'nuevo', mensaje, id, fotos.join(' '),
     ]);
   } finally { lock.releaseLock(); }
 
@@ -168,7 +197,37 @@ function pedido_(b) {
   if (pedidos.length) {
     try { UrlFetchApp.fetchAll(pedidos).forEach(r => { if (r.getResponseCode() < 300) enviados++; }); } catch (err) { /* idem */ }
   }
-  return json_({ ok: true, whatsapps: enviados });
+  return json_({ ok: true, id: id, whatsapps: enviados, fotos: fotos.length });
+}
+
+function estadoPedido_(id) {
+  const hoja = hojaPedidos_();
+  const datos = hoja.getDataRange().getValues();
+  for (let i = datos.length - 1; i >= 1; i--) {
+    if (String(datos[i][14]) === id) return json_({ ok: true, id: id, estado: String(datos[i][12] || 'nuevo'), fecha: datos[i][0] });
+  }
+  return json_({ ok: false, error: 'no_existe' });
+}
+
+function listarPedidos_(limite) {
+  const hoja = hojaPedidos_();
+  const datos = hoja.getDataRange().getValues();
+  const out = [];
+  for (let i = datos.length - 1; i >= 1 && out.length < limite; i--) {
+    const f = datos[i];
+    out.push({ id: String(f[14] || ''), fecha: f[0], cliente: String(f[1] || ''), whatsapp: String(f[2] || '').replace(/^'/, ''), origen: String(f[3] || ''), destino: String(f[4] || ''), vehiculo: String(f[5] || ''), ayudantes: Number(f[6] || 0), cuando: String(f[8] || ''), km: Number(f[9] || 0), precio: Number(f[10] || 0), estado: String(f[12] || 'nuevo'), fotos: String(f[15] || '') });
+  }
+  return out;
+}
+
+function cambiarEstado_(id, estado) {
+  if (!id) return false;
+  const hoja = hojaPedidos_();
+  const datos = hoja.getDataRange().getValues();
+  for (let i = datos.length - 1; i >= 1; i--) {
+    if (String(datos[i][14]) === id) { hoja.getRange(i + 1, 13).setValue(estado); return true; }
+  }
+  return false;
 }
 
 function hojaPedidos_() {
@@ -176,7 +235,7 @@ function hojaPedidos_() {
   let hoja = ss.getSheetByName('pedidos');
   if (!hoja) {
     hoja = ss.insertSheet('pedidos');
-    hoja.appendRow(['Fecha', 'Cliente', 'WhatsApp', 'Origen', 'Destino', 'Vehículo', 'Ayudantes', 'Qué lleva', 'Cuándo', 'Km', 'Precio', 'Neto', 'Estado', 'Mensaje']);
+    hoja.appendRow(['Fecha', 'Cliente', 'WhatsApp', 'Origen', 'Destino', 'Vehículo', 'Ayudantes', 'Qué lleva', 'Cuándo', 'Km', 'Precio', 'Neto', 'Estado', 'Mensaje', 'Id', 'Fotos']);
     hoja.setFrozenRows(1);
     hoja.getRange('A:A').setNumberFormat('dd/mm/yyyy hh:mm');
   }
@@ -194,7 +253,10 @@ function hojaPrecios_() {
 }
 
 function carpetaLogos_() {
-  const nombre = 'Logos ' + SpreadsheetApp.getActiveSpreadsheet().getName();
+  return carpeta_('Logos ' + SpreadsheetApp.getActiveSpreadsheet().getName());
+}
+
+function carpeta_(nombre) {
   const it = DriveApp.getFoldersByName(nombre);
   return it.hasNext() ? it.next() : DriveApp.createFolder(nombre);
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
@@ -157,37 +158,51 @@ class RemotePrices(private val context: Context, private val url: String?, confi
         }
     }
 
-    private suspend fun postJson(body: JSONObject): JSONObject? = withContext(Dispatchers.IO) {
-        val u = url ?: return@withContext null
-        var conn: HttpURLConnection? = null
-        try {
-            conn = (URL(u).openConnection() as HttpURLConnection).apply {
-                requestMethod = "POST"
-                instanceFollowRedirects = false
-                connectTimeout = 15_000; readTimeout = 15_000
-                doOutput = true
-                // text/plain evita la comprobación previa de CORS y Apps Script lo lee igual.
-                setRequestProperty("Content-Type", "text/plain; charset=utf-8")
-                outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-            }
-            var code = conn.responseCode
-            var text: String? = null
-            if (code in 300..399) {
-                val location = conn.getHeaderField("Location") ?: return@withContext null
-                conn.disconnect()
-                conn = (URL(location).openConnection() as HttpURLConnection).apply { connectTimeout = 15_000; readTimeout = 15_000 }
-                code = conn.responseCode
-            }
-            text = (if (code in 200..299) conn.inputStream else conn.errorStream)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
-            if (code !in 200..299 || text == null) {
-                Log.w(TAG, "POST -> $code ${text?.take(200)}"); return@withContext null
-            }
-            runCatching { JSONObject(text) }.getOrNull()
-        } catch (e: Exception) {
-            Log.w(TAG, "POST falló: ${e.message}"); null
-        } finally {
-            conn?.disconnect()
+    private suspend fun postJson(body: JSONObject): JSONObject? {
+        val u = url ?: return null
+        val text = Http.postScript(u, body.toString()) ?: return null
+        return runCatching { JSONObject(text) }.getOrNull()
+    }
+
+    // ---- Pedidos (estado, listado) -----------------------------------------------------------
+
+    /** Estado de un pedido por id ("nuevo", "confirmado", …) o null si no se pudo consultar. */
+    suspend fun orderStatus(id: String): String? {
+        if (url == null) return localOrders().firstOrNull { it.optString("id") == id }?.optString("estado")
+        val sep = if ('?' in url) "&" else "?"
+        val text = Http.request("$url${sep}pedido=${java.net.URLEncoder.encode(id, "UTF-8")}&_t=${System.currentTimeMillis() / 10000}") ?: return null
+        val json = runCatching { JSONObject(text) }.getOrNull() ?: return null
+        return if (json.optBoolean("ok")) json.optString("estado") else null
+    }
+
+    /** Últimos pedidos (los del backend, o los hechos desde este teléfono en modo local). */
+    suspend fun listOrders(pin: String): List<JSONObject>? {
+        if (url == null) return localOrders()
+        val json = postJson(JSONObject().put("pin", pin).put("accion", "pedidos")) ?: return null
+        if (!json.optBoolean("ok")) return null
+        val arr = json.optJSONArray("pedidos") ?: return emptyList()
+        return (0 until arr.length()).mapNotNull { arr.optJSONObject(it) }
+    }
+
+    suspend fun setOrderStatus(pin: String, id: String, estado: String): Boolean {
+        if (url == null) {
+            val list = localOrders()
+            list.firstOrNull { it.optString("id") == id }?.put("estado", estado) ?: return false
+            prefs.edit().putString(KEY_ORDERS, JSONArray(list).toString()).apply(); return true
         }
+        return postJson(JSONObject().put("pin", pin).put("accion", "estado").put("id", id).put("estado", estado))?.optBoolean("ok") == true
+    }
+
+    /** Guarda un pedido hecho desde este teléfono (modo local, para la demo del panel). */
+    fun saveLocalOrder(order: JSONObject) {
+        val list = ArrayList(localOrders())
+        list.add(0, order)
+        prefs.edit().putString(KEY_ORDERS, JSONArray(list.take(50)).toString()).apply()
+    }
+
+    private fun localOrders(): List<JSONObject> {
+        val arr = runCatching { JSONArray(prefs.getString(KEY_ORDERS, "[]")) }.getOrDefault(JSONArray())
+        return (0 until arr.length()).mapNotNull { arr.optJSONObject(it) }
     }
 
     private fun looksLikeSheet(csv: String): Boolean =
@@ -199,6 +214,7 @@ class RemotePrices(private val context: Context, private val url: String?, confi
         const val KEY_PIN = "pin"
         const val KEY_LOCAL_PIN = "pin_local"
         const val KEY_EMAIL = "correo_recuperacion"
+        const val KEY_ORDERS = "pedidos_local"
         const val LOGO_FILE = "logo.png"
     }
 }

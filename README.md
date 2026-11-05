@@ -38,7 +38,7 @@ store/                         Ícono 512 px y gráfico destacado para la ficha 
 ## Versión web
 
 `docs/index.html` (Capital Federal) y `docs/salto/index.html` (Salto) son la app completa en versión web (misma fórmula de precio y tiempos, mapa OpenStreetMap, envío por WhatsApp).
-Se publican gratis con GitHub Pages: *Settings → Pages → Deploy from a branch → esta rama, carpeta `/docs`*. Quedan en `https://el23ok23.github.io/FL/` y `https://el23ok23.github.io/FL/salto/`.
+Se publican gratis con GitHub Pages: *Settings → Pages → Deploy from a branch → esta rama, carpeta `/docs`*. Quedan en `https://el23ok23.github.io/FL/` y `https://el23ok23.github.io/FL/salto/ · Demo de marca blanca "Fletes Don Pedro": https://el23ok23.github.io/FL/donpedro/`.
 El número de WhatsApp y los precios se editan en el bloque `CONFIG` al principio del archivo.
 
 ## Qué completar antes de publicar

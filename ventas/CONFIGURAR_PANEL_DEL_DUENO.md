@@ -29,13 +29,24 @@ Si más adelante hay que cambiar el PIN o actualizar el script: editar, guardar 
 - Nueva empresa: `python3 scripts/nueva_empresa.py ... --precios-url "https://script.google.com/macros/s/.../exec"`.
 - Empresa ya creada: pegar la URL en `precios_remotos.url` del `app/src/<slug>/assets/config.json` y en `precios_remotos_url` del bloque CONFIG de `docs/<slug>/index.html`. Dejar `pin_local` vacío. Commit y push: GitHub genera el APK y publica la web.
 
-## 4. Probar
+## 4. Direcciones mejores (recomendado, gratis dentro del crédito de Google)
+
+Sin clave, las direcciones se buscan con el geocodificador del teléfono y con OpenStreetMap, que flojean en pueblos chicos. Con una clave de Google Places el autocompletado es el de Google Maps:
+
+1. https://console.cloud.google.com → proyecto nuevo (puede ser con la misma cuenta del dueño) → Facturación: cargar una tarjeta (Google da un crédito mensual gratuito que cubre con holgura el uso de una app de fletes; no cobra sin avisar).
+2. APIs y servicios → Habilitar: **Places API (New)**, **Routes API** y **Maps Static API**.
+3. Credenciales → Crear clave de API. Restringirla a "Aplicaciones de Android" con el paquete de la app (por ejemplo `com.fletaba.donpedro`) y la huella SHA-1 que imprime GitHub Actions en el build (o sin restricción mientras se prueba).
+4. Pegar la clave en `google.api_key` del `config.json` de la empresa (y `static_maps_key` si usa una distinta). Commit y push.
+
+## 5. Probar
 
 1. Abrir la app, mantener apretado el título de la primera pantalla, entrar con el PIN.
 2. Cambiar un precio y Guardar → "Guardado. Ya rige en todos los teléfonos."
 3. En la planilla aparece el valor nuevo. Abrir la web del cliente: lo toma al recargar.
 4. Elegir un logo de la galería → se guarda en una carpeta "Logos …" del Drive del dueño.
-5. Hacer un pedido de prueba desde la app: aparece en la hoja "pedidos", llega el correo y, si hay claves de CallMeBot, el WhatsApp.
+5. Hacer un pedido de prueba desde la app: aparece en la hoja "pedidos" con su id, llega el correo y, si hay claves de CallMeBot, el WhatsApp.
+6. En el panel, pestaña Pedidos, marcarlo "Confirmado": el teléfono del cliente lo muestra en menos de 15 segundos.
+7. Mandar un pedido con fotos: quedan en la carpeta "Pedidos …" del Drive con el enlace en la hoja.
 
 ## Qué pasa por detrás
 
@@ -45,6 +56,11 @@ Si más adelante hay que cambiar el PIN o actualizar el script: editar, guardar 
 - `POST /exec` con `{accion:"pedido", ...}` (sin PIN, lo mandan los clientes desde la app y la web) agrega una fila en la hoja "pedidos", manda el correo y llama a CallMeBot por cada número de `CALLMEBOT`.
 - Cualquiera con la URL puede *leer* los precios (los mismos que ve en la app). Escribir requiere el PIN, que vive solo en el script del dueño.
 
+## Qué es cada hoja
+
+- `precios`: dos columnas clave/valor. Es lo que edita el panel. Se puede corregir a mano.
+- `pedidos`: una fila por pedido (fecha, cliente, WhatsApp, origen, destino, vehículo, precio, estado, id, fotos). El dueño puede cambiar la columna Estado a mano o desde el panel.
+
 ## Sin Apps Script (modo local)
 
-Si en `config.json` queda `pin_local` con un PIN y `url` vacía, el panel funciona igual pero **los cambios valen solo en ese teléfono**. Sirve para probar y para mostrar la app en una reunión. Las apps del repositorio vienen así: Fletaba Salto con PIN `salto2026fletes` y Fletaba (Capital) con PIN `1234`. En modo local, "Olvidé mi PIN" abre el correo del teléfono con el PIN para mandárselo al correo de recuperación.
+Si en `config.json` queda `pin_local` con un PIN y `url` vacía, el panel funciona igual pero **los cambios valen solo en ese teléfono**. Sirve para probar y para mostrar la app en una reunión. Las apps del repositorio vienen así: Fletaba Salto con PIN `salto2026fletes` y Fletaba (Capital) con PIN `1234`. En modo local, "Olvidé mi PIN" abre el correo del teléfono con el PIN para mandárselo al correo de recuperación, y la pestaña Pedidos muestra solo los pedidos hechos desde ese teléfono. **El modo local no es seguro**: el PIN inicial va dentro de la app instalada y cualquiera con conocimientos puede leerlo. Sirve para probar y demostrar; una empresa real siempre va con Apps Script.

@@ -22,6 +22,9 @@ class OrderSender(context: Context, private val config: AppConfig) {
 
     enum class Result { SENT, OPENED_WHATSAPP, NOT_CONFIGURED }
 
+    /** Resultado del envío y, si el backend lo anotó, el id del pedido para seguir su estado. */
+    data class Outcome(val result: Result, val orderId: String? = null)
+
     /**
      * Envía el pedido por el primer canal que funcione:
      *  1. El backend del dueño (Apps Script): lo anota en su planilla, le manda un correo y lo reparte
@@ -30,22 +33,22 @@ class OrderSender(context: Context, private val config: AppConfig) {
      *  3. CallMeBot desde la app a cada número con clave. → SENT si al menos uno llegó
      *  4. Abrir WhatsApp con el mensaje armado hacia el primer número. → OPENED_WHATSAPP
      */
-    suspend fun send(order: OrderSummary, numbers: List<String>, backendUrl: String?): Result {
+    suspend fun send(order: OrderSummary, numbers: List<String>, backendUrl: String?, photos: List<ByteArray> = emptyList()): Outcome {
         // Con la parte privada (comisión y neto) solo en los canales que no pasan por el teléfono del cliente.
         val message = OrderMessage.build(order)
         val ownerMessage = OrderMessage.build(order, ownerNotes = true)
 
         backendUrl?.let { url ->
             val body = toJson(order, ownerMessage).put("accion", "pedido").put("numeros", JSONArray(numbers))
-            val ok = Http.request(url, "POST", body.toString(), headers = mapOf("Content-Type" to "text/plain; charset=utf-8"))
-                ?.let { runCatching { JSONObject(it).optBoolean("ok") }.getOrDefault(false) } == true
-            if (ok) return Result.SENT
+            if (photos.isNotEmpty()) body.put("imagenes", JSONArray(photos.map { android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP) }))
+            val json = Http.postScript(url, body.toString(), timeoutMs = if (photos.isEmpty()) 20_000 else 60_000)?.let { runCatching { JSONObject(it) }.getOrNull() }
+            if (json?.optBoolean("ok") == true) return Outcome(Result.SENT, json.optString("id").takeIf { it.isNotBlank() })
             Log.w(TAG, "Falló el backend del dueño, se prueba el siguiente canal")
         }
 
         config.webhookUrl?.let { url ->
             val ok = Http.request(url, "POST", toJson(order, ownerMessage).toString()) != null
-            if (ok) return Result.SENT
+            if (ok) return Outcome(Result.SENT)
             Log.w(TAG, "Falló el webhook, se prueba el siguiente canal")
         }
 
@@ -55,14 +58,14 @@ class OrderSender(context: Context, private val config: AppConfig) {
             val url = "https://api.callmebot.com/whatsapp.php?phone=%2B$n&text=${encode(ownerMessage)}&apikey=${encode(key)}"
             if (Http.request(url) != null) delivered++ else Log.w(TAG, "Falló CallMeBot para $n")
         }
-        if (delivered > 0) return Result.SENT
+        if (delivered > 0) return Outcome(Result.SENT)
 
         numbers.firstOrNull()?.let { n ->
-            if (openWhatsApp(n, message)) return Result.OPENED_WHATSAPP
+            if (openWhatsApp(n, message)) return Outcome(Result.OPENED_WHATSAPP)
         }
 
         Log.i(TAG, "Pedido sin canal configurado:\n$message")
-        return Result.NOT_CONFIGURED
+        return Outcome(Result.NOT_CONFIGURED)
     }
 
     /** Abre WhatsApp con el mensaje armado hacia ese número. */
@@ -98,6 +101,7 @@ class OrderSender(context: Context, private val config: AppConfig) {
             .put("distancia_km", o.distanceKm)
             .put("precio", o.price.total)
             .put("recargo_finde", o.price.weekend)
+            .put("ida_y_vuelta", o.roundTrip)
             .put("tiempo_incluido_min", o.loadTime?.totalMinutes ?: 0)
             .put("espera_por_15_min", o.waitFeePer15Min)
             .put("viaje_min", o.travelMinutes ?: -1)

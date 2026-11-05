@@ -80,6 +80,15 @@ Cada vehículo tiene `minutos_carga`: lo que tarda **una persona** en cargarlo l
 
 `negocio.whatsapp_dueno` admite varios números separados por coma (o la lista `negocio.whatsapps`). El primero es el principal; en la pantalla final el cliente ve un botón por cada número. Para que el pedido llegue solo a cada uno, cargar su clave de CallMeBot en `envio_pedido.callmebot_keys` o, mejor, en el `CALLMEBOT` del Apps Script del dueño, que además anota cada pedido en la hoja "pedidos" y manda un correo.
 
+### Precio mínimo y ida y vuelta
+
+- Cada vehículo admite `precio_minimo` (en `vehiculos` del config o `<id>.precio_minimo` en la planilla): si el cálculo da menos, se cobra ese mínimo y el presupuesto lo aclara.
+- `precios.descuento_ida_vuelta_porcentaje`: cuando el cliente marca "Ida y vuelta", el regreso (recorrido y ayudantes) se cobra con este descuento y se muestra como línea aparte.
+
+### Fotos, estado del pedido y pedidos en el panel
+
+Con `precios_remotos.url` configurado, el cliente puede adjuntar hasta 3 fotos (van al Drive del dueño), recibe un número de pedido y ve su estado, que el dueño cambia desde la pestaña Pedidos del panel (o en la hoja `pedidos`). Sin backend, no hay fotos y el estado vive solo en ese teléfono.
+
 ### Recargo de fin de semana
 
 `precios.recargo_fin_de_semana_porcentaje`: porcentaje que se suma al costo del flete los sábados y domingos (según la fecha elegida; "lo antes posible" cuenta como hoy). Se muestra al cliente como línea aparte. 0 = sin recargo.

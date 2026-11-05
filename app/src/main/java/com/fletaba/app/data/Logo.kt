@@ -44,18 +44,18 @@ object Logo {
     }
 
     /** Lee la imagen elegida en la galería, la achica a 512 px y la devuelve como PNG. */
-    suspend fun prepare(context: Context, uri: Uri): Pair<Bitmap, ByteArray>? = withContext(Dispatchers.IO) {
+    suspend fun prepare(context: Context, uri: Uri, maxSide: Int = MAX_SIDE, jpegQuality: Int? = null): Pair<Bitmap, ByteArray>? = withContext(Dispatchers.IO) {
         try {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
             var sample = 1
-            while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= MAX_SIDE) sample *= 2
+            while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxSide) sample *= 2
             val opts = BitmapFactory.Options().apply { inSampleSize = sample }
             val raw = context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) } ?: return@withContext null
-            val scale = MAX_SIDE.toFloat() / max(raw.width, raw.height)
+            val scale = maxSide.toFloat() / max(raw.width, raw.height)
             val bmp = if (scale < 1f) Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1), (raw.height * scale).toInt().coerceAtLeast(1), true) else raw
             val out = ByteArrayOutputStream()
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+            if (jpegQuality != null) bmp.compress(Bitmap.CompressFormat.JPEG, jpegQuality, out) else bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
             bmp to out.toByteArray()
         } catch (e: Exception) {
             Log.w(TAG, "No se pudo leer la imagen: ${e.message}"); null

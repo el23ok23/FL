@@ -330,6 +330,33 @@ class PriceSheetTest {
     }
 
     @Test
+    fun minimumFareAndRoundTrip() {
+        val cfg = PricingConfig(perHelper = 10000, perHelperKm = 0, perStairFloor = 0, perExtraStop = 0, roundTo = 1, urbanDistanceFactor = 1.0, minKm = 1.0, roundTripDiscountPct = 0.5)
+        val v = VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", baseFare = 10000, perKm = 1000, minFare = 25000)
+        val floors = listOf(FloorInfo(), FloorInfo())
+        val short = PriceCalculator.calculate(v, 2.0, 0, floors, cfg)
+        assertTrue(short.minimumApplied); assertEquals(25000, short.total)
+        assertEquals(short.total, short.base + short.distance + short.helpers + short.stairs + short.extraStops + short.weekend + short.returnTrip)
+        val oneWay = PriceCalculator.calculate(v, 30.0, 1, floors, cfg)
+        assertFalse(oneWay.minimumApplied); assertEquals(50000, oneWay.total) // 10000 + 30000 + 10000
+        val back = PriceCalculator.calculate(v, 30.0, 1, floors, cfg, roundTrip = true)
+        assertEquals(70000, back.total) // + (30000 + 10000) × 0.5
+        assertEquals(20000, back.returnTrip)
+        // Planilla
+        val r = PriceSheet.apply("kangoo.precio_minimo,30000\ndescuento_ida_vuelta_porcentaje,25", cfg, listOf(v), TimeConfig(6, 10, 0.5, 6000))
+        assertEquals(30000, r.vehicles[0].minFare); assertEquals(0.25, r.pricing.roundTripDiscountPct, 1e-9)
+        assertTrue(PriceSheet.currentValues(cfg, listOf(v), TimeConfig(6, 10, 0.5, 6000)).containsKey("kangoo.precio_minimo"))
+    }
+
+    @Test
+    fun orderStatus() {
+        assertEquals(OrderStatus.CONFIRMED, OrderStatus.parse("confirmado"))
+        assertEquals(OrderStatus.ON_THE_WAY, OrderStatus.parse("En camino"))
+        assertEquals(OrderStatus.DONE, OrderStatus.parse(" hecho "))
+        assertNull(OrderStatus.parse("cualquier cosa")); assertNull(OrderStatus.parse(null))
+    }
+
+    @Test
     fun brandingKeys() {
         val csv = "clave,valor\nnombre,Fletes Don Pedro, Salto\nwhatsapp,+54 9 2474 12-3456\ncolor_primario,0e7c4a\ncolor_acento,#ZZZ\nlogo_url,https://x/y.png\nkangoo.por_km,1500\n"
         val b = PriceSheet.branding(csv)

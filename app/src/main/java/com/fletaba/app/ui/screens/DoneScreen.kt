@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -89,6 +90,19 @@ fun DoneScreen(vm: OrderViewModel) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
+                    vm.orderId?.let { id ->
+                        val st = vm.orderStatus
+                        Spacer(Modifier.height(16.dp))
+                        Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f), modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Pedido $id", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(Modifier.height(4.dp))
+                                Text(st?.label ?: "Recibido", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                                Text(st?.detail ?: "Lo estamos revisando.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                                Text("Esta pantalla se actualiza sola.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
+                            }
+                        }
+                    }
                     Spacer(Modifier.height(16.dp))
                     Text(
                         "${vm.vehicle.name} · ${Money.formatArs(vm.price.total)} · ${vm.schedule.describe()}",

@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.Icons
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -118,6 +119,25 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         },
     ) {
         Column(Modifier.animateContentSize()) {
+            if (!vm.online) {
+                Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+                    Text(
+                        "Sin conexión. Las direcciones y el mapa necesitan internet; podés seguir escribiendo y se busca cuando vuelva.",
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    )
+                }
+            }
+            if (vm.hasLastOrder && stops.all { it.query.isBlank() }) {
+                Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.Center) {
+                    SuggestionChip(
+                        onClick = { vm.repeatLastOrder() },
+                        icon = { Icon(Icons.Filled.Refresh, contentDescription = null, Modifier.size(16.dp)) },
+                        label = { Text("Repetir el último flete · ${vm.lastOrderLabel}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        shape = MaterialTheme.shapes.small,
+                    )
+                }
+            }
             stops.forEachIndexed { index, draft ->
                 val isLast = index == count - 1
                 if (index > 0) {

@@ -1,5 +1,9 @@
 # Guion de venta · empresas de fletes de Salto
 
+## Demo en la reunión
+
+Mostrá la web de la empresa ficticia **Fletes Don Pedro** (https://el23ok23.github.io/FL/donpedro/, PIN `donpedro2026`): tiene marca propia en verde, origen hasta 120 km de Salto y el panel completo. Hacé un pedido de ida y vuelta, entrá al panel, marcalo "Confirmado" en Pedidos y mostrá cómo cambia el estado en la pantalla del cliente. Después cambiá un precio y el color. El video `marketing/videos/mp4/06-panel-del-dueno.mp4` resume lo mismo en 40 segundos para mandar por WhatsApp antes de la reunión.
+
 ## A quién
 Fleteros con 1 a 5 vehículos que hoy reciben pedidos por teléfono o WhatsApp y pasan presupuestos "a ojo". Dónde encontrarlos: grupos de Facebook de Salto, Marketplace, carteles en vehículos, corralones y mueblerías (preguntar con quién trabajan), la terminal, ferreterías grandes.
 

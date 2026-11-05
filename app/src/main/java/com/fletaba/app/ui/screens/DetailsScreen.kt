@@ -23,6 +23,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Switch
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
@@ -170,6 +185,13 @@ fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
                     }
                 }
             }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        RoundTripCard(vm)
+        if (vm.photosAvailable) {
+            Spacer(Modifier.height(16.dp))
+            PhotosCard(vm)
         }
 
         Spacer(Modifier.height(28.dp))
@@ -377,6 +399,67 @@ private fun CargoRow(item: CargoItem, count: Int, onChange: (Int) -> Unit, modif
             }
             androidx.compose.material3.IconButton(onClick = { onChange(+1) }, modifier = Modifier.size(28.dp)) {
                 Text("+", style = MaterialTheme.typography.titleMedium, color = colors.primary)
+            }
+        }
+    }
+}
+
+/** Ida y vuelta: el regreso se cobra con el descuento que fija el dueño. */
+@Composable
+private fun RoundTripCard(vm: OrderViewModel) {
+    val colors = MaterialTheme.colorScheme
+    val pct = (vm.pricing.roundTripDiscountPct * 100).toInt()
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = if (vm.roundTrip) colors.primaryContainer.copy(alpha = 0.45f) else colors.surface,
+        border = BorderStroke(1.dp, if (vm.roundTrip) colors.primary else colors.outlineVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("Ida y vuelta", style = MaterialTheme.typography.titleMedium, color = colors.onSurface)
+                Text(
+                    if (pct > 0) "El vehículo vuelve al origen con carga. El regreso tiene $pct % de descuento." else "El vehículo vuelve al origen con carga.",
+                    style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant,
+                )
+            }
+            Switch(checked = vm.roundTrip, onCheckedChange = { vm.updateRoundTrip(it) })
+        }
+    }
+}
+
+/** Fotos de la carga (hasta 3). Van con el pedido al dueño. */
+@Composable
+private fun PhotosCard(vm: OrderViewModel) {
+    val colors = MaterialTheme.colorScheme
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> uri?.let { vm.addPhoto(it) } }
+    Surface(shape = MaterialTheme.shapes.large, color = colors.surface, border = BorderStroke(1.dp, colors.outlineVariant), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Text("Fotos de lo que llevás (opcional)", style = MaterialTheme.typography.titleMedium, color = colors.onSurface)
+            Text("Ayudan a cotizar mejor. Hasta ${OrderViewModel.MAX_PHOTOS}.", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                vm.photos.forEachIndexed { i, (bmp, _) ->
+                    Box(Modifier.size(72.dp).clip(MaterialTheme.shapes.medium)) {
+                        Image(bmp.asImageBitmap(), contentDescription = "Foto ${i + 1}", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                        IconButton(onClick = { vm.removePhoto(i) }, modifier = Modifier.align(Alignment.TopEnd).size(28.dp)) {
+                            Icon(Icons.Filled.Close, contentDescription = "Quitar", tint = Color.White)
+                        }
+                    }
+                }
+                if (vm.photos.size < OrderViewModel.MAX_PHOTOS) {
+                    Box(
+                        Modifier
+                            .size(72.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(colors.primaryContainer.copy(alpha = 0.5f))
+                            .clickable(enabled = !vm.photoBusy) { pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (vm.photoBusy) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
+                        else Icon(Icons.Filled.Add, contentDescription = "Agregar foto", tint = colors.primary)
+                    }
+                }
             }
         }
     }

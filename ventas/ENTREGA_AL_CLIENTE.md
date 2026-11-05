@@ -29,9 +29,18 @@ Abrí tu dirección web con `?panel` al final (por ejemplo `https://el23ok23.git
 | **Recargos** | Por piso por escalera, por parada en el medio, la espera cada 15 minutos y el porcentaje extra de sábados y domingos (0 = sin recargo). |
 | **General** | Kilómetros mínimos que se cobran y a qué múltiplo se redondea el total. |
 | **Seguridad** | Correo de recuperación y cambio de PIN. |
+| **Pedidos** (pestaña) | Todos los pedidos con su estado. Tocás "Confirmado", "En camino", "Realizado" o "Cancelado" y el cliente lo ve en su app al instante. Botón para escribirle por WhatsApp. |
+
+Cada vehículo tiene además un **precio mínimo del viaje** (0 = sin mínimo), y en Recargos está el **descuento en la vuelta** para los fletes de ida y vuelta.
 
 Tocá **Guardar** abajo. Si algo quedó en rojo, corregilo antes.
 "Volver a los valores originales" carga los que tenía la app al entregarla (también hay que tocar Guardar).
+
+## Qué ve el cliente en su app
+
+- Puede pedir **ida y vuelta** (el regreso con el descuento que fijes), adjuntar hasta **3 fotos** de lo que lleva, usar su **ubicación** como origen y **repetir el último flete** con un toque.
+- Después de enviar, ve el número de pedido y su **estado**, que vos cambiás desde la pestaña Pedidos. Se actualiza solo.
+- Si se queda sin internet, la app se lo avisa en vez de quedarse en blanco.
 
 ## Cómo te llegan los pedidos
 

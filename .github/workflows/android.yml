@@ -81,6 +81,8 @@ jobs:
           cp app/build/outputs/apk/salto/debug/app-salto-debug.apk release/FletabaSalto.apk
           cp app/build/outputs/bundle/cabaRelease/app-caba-release.aab release/Fletaba-release.aab
           cp app/build/outputs/bundle/saltoRelease/app-salto-release.aab release/FletabaSalto-release.aab
+          cp app/build/outputs/apk/donpedro/debug/app-donpedro-debug.apk release/FletesDonPedro.apk
+          cp app/build/outputs/bundle/donpedroRelease/app-donpedro-release.aab release/FletesDonPedro-release.aab
 
       - uses: softprops/action-gh-release@v2
         if: github.event_name != 'pull_request'
@@ -95,3 +97,5 @@ jobs:
             release/FletabaSalto.apk
             release/Fletaba-release.aab
             release/FletabaSalto-release.aab
+            release/FletesDonPedro.apk
+            release/FletesDonPedro-release.aab

@@ -129,6 +129,18 @@ fun QuoteScreen(vm: OrderViewModel, step: Int, total: Int) {
                     HorizontalDivider(color = colors.outlineVariant)
                     BreakdownRow("Sábado o domingo · ${(vm.pricing.weekendPct * 100).toInt()} %", p.weekend)
                 }
+                if (p.returnTrip > 0) {
+                    HorizontalDivider(color = colors.outlineVariant)
+                    BreakdownRow("Vuelta al origen${if (vm.pricing.roundTripDiscountPct > 0) " · ${(vm.pricing.roundTripDiscountPct * 100).toInt()} % de descuento" else ""}", p.returnTrip)
+                }
+                if (p.minimumApplied) {
+                    HorizontalDivider(color = colors.outlineVariant)
+                    Text(
+                        "Se aplica el precio mínimo de ${vm.vehicle.name}.",
+                        style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                    )
+                }
             }
         }
 

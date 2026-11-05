@@ -44,6 +44,11 @@ android {
             applicationId = "com.fletaba.salto"
             resValue("string", "app_name", "Fletaba Salto")
         }
+        create("donpedro") {
+            dimension = "origen"
+            applicationId = "com.fletaba.donpedro"
+            resValue("string", "app_name", "Fletes Don Pedro")
+        }
     }
 
     signingConfigs {

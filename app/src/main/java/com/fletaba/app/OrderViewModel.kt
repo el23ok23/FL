@@ -17,6 +17,7 @@ import com.fletaba.app.data.AppConfig
 import com.fletaba.app.data.AppSignature
 import com.fletaba.app.data.BrandColors
 import com.fletaba.app.data.LocationHelper
+import com.fletaba.app.data.Network
 import com.fletaba.app.data.Logo
 import com.fletaba.app.data.CabaStreets
 import com.fletaba.app.data.GeocoderProvider
@@ -97,6 +98,12 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     var logo: Bitmap? by mutableStateOf(null)
         private set
     private var branding = PriceSheet.Branding()
+    /** Colores que se muestran: con el panel abierto, los que el dueño está eligiendo (vista previa). */
+    val brandShown: BrandColors
+        get() = if (adminOpen && adminUnlocked) BrandColors(
+            primary = AppConfig.parseColor(adminValues[PriceSheet.KEY_PRIMARY]?.takeIf { it.isNotBlank() }, config.brand.primary),
+            accent = AppConfig.parseColor(adminValues[PriceSheet.KEY_ACCENT]?.takeIf { it.isNotBlank() }, config.brand.accent),
+        ) else brand
 
     private fun applySheet(csv: String) {
         val r = PriceSheet.apply(csv, config.pricing, config.vehicles, config.times)
@@ -410,6 +417,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         searchJob = viewModelScope.launch {
             delay(350) // espera a que deje de tipear
             searching = true
+            checkOnline()
             val result = addresses.suggest(q, sessionToken, scopeFor(index))
             val stillCurrent = activeStop == index && stops.getOrNull(index)?.query?.trim() == q
             if (stillCurrent) { suggestions = result; noResults = result.isEmpty() }
@@ -549,7 +557,131 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Precio aproximado, siempre al día con las elecciones actuales. */
     val price: PriceBreakdown
-        get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, pricing, weekend = schedule.isWeekend())
+        get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, pricing, weekend = schedule.isWeekend(), roundTrip = roundTrip)
+
+    // ---- Ida y vuelta y fotos de la carga ----------------------------------------------------
+    /** El flete vuelve al origen con carga: se cobra el regreso con el descuento configurado. */
+    var roundTrip by mutableStateOf(false)
+        private set
+    fun updateRoundTrip(value: Boolean) { roundTrip = value }
+
+    /** Fotos de la carga (miniatura + JPEG listo para subir). Solo con backend del dueño. */
+    val photos = mutableStateListOf<Pair<Bitmap, ByteArray>>()
+    val photosAvailable: Boolean get() = config.remotePricesUrl != null
+    var photoBusy by mutableStateOf(false)
+        private set
+    fun addPhoto(uri: Uri) {
+        if (photoBusy || photos.size >= MAX_PHOTOS) return
+        photoBusy = true
+        viewModelScope.launch {
+            Logo.prepare(getApplication(), uri, maxSide = 1024, jpegQuality = 78)?.let { photos.add(it) }
+            photoBusy = false
+        }
+    }
+    fun removePhoto(index: Int) { if (index in photos.indices) photos.removeAt(index) }
+
+    // ---- Conexión --------------------------------------------------------------------------
+    var online by mutableStateOf(true)
+        private set
+    private fun checkOnline() { online = Network.isOnline(getApplication()) }
+
+    // ---- Último pedido (para repetirlo con un toque) -------------------------------------------
+    private val orderPrefs = app.getSharedPreferences("fletaba_pedidos", android.content.Context.MODE_PRIVATE)
+    var lastOrderLabel by mutableStateOf<String?>(orderPrefs.getString("ultimo_resumen", null))
+        private set
+    val hasLastOrder: Boolean get() = lastOrderLabel != null && orderPrefs.contains("ultimo")
+
+    private fun saveLastOrder() {
+        val arr = org.json.JSONArray()
+        stops.forEach { st ->
+            val pt = st.point ?: return
+            arr.put(
+                org.json.JSONObject().put("q", st.query).put("label", pt.label).put("lat", pt.location.lat).put("lng", pt.location.lng)
+                    .put("cov", pt.insideCoverage).put("ori", pt.insideOrigin).put("acc", st.floor.access.name).put("floors", st.floor.floors),
+            )
+        }
+        val counts = org.json.JSONObject().also { o -> cargoCounts.forEach { (k, v) -> o.put(k, v) } }
+        val json = org.json.JSONObject().put("stops", arr).put("vehicle", vehicle.kind.name).put("helpers", helpers)
+            .put("counts", counts).put("note", cargoNote).put("roundTrip", roundTrip)
+        val first = stops.first().point?.label?.substringBefore(",").orEmpty()
+        val last = stops.last().point?.label?.substringBefore(",").orEmpty()
+        lastOrderLabel = "$first → $last"
+        orderPrefs.edit().putString("ultimo", json.toString()).putString("ultimo_resumen", lastOrderLabel).apply()
+    }
+
+    /** Vuelve a cargar el recorrido, el vehículo, los ayudantes y la carga del último pedido. */
+    fun repeatLastOrder() {
+        val json = runCatching { org.json.JSONObject(orderPrefs.getString("ultimo", null) ?: return) }.getOrNull() ?: return
+        val arr = json.optJSONArray("stops") ?: return
+        if (arr.length() < 2) return
+        searchJob?.cancel()
+        stops.clear()
+        for (i in 0 until arr.length()) {
+            val o = arr.getJSONObject(i)
+            val point = AddressPoint(o.optString("label"), com.fletaba.core.LatLng(o.getDouble("lat"), o.getDouble("lng")), o.optBoolean("cov", true), o.optBoolean("ori", i == 0))
+            val access = runCatching { com.fletaba.core.Access.valueOf(o.optString("acc", "GROUND")) }.getOrDefault(com.fletaba.core.Access.GROUND)
+            stops.add(newStop().copy(query = o.optString("q", point.label), point = point, floor = FloorInfo(access, o.optInt("floors", 0))))
+        }
+        com.fletaba.core.VehicleKind.fromId(json.optString("vehicle").lowercase())?.let { k -> vehicles.indexOfFirst { it.kind == k }.takeIf { it >= 0 }?.let { vehicleIndex = it } }
+        helpers = json.optInt("helpers", 0).coerceIn(0, 2)
+        cargoCounts.clear()
+        json.optJSONObject("counts")?.let { c -> c.keys().forEach { k -> cargoCounts[k] = c.optInt(k) } }
+        cargoNote = json.optString("note", "")
+        roundTrip = json.optBoolean("roundTrip", false)
+        activeStop = 0
+        clearSuggestions()
+        recomputeRoute()
+    }
+
+    // ---- Estado del pedido enviado ------------------------------------------------------------
+    var orderId by mutableStateOf<String?>(null)
+        private set
+    var orderStatus by mutableStateOf<com.fletaba.core.OrderStatus?>(null)
+        private set
+    private var statusJob: Job? = null
+
+    private fun watchStatus(id: String) {
+        statusJob?.cancel()
+        statusJob = viewModelScope.launch {
+            repeat(60) { // ~15 minutos
+                remotePrices.orderStatus(id)?.let { com.fletaba.core.OrderStatus.parse(it) }?.let { orderStatus = it }
+                if (orderStatus == com.fletaba.core.OrderStatus.DONE || orderStatus == com.fletaba.core.OrderStatus.CANCELLED) return@launch
+                delay(15_000)
+            }
+        }
+    }
+    fun refreshStatus() { orderId?.let { watchStatus(it) } }
+
+    // ---- Pedidos en el panel del dueño --------------------------------------------------------
+    var adminTab by mutableIntStateOf(0)
+        private set
+    fun selectAdminTab(tab: Int) { adminTab = tab; if (tab == 1) loadOrders() }
+    val adminOrders = mutableStateListOf<org.json.JSONObject>()
+    var ordersLoading by mutableStateOf(false)
+        private set
+    var ordersMessage by mutableStateOf<String?>(null)
+        private set
+    fun loadOrders() {
+        if (ordersLoading) return
+        val pin = remotePrices.rememberedPin() ?: return
+        ordersLoading = true; ordersMessage = null
+        viewModelScope.launch {
+            val list = remotePrices.listOrders(pin)
+            if (list == null) ordersMessage = "No se pudieron cargar los pedidos. Revisá la conexión."
+            else { adminOrders.clear(); adminOrders.addAll(list); if (list.isEmpty()) ordersMessage = "Todavía no hay pedidos." }
+            ordersLoading = false
+        }
+    }
+    fun setOrderStatus(id: String, status: com.fletaba.core.OrderStatus) {
+        val pin = remotePrices.rememberedPin() ?: return
+        viewModelScope.launch {
+            if (remotePrices.setOrderStatus(pin, id, status.key)) {
+                val i = adminOrders.indexOfFirst { it.optString("id") == id }
+                if (i >= 0) adminOrders[i] = org.json.JSONObject(adminOrders[i].toString()).put("estado", status.key)
+                if (orderId == id) orderStatus = status
+            } else ordersMessage = "No se pudo cambiar el estado. Revisá la conexión."
+        }
+    }
 
     /** Tiempo de carga y descarga incluido en el precio, parada por parada. */
     val loadTime: LoadTimeBreakdown
@@ -577,6 +709,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     var lastMessage: String = ""
         private set
     fun openWhatsApp(number: String) { sender.openWhatsApp(number, lastMessage) }
+    fun openWhatsAppTo(number: String, text: String) { sender.openWhatsApp(number, text) }
 
     // ---- Ubicación actual como origen ---------------------------------------------------------
     var locating by mutableStateOf(false)
@@ -590,6 +723,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     fun useMyLocation() {
         if (locating) return
         locating = true; locationMessage = null
+        checkOnline()
         viewModelScope.launch {
             val here = LocationHelper.current(getApplication())
             if (here == null) {
@@ -630,12 +764,30 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             loadTime = loadTime,
             waitFeePer15Min = times.waitFeePer15Min,
             travelMinutes = route?.durationMin,
+            roundTrip = roundTrip,
+            photoCount = photos.size,
         )
         customerPrefs.edit().putString("nombre", customerName.trim()).putString("whatsapp", customerPhone).apply()
+        saveLastOrder()
         lastMessage = OrderMessage.build(summary)
         sending = true
+        checkOnline()
         viewModelScope.launch {
-            sendResult = sender.send(summary, ownerWhatsApps, config.remotePricesUrl)
+            val outcome = sender.send(summary, ownerWhatsApps, config.remotePricesUrl, photos.map { it.second })
+            sendResult = outcome.result
+            orderStatus = null
+            orderId = outcome.orderId ?: if (!remotePrices.synced) {
+                // Modo local: el pedido queda anotado en este teléfono para el panel del dueño.
+                val id = UUID.randomUUID().toString().take(8).uppercase()
+                remotePrices.saveLocalOrder(
+                    org.json.JSONObject().put("id", id).put("fecha", java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale("es", "AR")).format(java.util.Date()))
+                        .put("cliente", summary.customerName.trim()).put("whatsapp", summary.customerPhone).put("origen", summary.stops.first().point.label)
+                        .put("destino", summary.stops.last().point.label).put("vehiculo", summary.vehicle.name).put("ayudantes", summary.helpers)
+                        .put("cuando", summary.schedule.describe()).put("km", summary.distanceKm).put("precio", summary.price.total).put("estado", "nuevo"),
+                )
+                id
+            } else null
+            orderId?.let { orderStatus = com.fletaba.core.OrderStatus.NEW; watchStatus(it) }
             sending = false
             step = Step.DONE
         }
@@ -651,6 +803,8 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         helpers = 0
         cargoCounts.clear(); cargoNote = ""
         schedule = Schedule()
+        roundTrip = false; photos.clear()
+        statusJob?.cancel(); orderId = null; orderStatus = null
         sending = false; sendResult = null
         sessionToken = UUID.randomUUID().toString()
         step = Step.ROUTE
@@ -658,12 +812,14 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     // Va al final: los bloques init corren en orden de declaración y este usa propiedades de arriba.
     init {
+        checkOnline()
         remotePrices.cached()?.let { applySheet(it) }
         viewModelScope.launch { remotePrices.fetch()?.let { applySheet(it) } }
     }
 
     companion object {
         const val CARGO_MAX = 80
+        const val MAX_PHOTOS = 3
         /** Vehículo seleccionado al entrar (índice en config.json): el furgón mediano. */
         private const val DEFAULT_VEHICLE = 1
     }
