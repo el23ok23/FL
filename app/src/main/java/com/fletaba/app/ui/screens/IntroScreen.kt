@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.fletaba.app.ui.components.VehicleIcon
-import com.fletaba.app.ui.theme.FletabaOrange
 import com.fletaba.core.VehicleKind
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -126,7 +125,7 @@ fun IntroScreen(title: String, subtitle: String, onFinished: () -> Unit) {
                     Text(
                         subtitle,
                         style = MaterialTheme.typography.titleMedium,
-                        color = FletabaOrange,
+                        color = colors.tertiary,
                     )
                 }
             }
