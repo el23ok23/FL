@@ -263,6 +263,48 @@ class LoadTimeTest {
 }
 
 class PriceSheetTest {
+    @Test
+    fun formAndCsvRoundTrip() {
+        val pricing = PricingConfig(perHelper = 15000, perHelperKm = 500, perStairFloor = 6000, perExtraStop = 8000, roundTo = 500, urbanDistanceFactor = 1.3, minKm = 2.5, operatingPct = 0.2, commissionPct = 0.15)
+        val vehicles = listOf(VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", baseFare = 25000, perKm = 1800))
+        val times = TimeConfig(stairMinutesPerFloor = 6, elevatorMinutes = 10, intermediateFactor = 0.5, waitFeePer15Min = 6000)
+        val values = PriceSheet.currentValues(pricing, vehicles, times)
+        assertEquals("2.5", values["km_minimo"])
+        assertEquals("15", values["comision_porcentaje"])
+        assertEquals("25000", values["kangoo.tarifa_base"])
+        val groups = PriceSheet.form(vehicles, advanced = true)
+        // Todos los campos numéricos del formulario tienen valor actual
+        groups.flatMap { it.fields }.filter { !it.text }.forEach { f -> assertTrue(f.key, values.containsKey(f.key)) }
+        assertTrue(PriceSheet.form(vehicles, advanced = false).none { it.title == "Avanzado" })
+        // Edito, armo el CSV y lo aplico
+        val edited = values.toMutableMap().apply { put("kangoo.por_km", "2.000"); put("km_minimo", "3,5"); put("por_ayudante", "abc") }
+        val csv = PriceSheet.toCsv(edited)
+        assertFalse(csv.contains("por_ayudante,abc"))
+        val r = PriceSheet.apply(csv, pricing, vehicles, times)
+        assertEquals(2000, r.vehicles[0].perKm)
+        assertEquals(3.5, r.pricing.minKm, 1e-9)
+        assertEquals(15000, r.pricing.perHelper)
+        assertTrue(PriceSheet.isNumber("$ 25.000")); assertFalse(PriceSheet.isNumber("veinte"))
+    }
+
+    @Test
+    fun brandingKeys() {
+        val csv = "clave,valor\nnombre,Fletes Don Pedro, Salto\nwhatsapp,+54 9 2474 12-3456\ncolor_primario,0e7c4a\ncolor_acento,#ZZZ\nlogo_url,https://x/y.png\nkangoo.por_km,1500\n"
+        val b = PriceSheet.branding(csv)
+        assertEquals("Fletes Don Pedro, Salto", b.name)
+        assertEquals("5492474123456", b.whatsapp)
+        assertEquals("#0E7C4A", b.primary)
+        assertNull(b.accent)
+        assertEquals("https://x/y.png", b.logoUrl)
+        // Las claves de texto no rompen los números y vuelven a salir en el CSV
+        val out = PriceSheet.toCsv(linkedMapOf("nombre" to "Don Pedro", "kangoo.por_km" to "1.500", "color_primario" to "", "por_ayudante" to "x"))
+        assertTrue(out.contains("nombre,Don Pedro")); assertTrue(out.contains("kangoo.por_km,1.500"))
+        assertFalse(out.contains("color_primario")); assertFalse(out.contains("por_ayudante"))
+        assertTrue(PriceSheet.isValid("nombre", "Fletes Pepe")); assertFalse(PriceSheet.isValid("nombre", "F"))
+        assertTrue(PriceSheet.isValid("whatsapp", "")); assertFalse(PriceSheet.isValid("whatsapp", "123"))
+        assertTrue(PriceSheet.form(emptyList(), advanced = false).first().fields.all { it.text })
+    }
+
     private val pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.2, commissionPct = 0.15)
     private val times = TimeConfig(6, 10, 0.5, 6000)
     private val vehicles = listOf(

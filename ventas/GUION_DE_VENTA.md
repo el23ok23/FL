@@ -18,17 +18,17 @@ Fleteros con 1 a 5 vehículos que hoy reciben pedidos por teléfono o WhatsApp y
 - **Seriedad**: "Una empresa con app propia cobra mejor y cierra más rápido."
 - **Precio claro**: "Tarifa, km, ayudantes, pisos: el cliente ve de dónde sale el número. Menos regateo."
 - **Espera**: "Queda escrito cuánto tiempo de carga incluye y cuánto cuesta la espera."
-- **Sin ataduras**: "Pagás una vez y es tuya. Ni comisión ni abono, nunca. Los precios los cambiás vos desde una planilla."
+- **Sin ataduras**: "Pagás una vez y es tuya. Ni comisión ni abono, nunca. Los precios, el nombre, los colores y el logo los cambiás vos desde la app."
 
 ## Objeciones y respuestas
 - *"Mis clientes me llaman, no usan apps."* → "Por eso también tenés la web: les mandás el enlace por WhatsApp y cotizan ahí, sin instalar nada. Y los que buscan en Google te encuentran en Play."
 - *"Es caro."* → "Es un solo pago; dividilo en los años que la vas a usar y son centavos por flete. Y no tiene comisiones ni mensual: nunca más pagás."
 - *"Ya tengo página de Facebook."* → "Perfecto, la app se promociona ahí: te doy 10 posts y 5 videos con tu marca."
-- *"¿Y si cambio los precios?"* → "Los cambiás vos desde tu planilla de Google, desde el celular, cuando quieras. Te muestro: cambio este número y mirá el presupuesto."
+- *"¿Y si cambio los precios?"* → "Los cambiás vos desde la app, con tu PIN. Te muestro: mantengo apretado el título, entro, cambio este número, Guardar, y mirá el presupuesto."
 - *"Lo pienso."* → "Dale. Te dejo la demo con tu nombre esta semana, sin cargo, y lo ves funcionando."
 
 ## Cierre
 Ofrecer la prueba de 48 horas con su nombre. Pedir: nombre comercial, logo o color, WhatsApp de pedidos, lista de vehículos y tarifas actuales. Agendar la entrega.
 
 ## Después de la venta
-Checklist: crear su planilla de precios en Google Sheets (importar `docs/plantilla-precios-salto.csv`, publicar como CSV, compartir con su Gmail como editor) → `scripts/nueva_empresa.py` con sus datos y `--precios-url` → revisar APK y web → cargar su clave de CallMeBot para que los pedidos le lleguen solos → publicar en Play → entregar `ENTREGA_AL_CLIENTE.md`, posts y videos → capacitación de una hora → cobrar el 50 % restante.
+Checklist: crear su planilla y Apps Script (`ventas/CONFIGURAR_PANEL_DEL_DUENO.md`, 10 minutos) → `scripts/nueva_empresa.py` con sus datos y `--precios-url` → revisar APK y web → cargar su clave de CallMeBot para que los pedidos le lleguen solos → publicar en Play → entregar `ENTREGA_AL_CLIENTE.md`, posts y videos → capacitación de una hora → cobrar el 50 % restante.

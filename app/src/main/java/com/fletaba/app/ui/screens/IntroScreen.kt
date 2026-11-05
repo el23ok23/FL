@@ -7,7 +7,12 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -50,7 +55,7 @@ import kotlinx.coroutines.launch
  * un pequeño rebote y "deja" el nombre. Dura ~1,3 s y pasa sola (o antes, si se toca).
  */
 @Composable
-fun IntroScreen(title: String, subtitle: String, onFinished: () -> Unit) {
+fun IntroScreen(title: String, subtitle: String, logo: Bitmap? = null, onFinished: () -> Unit) {
     val finish by rememberUpdatedState(onFinished)
     val truckX = remember { Animatable(-1.2f) } // en fracciones del ancho
     val wheel = remember { Animatable(0f) }
@@ -103,11 +108,23 @@ fun IntroScreen(title: String, subtitle: String, onFinished: () -> Unit) {
                     }
                 }
                 Box(Modifier.offset { IntOffset((truckX.value * widthPx).toInt(), 0) }) {
-                    VehicleIcon(
-                        kind = VehicleKind.FURGON_MEDIANO,
-                        modifier = Modifier.size(width = 180.dp, height = 100.dp),
-                        wheelRotation = wheel.value,
-                    )
+                    if (logo != null) {
+                        // Logo del dueño: entra con el mismo movimiento que la camioneta.
+                        Image(
+                            bitmap = logo.asImageBitmap(),
+                            contentDescription = title,
+                            modifier = Modifier
+                                .size(150.dp)
+                                .clip(RoundedCornerShape(32.dp)),
+                            contentScale = ContentScale.Fit,
+                        )
+                    } else {
+                        VehicleIcon(
+                            kind = VehicleKind.FURGON_MEDIANO,
+                            modifier = Modifier.size(width = 180.dp, height = 100.dp),
+                            wheelRotation = wheel.value,
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(10.dp))

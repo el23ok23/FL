@@ -35,6 +35,8 @@ data class AppConfig(
     val brand: BrandColors = DEFAULT_BRAND,
     /** Planilla de precios del dueño (CSV publicado de Google Sheets); vacío = solo config.json. */
     val remotePricesUrl: String? = null,
+    /** PIN del panel del dueño cuando no hay planilla (los cambios valen solo en ese teléfono). */
+    val localOwnerPin: String? = null,
 ) {
     companion object {
         private const val TAG = "AppConfig"
@@ -118,11 +120,12 @@ data class AppConfig(
                     accent = parseColor(marca.optString("color_acento"), DEFAULT_BRAND.accent),
                 ),
                 remotePricesUrl = clean(remotos.optString("url"))?.takeIf { it.startsWith("https://") },
+                localOwnerPin = clean(remotos.optString("pin_local")),
             )
         }
 
         /** "#1B7BE0" → 0xFF1B7BE0; si no es válido, devuelve el color por defecto. */
-        private fun parseColor(hex: String?, fallback: Long): Long {
+        fun parseColor(hex: String?, fallback: Long): Long {
             val h = hex?.trim()?.removePrefix("#") ?: return fallback
             if (h.length != 6 || !h.all { it.isLetterOrDigit() }) return fallback
             return (0xFF000000L or h.toLong(16))

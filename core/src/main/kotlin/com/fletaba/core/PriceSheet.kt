@@ -65,6 +65,133 @@ object PriceSheet {
         return Result(p, v, t, applied)
     }
 
+    // ---- Formulario del panel del dueño -----------------------------------------------------
+
+    /** Un valor editable: clave de la planilla, etiqueta para mostrar y si admite decimales (o es texto). */
+    data class Field(val key: String, val label: String, val decimal: Boolean = false, val unit: String = "$", val text: Boolean = false)
+
+    // ---- Marca (también editable por el dueño) ------------------------------------------------
+
+    const val KEY_NAME = "nombre"
+    const val KEY_WHATSAPP = "whatsapp"
+    const val KEY_PRIMARY = "color_primario"
+    const val KEY_ACCENT = "color_acento"
+    const val KEY_LOGO = "logo_url"
+    /** Claves cuyo valor es texto (no se validan como número). */
+    val TEXT_KEYS = setOf(KEY_NAME, KEY_WHATSAPP, KEY_PRIMARY, KEY_ACCENT, KEY_LOGO)
+
+    /** Lo que el dueño puede cambiar de su marca desde la app. null = sin cambio. */
+    data class Branding(
+        val name: String? = null,
+        /** 549 + área + número, solo dígitos. */
+        val whatsapp: String? = null,
+        /** "#RRGGBB" */
+        val primary: String? = null,
+        val accent: String? = null,
+        val logoUrl: String? = null,
+    )
+
+    fun branding(csv: String): Branding = branding(parse(csv))
+
+    fun branding(values: Map<String, String>): Branding = Branding(
+        name = values[KEY_NAME]?.takeIf { it.isNotBlank() },
+        whatsapp = values[KEY_WHATSAPP]?.filter { it.isDigit() }?.takeIf { it.length >= 10 },
+        primary = values[KEY_PRIMARY]?.let { hex(it) },
+        accent = values[KEY_ACCENT]?.let { hex(it) },
+        logoUrl = values[KEY_LOGO]?.trim()?.takeIf { it.startsWith("https://") || it.startsWith("file:") || it == "local" },
+    )
+
+    /** "#1b7be0", "1B7BE0" → "#1B7BE0"; otra cosa → null. */
+    fun hex(text: String): String? {
+        val h = text.trim().removePrefix("#").uppercase()
+        return if (Regex("^[0-9A-F]{6}$").matches(h)) "#$h" else null
+    }
+
+    data class Group(val title: String, val fields: List<Field>, val subtitle: String? = null)
+
+    /**
+     * Grupos y campos que ve el dueño en el panel, en orden. [advanced] agrega los porcentajes
+     * invisibles para el cliente (recargo operativo y comisión).
+     */
+    fun form(vehicles: List<VehicleSpec>, advanced: Boolean): List<Group> {
+        val out = ArrayList<Group>()
+        out += Group(
+            "Tu negocio",
+            listOf(
+                Field(KEY_NAME, "Nombre que ve el cliente", text = true, unit = ""),
+                Field(KEY_WHATSAPP, "WhatsApp donde llegan los pedidos", text = true, unit = ""),
+            ),
+        )
+        vehicles.forEach { v ->
+            val id = v.kind.name.lowercase()
+            out += Group(
+                title = v.name,
+                subtitle = v.dimensions,
+                fields = listOf(Field("$id.tarifa_base", "Tarifa base"), Field("$id.por_km", "Por kilómetro")),
+            )
+        }
+        out += Group("Ayudantes", listOf(Field("por_ayudante", "Por ayudante (base)"), Field("por_ayudante_km", "Por ayudante, por km")))
+        out += Group(
+            "Recargos",
+            listOf(
+                Field("por_piso_escalera", "Por piso por escalera"),
+                Field("por_parada_extra", "Por parada en el medio"),
+                Field("espera_por_15_min", "Espera, cada 15 minutos"),
+            ),
+        )
+        out += Group(
+            "General",
+            listOf(Field("km_minimo", "Kilómetros mínimos", decimal = true, unit = "km"), Field("redondeo", "Redondear el total a")),
+        )
+        if (advanced) {
+            out += Group(
+                "Avanzado",
+                subtitle = "Porcentajes que el cliente no ve, incluidos en el precio.",
+                fields = listOf(
+                    Field("recargo_operativo_porcentaje", "Recargo operativo", decimal = true, unit = "%"),
+                    Field("comision_porcentaje", "Comisión", decimal = true, unit = "%"),
+                ),
+            )
+        }
+        return out
+    }
+
+    /** Valores actuales, con las claves de la planilla, para precargar el formulario. */
+    fun currentValues(pricing: PricingConfig, vehicles: List<VehicleSpec>, times: TimeConfig): Map<String, String> =
+        parse(template(pricing, vehicles, times))
+
+    /** Valores actuales de marca con las claves de la planilla (vacío = el de fábrica). */
+    fun brandingValues(b: Branding): Map<String, String> = linkedMapOf(
+        KEY_NAME to (b.name ?: ""), KEY_WHATSAPP to (b.whatsapp ?: ""),
+        KEY_PRIMARY to (b.primary ?: ""), KEY_ACCENT to (b.accent ?: ""), KEY_LOGO to (b.logoUrl ?: ""),
+    )
+
+    /** true si el texto es un número que la planilla entiende. */
+    fun isNumber(text: String): Boolean = text.toNumber() != null
+
+    /** true si el valor sirve para esa clave (número, o texto no vacío en las claves de texto). */
+    fun isValid(key: String, value: String): Boolean = when (key) {
+        KEY_NAME -> value.trim().length in 2..40
+        KEY_WHATSAPP -> value.isBlank() || value.filter { it.isDigit() }.length in 10..15
+        KEY_PRIMARY, KEY_ACCENT -> value.isBlank() || hex(value) != null
+        KEY_LOGO -> true
+        else -> isNumber(value)
+    }
+
+    /** Arma el CSV "clave,valor" a partir de lo que escribió el dueño (solo claves con valor válido). */
+    fun toCsv(values: Map<String, String>): String = buildString {
+        appendLine("clave,valor")
+        values.forEach { (k, v) ->
+            if (k.isBlank()) return@forEach
+            if (k in TEXT_KEYS) {
+                val t = v.trim().replace('\n', ' ').replace('\r', ' ')
+                if (t.isNotEmpty()) appendLine("$k,$t")
+            } else if (v.toNumber() != null) {
+                appendLine("$k,${v.trim().replace(',', '.')}")
+            }
+        }
+    }
+
     /** Acepta "25000", "25.000", "25,5" y "$ 25.000". */
     private fun String.toNumber(): Double? {
         var s = trim().removePrefix("$").trim().replace(" ", "")
@@ -83,15 +210,21 @@ object PriceSheet {
         appendLine("por_ayudante_km,${pricing.perHelperKm}")
         appendLine("por_piso_escalera,${pricing.perStairFloor}")
         appendLine("por_parada_extra,${pricing.perExtraStop}")
-        appendLine("km_minimo,${pricing.minKm}")
+        appendLine("km_minimo,${num(pricing.minKm)}")
         appendLine("redondeo,${pricing.roundTo}")
         appendLine("espera_por_15_min,${times.waitFeePer15Min}")
-        appendLine("comision_porcentaje,${(pricing.commissionPct * 100).toInt()}")
-        appendLine("recargo_operativo_porcentaje,${(pricing.operatingPct * 100).toInt()}")
+        appendLine("comision_porcentaje,${num(pricing.commissionPct * 100)}")
+        appendLine("recargo_operativo_porcentaje,${num(pricing.operatingPct * 100)}")
         vehicles.forEach { v ->
             val id = v.kind.name.lowercase()
             appendLine("$id.tarifa_base,${v.baseFare}")
             appendLine("$id.por_km,${v.perKm}")
         }
+    }
+
+    /** 2.0 → "2", 2.5 → "2.5", 15.000001 → "15". */
+    private fun num(d: Double): String {
+        val r = Math.round(d * 100) / 100.0
+        return if (r == Math.floor(r)) r.toLong().toString() else r.toString()
     }
 }

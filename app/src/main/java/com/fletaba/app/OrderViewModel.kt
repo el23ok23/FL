@@ -1,6 +1,8 @@
 package com.fletaba.app
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -13,6 +15,8 @@ import com.fletaba.app.data.AddressProvider
 import com.fletaba.app.data.AddressSuggestion
 import com.fletaba.app.data.AppConfig
 import com.fletaba.app.data.AppSignature
+import com.fletaba.app.data.BrandColors
+import com.fletaba.app.data.Logo
 import com.fletaba.app.data.CabaStreets
 import com.fletaba.app.data.GeocoderProvider
 import com.fletaba.app.data.GooglePlacesProvider
@@ -76,7 +80,21 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     var pricesFromSheet by mutableStateOf(false)
         private set
 
-    private val remotePrices: RemotePrices? = config.remotePricesUrl?.let { RemotePrices(app, it) }
+    private val remotePrices = RemotePrices(app, config.remotePricesUrl, config.localOwnerPin)
+
+    // ---- Marca (también editable por el dueño) -------------------------------------------------
+    var businessName: String by mutableStateOf(config.businessName)
+        private set
+    var ownerWhatsApp: String? by mutableStateOf(config.ownerWhatsApp)
+        private set
+    var brand: BrandColors by mutableStateOf(config.brand)
+        private set
+    /** Dirección del logo del dueño ("local", https…) o null si usa el de fábrica. */
+    var logoSource: String? by mutableStateOf(null)
+        private set
+    var logo: Bitmap? by mutableStateOf(null)
+        private set
+    private var branding = PriceSheet.Branding()
 
     private fun applySheet(csv: String) {
         val r = PriceSheet.apply(csv, config.pricing, config.vehicles, config.times)
@@ -85,7 +103,121 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             pricesFromSheet = true
             if (vehicleIndex > vehicles.lastIndex) vehicleIndex = vehicles.lastIndex
         }
+        applyBranding(PriceSheet.branding(csv))
     }
+
+    private fun applyBranding(b: PriceSheet.Branding) {
+        branding = b
+        businessName = b.name ?: config.businessName
+        ownerWhatsApp = b.whatsapp ?: config.ownerWhatsApp
+        brand = BrandColors(
+            primary = AppConfig.parseColor(b.primary, config.brand.primary),
+            accent = AppConfig.parseColor(b.accent, config.brand.accent),
+        )
+        if (b.logoUrl != logoSource || (b.logoUrl != null && logo == null)) {
+            logoSource = b.logoUrl
+            if (b.logoUrl == null) logo = null
+            else viewModelScope.launch { logo = Logo.load(getApplication(), b.logoUrl, remotePrices.localLogoFile()) }
+        }
+    }
+    // ---- Panel del dueño ----------------------------------------------------------------------
+    /** El panel se abre manteniendo apretado el título de la primera pantalla. */
+    var adminOpen by mutableStateOf(false)
+        private set
+    /** true una vez que el PIN fue aceptado. */
+    var adminUnlocked by mutableStateOf(false)
+        private set
+    var adminBusy by mutableStateOf(false)
+        private set
+    /** Mensaje de estado del panel (error de PIN, sin internet, guardado). */
+    var adminMessage by mutableStateOf<String?>(null)
+        private set
+    /** Valores que está editando el dueño, por clave de la planilla. */
+    val adminValues = mutableStateMapOf<String, String>()
+    val adminAvailable: Boolean get() = remotePrices.available
+    /** true si los cambios llegan a todos los teléfonos; false si valen solo en este. */
+    val adminSynced: Boolean get() = remotePrices.synced
+    val adminForm: List<PriceSheet.Group>
+        get() = PriceSheet.form(config.vehicles, advanced = config.pricing.commissionPct > 0 || config.pricing.operatingPct > 0)
+
+    fun openAdmin() {
+        adminMessage = null
+        loadAdminValues(pricing, vehicles, times)
+        adminOpen = true
+        val pin = remotePrices.rememberedPin()
+        if (pin != null && !adminUnlocked) unlockAdmin(pin, remember = true)
+    }
+    fun closeAdmin() { adminOpen = false; adminMessage = null }
+    fun lockAdmin() { adminUnlocked = false; remotePrices.rememberPin(null); adminMessage = null }
+
+    private fun loadAdminValues(p: PricingConfig, v: List<VehicleSpec>, t: TimeConfig, b: PriceSheet.Branding = branding) {
+        adminValues.clear(); adminValues.putAll(PriceSheet.currentValues(p, v, t)); adminValues.putAll(PriceSheet.brandingValues(b))
+        adminLogoPreview = null
+    }
+    /** Logo recién elegido en la galería, antes de guardar. */
+    var adminLogoPreview: Bitmap? by mutableStateOf(null)
+        private set
+
+    /** El dueño eligió una imagen de la galería: se achica, se sube y queda lista para Guardar. */
+    fun pickLogo(uri: Uri) {
+        if (adminBusy) return
+        val pin = remotePrices.rememberedPin() ?: run { adminUnlocked = false; return }
+        adminBusy = true; adminMessage = null
+        viewModelScope.launch {
+            val prepared = Logo.prepare(getApplication(), uri)
+            if (prepared == null) { adminMessage = "No se pudo leer esa imagen."; adminBusy = false; return@launch }
+            val url = remotePrices.uploadLogo(prepared.second, pin)
+            if (url == null) {
+                adminMessage = "No se pudo subir el logo. Revisá la conexión y probá de nuevo."
+            } else {
+                adminLogoPreview = prepared.first
+                adminValues[PriceSheet.KEY_LOGO] = url
+                adminMessage = "Logo listo. Tocá Guardar para que se vea."
+            }
+            adminBusy = false
+        }
+    }
+    fun removeLogo() { adminValues[PriceSheet.KEY_LOGO] = ""; adminLogoPreview = null }
+
+    fun unlockAdmin(pin: String, remember: Boolean = true) {
+        if (adminBusy) return
+        adminBusy = true; adminMessage = null
+        viewModelScope.launch {
+            when (remotePrices.verifyPin(pin.trim())) {
+                RemotePrices.Status.OK -> { adminUnlocked = true; if (remember) remotePrices.rememberPin(pin.trim()) }
+                RemotePrices.Status.WRONG_PIN -> { adminMessage = "PIN incorrecto"; remotePrices.rememberPin(null) }
+                RemotePrices.Status.OFFLINE -> adminMessage = "Sin conexión. Hace falta internet para entrar."
+                RemotePrices.Status.NOT_CONFIGURED -> adminMessage = "El panel todavía no está configurado."
+            }
+            adminBusy = false
+        }
+    }
+
+    fun setAdminValue(key: String, value: String) { adminValues[key] = value }
+    /** Vuelve a cargar en el formulario los precios originales de la app (no guarda hasta tocar Guardar). */
+    fun resetAdminValues() { loadAdminValues(config.pricing, config.vehicles, config.times, PriceSheet.Branding()); adminMessage = "Precios originales cargados. Tocá Guardar para aplicarlos." }
+    val adminValid: Boolean get() = adminForm.flatMap { it.fields }.all { PriceSheet.isValid(it.key, adminValues[it.key] ?: "") }
+
+    fun saveAdmin() {
+        if (adminBusy || !adminValid) return
+        val pin = remotePrices.rememberedPin() ?: run { adminUnlocked = false; return }
+        val csv = PriceSheet.toCsv(adminValues)
+        adminBusy = true; adminMessage = null
+        viewModelScope.launch {
+            when (remotePrices.publish(csv, pin)) {
+                RemotePrices.Status.OK -> {
+                    applySheet(csv)
+                    if (adminLogoPreview != null) { logo = adminLogoPreview }
+                    adminMessage = if (remotePrices.synced) "Guardado. Ya rige en todos los teléfonos." else "Guardado en este teléfono."
+                }
+                RemotePrices.Status.WRONG_PIN -> { adminMessage = "PIN incorrecto"; adminUnlocked = false; remotePrices.rememberPin(null) }
+                RemotePrices.Status.OFFLINE -> adminMessage = "Sin conexión. No se pudo guardar; probá de nuevo."
+                RemotePrices.Status.NOT_CONFIGURED -> adminMessage = "El panel todavía no está configurado."
+            }
+            adminBusy = false
+        }
+    }
+
     /** Mapa real de Google (solo con clave). */
     val staticMaps: StaticMapService? = config.staticMapsKey?.let { StaticMapService(it) }
     /** Mapa real de OpenStreetMap, sin clave (respaldo). */
@@ -373,7 +505,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         val phone = phoneNormalized ?: return
         if (sending || !allResolved) return
         val summary = OrderSummary(
-            businessName = config.businessName,
+            businessName = businessName,
             customerName = customerName,
             customerPhone = phone,
             stops = stops.map { Stop(it.point!!, it.floor) },
@@ -389,7 +521,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         )
         sending = true
         viewModelScope.launch {
-            sendResult = sender.send(summary)
+            sendResult = sender.send(summary, ownerWhatsApp)
             sending = false
             step = Step.DONE
         }
@@ -413,10 +545,8 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     // Va al final: los bloques init corren en orden de declaración y este usa propiedades de arriba.
     init {
-        remotePrices?.let { remote ->
-            remote.cached()?.let { applySheet(it) }
-            viewModelScope.launch { remote.fetch()?.let { applySheet(it) } }
-        }
+        remotePrices.cached()?.let { applySheet(it) }
+        viewModelScope.launch { remotePrices.fetch()?.let { applySheet(it) } }
     }
 
     companion object {

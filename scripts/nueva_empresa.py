@@ -34,7 +34,8 @@ def main():
     ap.add_argument("--precios-de", default=None, choices=["caba", "salto"], help="de qué variante copiar los precios (por defecto, la del origen)")
     ap.add_argument("--comision", type=float, default=0, help="comisión %% sobre el bruto (venta única: 0)")
     ap.add_argument("--operativo", type=float, default=0, help="recargo operativo %% (venta única: 0, el dueño pone sus precios reales)")
-    ap.add_argument("--precios-url", default="", help="enlace CSV de la planilla de Google Sheets del dueño (puede agregarse después)")
+    ap.add_argument("--pin", default="", help="PIN local del panel del dueño (si no hay Apps Script); vacío = sin panel local")
+    ap.add_argument("--precios-url", default="", help="dirección /exec del Apps Script de la planilla del dueño (ver ventas/CONFIGURAR_PANEL_DEL_DUENO.md); puede agregarse después")
     a = ap.parse_args()
 
     slug = a.slug.lower()
@@ -74,6 +75,7 @@ def main():
     cfg["precios"]["comision_porcentaje"] = a.comision
     cfg["precios"]["recargo_operativo_porcentaje"] = a.operativo
     cfg["precios_remotos"]["url"] = a.precios_url
+    cfg["precios_remotos"]["pin_local"] = a.pin
     dst_dir = os.path.join(ROOT, "app", "src", slug, "assets"); os.makedirs(dst_dir, exist_ok=True)
     s = json.dumps(cfg, ensure_ascii=False, indent=2)
     s = re.sub(r'\{\s+"id": "([^"]+)",\s+"nombre": "([^"]+)",\s+"descripcion": "([^"]+)",\s+"medidas": "([^"]+)",\s+"carga": "([^"]+)",\s+"tarifa_base": (\d+),\s+"por_km": (\d+),\s+"minutos_carga": (\d+),\s+"m3": ([\d.]+)\s+\}',
@@ -117,7 +119,7 @@ def main():
   App:   variante '{slug}' · id {app_id} · config en app/src/{slug}/assets/config.json
   Web:   docs/{slug}/index.html  →  https://el23ok23.github.io/FL/{slug}/
   APK:   tras el push, https://github.com/el23ok23/FL/releases/download/ultima-version/{release_name}.apk
-  Precios: {"planilla " + a.precios_url if a.precios_url else "los del config.json (agregá la planilla del dueño en precios_remotos.url cuando la tenga)"}
+  Panel del dueño: {"sincronizado con todos los teléfonos vía " + a.precios_url if a.precios_url else ("modo local con PIN " + a.pin if a.pin else "desactivado (pasá --precios-url o --pin)")}
 Siguiente paso: git add -A && git commit -m "Nueva empresa: {a.nombre}" && git push""")
 
 if __name__ == "__main__":

@@ -101,6 +101,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         subtitle = "Salimos desde ${origin.name} a cualquier punto del país. Podés sumar hasta ${OrderSummary.MAX_STOPS - 2} paradas en el medio.",
         stepName = "Recorrido",
         centered = false,
+        onTitleLongPress = { if (vm.adminAvailable) vm.openAdmin() },
         bottomBar = {
             PrimaryButton(
                 text = "Continuar",

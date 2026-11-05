@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import com.fletaba.app.ui.theme.FletabaTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fletaba.app.OrderViewModel
 import com.fletaba.app.Step
+import com.fletaba.app.ui.screens.AdminScreen
 import com.fletaba.app.ui.screens.DetailsScreen
 import com.fletaba.app.ui.screens.DoneScreen
 import com.fletaba.app.ui.screens.IntroScreen
@@ -34,9 +37,23 @@ private const val TOTAL_STEPS = 4
  */
 @Composable
 fun FletabaApp(vm: OrderViewModel = viewModel()) {
+    // El tema sale del estado: si el dueño cambia los colores desde el panel, la app cambia al instante.
+    FletabaTheme(primary = Color(vm.brand.primary), accent = Color(vm.brand.accent)) {
+        FletabaFlow(vm)
+    }
+}
+
+@Composable
+private fun FletabaFlow(vm: OrderViewModel) {
     val step = vm.step
 
     BackHandler(enabled = step != Step.INTRO && step != Step.ROUTE) { vm.back() }
+
+    if (vm.adminOpen) {
+        BackHandler { vm.closeAdmin() }
+        AdminScreen(vm)
+        return
+    }
 
     AnimatedContent(
         targetState = step,
@@ -57,8 +74,9 @@ fun FletabaApp(vm: OrderViewModel = viewModel()) {
     ) { current ->
         when (current) {
             Step.INTRO -> IntroScreen(
-                title = vm.config.businessName,
+                title = vm.businessName,
                 subtitle = "Desde ${vm.config.origin.name} a todo el país",
+                logo = vm.logo,
                 onFinished = { vm.finishIntro() },
             )
             Step.ROUTE -> RouteScreen(vm, step = 1, total = TOTAL_STEPS)

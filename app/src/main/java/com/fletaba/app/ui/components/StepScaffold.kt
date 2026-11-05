@@ -37,6 +37,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +58,8 @@ fun StepScaffold(
     onBack: (() -> Unit)? = null,
     stepName: String? = null,
     centered: Boolean = true,
+    /** Mantener apretado el título (p. ej. para abrir el panel del dueño). */
+    onTitleLongPress: (() -> Unit)? = null,
     bottomBar: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -155,6 +159,9 @@ fun StepScaffold(
                         style = MaterialTheme.typography.headlineMedium,
                         color = colors.onBackground,
                         textAlign = TextAlign.Center,
+                        modifier = if (onTitleLongPress == null) Modifier else Modifier.pointerInput(Unit) {
+                            detectTapGestures(onLongPress = { onTitleLongPress() })
+                        },
                     )
                     if (subtitle != null) {
                         Spacer(Modifier.height(8.dp))

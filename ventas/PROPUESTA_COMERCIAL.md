@@ -24,7 +24,7 @@ Sin pagos dentro de la app: el cliente confirma con vos por WhatsApp y vos cobr�
 | **Pago único** | $ 1.200.000 (IVA no incluido) |
 | Comisión por flete | **Ninguna, nunca** |
 | Abono mensual | **Ninguno** |
-| Cambiar precios | **Vos mismo, cuando quieras**, desde tu planilla de Google: cambiás el número y la app lo toma. Sin pedirle a nadie. |
+| Cambiar precios, nombre, colores y logo | **Vos mismo, desde la app**, con tu PIN: tocás Guardar y rige en todos los teléfonos. Sin pedirle a nadie. |
 | Incluye | App Android con tu marca publicada en Google Play, versión web con tu enlace, pedidos a tu WhatsApp, planilla de precios, material para redes (10 posts y 5 videos), capacitación de 1 hora y 60 días de garantía por fallas. |
 | Opcional | Soporte y mejoras después de la garantía: por hora o por trabajo, solo si lo pedís. |
 
@@ -40,7 +40,7 @@ Valor de referencia, noviembre 2026. Se cobra 50 % al empezar y 50 % contra entr
 ## Preguntas frecuentes
 
 - **¿Necesito saber de tecnología?** No. Vos recibís pedidos por WhatsApp como siempre; nosotros nos ocupamos de la app.
-- **¿Puedo cambiar los precios?** Sí, vos mismo y al instante: la app lee tus precios de una planilla de Google que es tuya. Cambiás un número y listo.
+- **¿Puedo cambiar los precios?** Sí, vos mismo y al instante, desde la app: entrás con tu PIN, cambiás el número y tocás Guardar. También el nombre, los colores y el logo.
 - **¿Tengo que pagar algo después?** No. Ni comisión por flete ni abono. Si algún día querés una mejora, se cotiza aparte.
 - **¿Los datos de mis clientes son míos?** Sí. Los pedidos llegan a tu WhatsApp; la app no guarda datos en ningún otro lado.
 - **¿Funciona en celulares viejos?** Sí, desde Android 5 (2014 en adelante). Y la web funciona en cualquier teléfono.

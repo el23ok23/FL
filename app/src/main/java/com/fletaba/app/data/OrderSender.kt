@@ -22,7 +22,7 @@ class OrderSender(context: Context, private val config: AppConfig) {
 
     enum class Result { SENT, OPENED_WHATSAPP, NOT_CONFIGURED }
 
-    suspend fun send(order: OrderSummary): Result {
+    suspend fun send(order: OrderSummary, ownerWhatsApp: String? = config.ownerWhatsApp): Result {
         // Con la parte privada (comisión y neto) solo en los canales que no pasan por el teléfono del cliente.
         val message = OrderMessage.build(order)
         val ownerMessage = OrderMessage.build(order, ownerNotes = true)
@@ -33,7 +33,7 @@ class OrderSender(context: Context, private val config: AppConfig) {
             Log.w(TAG, "Falló el webhook, se prueba el siguiente canal")
         }
 
-        val owner = config.ownerWhatsApp
+        val owner = ownerWhatsApp
         val botKey = config.callMeBotKey
         if (owner != null && botKey != null) {
             val url = "https://api.callmebot.com/whatsapp.php?phone=%2B$owner" +
