@@ -17,23 +17,18 @@
 
 Sin pagos dentro de la app: el cliente confirma con vos por WhatsApp y vos cobrás como siempre.
 
-## Planes
+## Precio: un solo pago, y la app es tuya
 
-| | Inicial | Profesional | Comisión |
-|---|---|---|---|
-| Alta (una sola vez) | $ 250.000 | $ 350.000 | $ 0 |
-| Mensual | $ 35.000 | $ 55.000 | $ 0 |
-| Comisión por flete | 0 % | 0 % | 10 % del bruto |
-| App Android + web con tu marca | ✓ | ✓ | ✓ |
-| Publicación en Google Play | ✓ | ✓ | ✓ |
-| Cambios de precios y textos | 2 por mes | Ilimitados | Ilimitados |
-| Pedidos automáticos a tu WhatsApp (sin que el cliente toque nada) | — | ✓ | ✓ |
-| Mapa y direcciones de Google (autocompletado letra a letra) | — | ✓ | ✓ |
-| Material para redes (10 posts + 5 videos) | Lanzamiento | Lanzamiento + 1 tanda cada 3 meses | Lanzamiento |
-| Soporte | Por WhatsApp, días hábiles | Prioritario, 7 días | Por WhatsApp, días hábiles |
+| | |
+|---|---|
+| **Pago único** | $ 1.200.000 (IVA no incluido) |
+| Comisión por flete | **Ninguna, nunca** |
+| Abono mensual | **Ninguno** |
+| Cambiar precios | **Vos mismo, cuando quieras**, desde tu planilla de Google: cambiás el número y la app lo toma. Sin pedirle a nadie. |
+| Incluye | App Android con tu marca publicada en Google Play, versión web con tu enlace, pedidos a tu WhatsApp, planilla de precios, material para redes (10 posts y 5 videos), capacitación de 1 hora y 60 días de garantía por fallas. |
+| Opcional | Soporte y mejoras después de la garantía: por hora o por trabajo, solo si lo pedís. |
 
-Valores de referencia en pesos, noviembre 2026; se actualizan por inflación cada trimestre. IVA no incluido.
-En el plan Comisión, la app ya incluye el 10 % en el precio que ve el cliente, y la empresa lo liquida mensualmente con el detalle que le llega en cada pedido.
+Valor de referencia, noviembre 2026. Se cobra 50 % al empezar y 50 % contra entrega.
 
 ## Cómo es el proceso
 
@@ -45,8 +40,8 @@ En el plan Comisión, la app ya incluye el 10 % en el precio que ve el cliente, 
 ## Preguntas frecuentes
 
 - **¿Necesito saber de tecnología?** No. Vos recibís pedidos por WhatsApp como siempre; nosotros nos ocupamos de la app.
-- **¿Puedo cambiar los precios?** Sí, cuando quieras: nos escribís y en el día quedan actualizados.
-- **¿Qué pasa si no quiero seguir?** Avisás con 30 días y se da de baja. La app deja de publicarse. No hay permanencia mínima.
+- **¿Puedo cambiar los precios?** Sí, vos mismo y al instante: la app lee tus precios de una planilla de Google que es tuya. Cambiás un número y listo.
+- **¿Tengo que pagar algo después?** No. Ni comisión por flete ni abono. Si algún día querés una mejora, se cotiza aparte.
 - **¿Los datos de mis clientes son míos?** Sí. Los pedidos llegan a tu WhatsApp; la app no guarda datos en ningún otro lado.
 - **¿Funciona en celulares viejos?** Sí, desde Android 5 (2014 en adelante). Y la web funciona en cualquier teléfono.
 

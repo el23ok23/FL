@@ -33,6 +33,8 @@ data class AppConfig(
     /** De dónde salen los fletes (Capital Federal, Salto…). */
     val origin: OriginZone,
     val brand: BrandColors = DEFAULT_BRAND,
+    /** Planilla de precios del dueño (CSV publicado de Google Sheets); vacío = solo config.json. */
+    val remotePricesUrl: String? = null,
 ) {
     companion object {
         private const val TAG = "AppConfig"
@@ -60,6 +62,7 @@ data class AppConfig(
             val tiempos = root.optJSONObject("tiempos") ?: JSONObject()
             val origen = root.optJSONObject("origen")
             val marca = root.optJSONObject("marca") ?: JSONObject()
+            val remotos = root.optJSONObject("precios_remotos") ?: JSONObject()
 
             val vehicles = ArrayList<VehicleSpec>()
             root.optJSONArray("vehiculos")?.let { arr ->
@@ -114,6 +117,7 @@ data class AppConfig(
                     primary = parseColor(marca.optString("color_principal"), DEFAULT_BRAND.primary),
                     accent = parseColor(marca.optString("color_acento"), DEFAULT_BRAND.accent),
                 ),
+                remotePricesUrl = clean(remotos.optString("url"))?.takeIf { it.startsWith("https://") },
             )
         }
 

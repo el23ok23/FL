@@ -18,6 +18,7 @@ import com.fletaba.app.data.GeocoderProvider
 import com.fletaba.app.data.GooglePlacesProvider
 import com.fletaba.app.data.OrderSender
 import com.fletaba.app.data.OsmMapService
+import com.fletaba.app.data.RemotePrices
 import com.fletaba.app.data.RouteInfo
 import com.fletaba.app.data.RoutesService
 import com.fletaba.app.data.SearchScope
@@ -31,6 +32,9 @@ import com.fletaba.core.LoadTimeBreakdown
 import com.fletaba.core.OrderSummary
 import com.fletaba.core.PriceBreakdown
 import com.fletaba.core.PriceCalculator
+import com.fletaba.core.PriceSheet
+import com.fletaba.core.PricingConfig
+import com.fletaba.core.TimeConfig
 import com.fletaba.core.Schedule
 import com.fletaba.core.Stop
 import com.fletaba.core.VehicleSpec
@@ -60,6 +64,28 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     private val routes: RoutesService? =
         config.googleApiKey?.let { RoutesService(it, app.packageName, signature) }
     private val sender = OrderSender(app, config)
+
+    // ---- Precios (editables por el dueño desde su planilla) ---------------------------------
+    var pricing: PricingConfig by mutableStateOf(config.pricing)
+        private set
+    var vehicles: List<VehicleSpec> by mutableStateOf(config.vehicles)
+        private set
+    var times: TimeConfig by mutableStateOf(config.times)
+        private set
+    /** true cuando los precios vienen de la planilla del dueño (descargada o en caché). */
+    var pricesFromSheet by mutableStateOf(false)
+        private set
+
+    private val remotePrices: RemotePrices? = config.remotePricesUrl?.let { RemotePrices(app, it) }
+
+    private fun applySheet(csv: String) {
+        val r = PriceSheet.apply(csv, config.pricing, config.vehicles, config.times)
+        if (r.applied > 0) {
+            pricing = r.pricing; vehicles = r.vehicles; times = r.times
+            pricesFromSheet = true
+            if (vehicleIndex > vehicles.lastIndex) vehicleIndex = vehicles.lastIndex
+        }
+    }
     /** Mapa real de Google (solo con clave). */
     val staticMaps: StaticMapService? = config.staticMapsKey?.let { StaticMapService(it) }
     /** Mapa real de OpenStreetMap, sin clave (respaldo). */
@@ -282,14 +308,14 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             route?.let { return it.distanceKm }
             val pts = stops.mapNotNull { it.point?.location }
             if (pts.size < 2) return 0.0
-            return PriceCalculator.estimateRoadKm(pts, config.pricing)
+            return PriceCalculator.estimateRoadKm(pts, pricing)
         }
 
     // ---- Vehículo, ayudantes, carga, cuándo -------------------------------------------------
-    var vehicleIndex by mutableIntStateOf(DEFAULT_VEHICLE.coerceAtMost(config.vehicles.lastIndex))
+    var vehicleIndex by mutableIntStateOf(DEFAULT_VEHICLE.coerceAtMost(vehicles.lastIndex))
         private set
-    fun selectVehicle(index: Int) { vehicleIndex = index.coerceIn(0, config.vehicles.lastIndex) }
-    val vehicle: VehicleSpec get() = config.vehicles[vehicleIndex]
+    fun selectVehicle(index: Int) { vehicleIndex = index.coerceIn(0, vehicles.lastIndex) }
+    val vehicle: VehicleSpec get() = vehicles[vehicleIndex]
 
     var helpers by mutableIntStateOf(0)
         private set
@@ -320,11 +346,11 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Precio aproximado, siempre al día con las elecciones actuales. */
     val price: PriceBreakdown
-        get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, config.pricing)
+        get() = PriceCalculator.calculate(vehicle, distanceKm, helpers, stops.map { it.floor }, pricing)
 
     /** Tiempo de carga y descarga incluido en el precio, parada por parada. */
     val loadTime: LoadTimeBreakdown
-        get() = LoadTime.calculate(vehicle, helpers, stops.map { it.floor }, config.times)
+        get() = LoadTime.calculate(vehicle, helpers, stops.map { it.floor }, times)
 
     // ---- Contacto y envío --------------------------------------------------------------------
     var customerName by mutableStateOf("")
@@ -358,7 +384,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             distanceKm = distanceKm,
             price = price,
             loadTime = loadTime,
-            waitFeePer15Min = config.times.waitFeePer15Min,
+            waitFeePer15Min = times.waitFeePer15Min,
             travelMinutes = route?.durationMin,
         )
         sending = true
@@ -375,7 +401,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         activeStop = 0
         suggestions = emptyList(); searching = false; noResults = false
         route = null; routeLoading = false
-        vehicleIndex = DEFAULT_VEHICLE.coerceAtMost(config.vehicles.lastIndex)
+        vehicleIndex = DEFAULT_VEHICLE.coerceAtMost(vehicles.lastIndex)
         helpers = 0
         cargoCounts.clear(); cargoNote = ""
         schedule = Schedule()
@@ -383,6 +409,14 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
         sending = false; sendResult = null
         sessionToken = UUID.randomUUID().toString()
         step = Step.ROUTE
+    }
+
+    // Va al final: los bloques init corren en orden de declaración y este usa propiedades de arriba.
+    init {
+        remotePrices?.let { remote ->
+            remote.cached()?.let { applySheet(it) }
+            viewModelScope.launch { remote.fetch()?.let { applySheet(it) } }
+        }
     }
 
     companion object {

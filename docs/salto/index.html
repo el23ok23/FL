@@ -235,6 +235,7 @@ a.wa{display:inline-block;margin-top:14px;background:#25D366;color:#fff;text-dec
 <script>
 /* ============================ CONFIGURACIÓN (editá acá) ============================ */
 const CONFIG = {
+  precios_remotos_url: "" /* enlace CSV de la planilla de Google Sheets del dueño; vacío = usa los precios de abajo */,
   negocio: { nombre: "Fletaba Salto", whatsapp_dueno: "" /* 549 + área + número, ej. 5491123456789 */, webhook_url: "" },
   origen: { nombre: "Capital Federal", nombre_corto: "CABA", busqueda_extra: "Ciudad Autónoma de Buenos Aires", palabras_fuera: ["provincia"], palabras_dentro: ["autónoma","autonoma","caba","capital federal"], poligono: null /* null = Capital Federal */, calles: null },
   precios: { por_ayudante: 12000, por_ayudante_km: 400, por_piso_escalera: 5000, por_parada_extra: 6000, redondeo: 500, km_minimo: 2, factor_distancia_urbana: 1.25, comision_porcentaje: 15, recargo_operativo_porcentaje: 20 },
@@ -414,7 +415,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-pick],[dat
 function scrollToVehicle(){const car=$("#carousel");const el=car.children[S.vehicle];if(el)el.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});}
 let scrollT=null;$("#carousel").addEventListener("scroll",()=>{clearTimeout(scrollT);scrollT=setTimeout(()=>{const car=$("#carousel");const mid=car.scrollLeft+car.clientWidth/2;let best=0,bd=1e9;[...car.children].forEach((el,i)=>{const c=el.offsetLeft+el.offsetWidth/2;const d=Math.abs(c-mid);if(d<bd){bd=d;best=i;}});if(best!==S.vehicle){S.vehicle=best;render();}},120);});
 window.addEventListener("resize",()=>{if(S.step===0)drawMap();});
-render();
+/* Precios del dueño desde su planilla (clave,valor). Lo que no esté en la planilla queda como está. */
+function applySheet(csv){const n=s=>{s=String(s).trim().replace(/^\$/,"").replace(/\s/g,"");if(s.includes(",")&&s.includes("."))s=s.replace(/\./g,"").replace(",",".");else if(s.includes(","))s=s.replace(",",".");else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,"");const v=parseFloat(s);return isNaN(v)?null:v;};let applied=0;csv.split(/\r?\n/).forEach(line=>{line=line.trim().replace(/^\uFEFF/,"");if(!line)return;let i=line.search(/[;\t]/);if(i<0)i=line.indexOf(",");if(i<=0)return;const k=line.slice(0,i).trim().replace(/"/g,"").toLowerCase().replace(/ /g,"_");const v=n(line.slice(i+1).replace(/[,;\t]+$/,"").replace(/"/g,""));if(v===null||k==="clave")return;const P=CONFIG.precios,T=CONFIG.tiempos;const map={por_ayudante:[P,"por_ayudante"],por_ayudante_km:[P,"por_ayudante_km"],por_piso_escalera:[P,"por_piso_escalera"],por_parada_extra:[P,"por_parada_extra"],redondeo:[P,"redondeo"],km_minimo:[P,"km_minimo"],factor_distancia_urbana:[P,"factor_distancia_urbana"],comision_porcentaje:[P,"comision_porcentaje"],recargo_operativo_porcentaje:[P,"recargo_operativo_porcentaje"],minutos_por_piso_escalera:[T,"minutos_por_piso_escalera"],minutos_ascensor:[T,"minutos_ascensor"],factor_parada_intermedia:[T,"factor_parada_intermedia"],espera_por_15_min:[T,"espera_por_15_min"]};if(map[k]){map[k][0][map[k][1]]=v;applied++;return;}const m=k.match(/^([a-z0-9_]+)\.(tarifa_base|por_km|minutos_carga|m3)$/);if(m){const veh=CONFIG.vehiculos.find(x=>x.id===m[1]);if(veh){veh[m[2]]=v;applied++;}}});return applied;}
+if(CONFIG.precios_remotos_url){const u=CONFIG.precios_remotos_url+(CONFIG.precios_remotos_url.includes("?")?"&":"?")+"_t="+Math.floor(Date.now()/60000);fetch(u).then(r=>r.ok?r.text():null).then(t=>{if(t&&!t.trim().startsWith("<")&&applySheet(t)>0){const car=document.getElementById("carousel");car.innerHTML="";render();}}).catch(()=>{});}
 </script>
 
 </body>

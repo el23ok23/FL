@@ -58,7 +58,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
-    val vehicles = vm.config.vehicles
+    val vehicles = vm.vehicles
     val colors = MaterialTheme.colorScheme
     val pagerState = rememberPagerState(initialPage = vm.vehicleIndex) { vehicles.size }
     val scope = rememberCoroutineScope()
@@ -154,7 +154,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
                         )
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            "Desde ${Money.formatArs(PriceCalculator.gross(v.baseFare, vm.config.pricing))} + ${Money.formatArs(PriceCalculator.gross(v.perKm, vm.config.pricing))}/km",
+                            "Desde ${Money.formatArs(PriceCalculator.gross(v.baseFare, vm.pricing))} + ${Money.formatArs(PriceCalculator.gross(v.perKm, vm.pricing))}/km",
                             style = MaterialTheme.typography.labelMedium,
                             color = colors.primary,
                         )
@@ -200,7 +200,7 @@ fun VehicleScreen(vm: OrderViewModel, step: Int, total: Int) {
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
         )
-        val helperCost = PriceCalculator.gross(PriceCalculator.helperCost(vm.distanceKm, vm.config.pricing), vm.config.pricing)
+        val helperCost = PriceCalculator.gross(PriceCalculator.helperCost(vm.distanceKm, vm.pricing), vm.pricing)
         Text(
             "Para cargar y descargar. El chofer va incluido. Cada ayudante: ${Money.formatArs(helperCost)} para este recorrido.",
             style = MaterialTheme.typography.bodySmall,

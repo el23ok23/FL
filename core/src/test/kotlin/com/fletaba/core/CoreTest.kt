@@ -262,6 +262,51 @@ class LoadTimeTest {
     }
 }
 
+class PriceSheetTest {
+    private val pricing = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.2, commissionPct = 0.15)
+    private val times = TimeConfig(6, 10, 0.5, 6000)
+    private val vehicles = listOf(
+        VehicleSpec(VehicleKind.KANGOO, "Kangoo", "", "", "", 25000, 1800, 30, 3.0),
+        VehicleSpec(VehicleKind.FURGON_MEDIANO, "Furgón mediano", "", "", "", 35000, 2300, 45, 10.0),
+    )
+
+    @Test fun `aplica solo lo que esta en la planilla`() {
+        val csv = """clave,valor
+            |por_ayudante,"18.000"
+            |kangoo.tarifa_base,${'$'} 27.500
+            |furgon_mediano.por_km,2600
+            |comision_porcentaje,0
+            |recargo_operativo_porcentaje,0
+            |espera_por_15_min,7000
+            |clave_desconocida,123
+            |""".trimMargin()
+        val r = PriceSheet.apply(csv, pricing, vehicles, times)
+        assertEquals(18000, r.pricing.perHelper)
+        assertEquals(500, r.pricing.perHelperKm) // no estaba: queda igual
+        assertEquals(27500, r.vehicles[0].baseFare)
+        assertEquals(1800, r.vehicles[0].perKm)
+        assertEquals(2600, r.vehicles[1].perKm)
+        assertEquals(0.0, r.pricing.commissionPct, 1e-9)
+        assertEquals(0.0, r.pricing.operatingPct, 1e-9)
+        assertEquals(7000, r.times.waitFeePer15Min)
+        assertEquals(6, r.applied)
+    }
+
+    @Test fun `numeros con coma punto y pesos`() {
+        val r = PriceSheet.apply("km_minimo;2,5\nredondeo;1.000\n", pricing, vehicles, times)
+        assertEquals(2.5, r.pricing.minKm, 1e-9)
+        assertEquals(1000, r.pricing.roundTo)
+    }
+
+    @Test fun `la plantilla se puede volver a aplicar sin cambios`() {
+        val csv = PriceSheet.template(pricing, vehicles, times)
+        val r = PriceSheet.apply(csv, pricing, vehicles, times)
+        assertEquals(pricing.perHelper, r.pricing.perHelper)
+        assertEquals(vehicles[1].baseFare, r.vehicles[1].baseFare)
+        assertTrue(csv.contains("kangoo.tarifa_base,25000"))
+    }
+}
+
 class OwnerNotesTest {
     @Test fun `la comision solo aparece en el mensaje privado`() {
         val cfg = PricingConfig(15000, 500, 6000, 8000, 500, 1.3, 2.0, operatingPct = 0.2, commissionPct = 0.15)

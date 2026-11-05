@@ -64,7 +64,7 @@ import com.fletaba.core.TimeSlot
 fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
     val focus = LocalFocusManager.current
     val colors = MaterialTheme.colorScheme
-    val perFloor = PriceCalculator.gross(vm.config.pricing.perStairFloor, vm.config.pricing)
+    val perFloor = PriceCalculator.gross(vm.pricing.perStairFloor, vm.pricing)
     val today = remember { DayDate.today() }
     val days = remember(today) { DayDate.upcoming(14, today) }
     val schedule = vm.schedule
@@ -142,7 +142,7 @@ fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
         val volume = vm.cargoVolume
         if (volume > 0) {
             val fits = vm.vehicle.volumeM3 >= volume * 1.15
-            val suggested = CargoItems.smallestThatFits(volume, vm.config.vehicles)
+            val suggested = CargoItems.smallestThatFits(volume, vm.vehicles)
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 color = if (fits) colors.primaryContainer.copy(alpha = 0.45f) else colors.tertiaryContainer.copy(alpha = 0.7f),
@@ -164,7 +164,7 @@ fun DetailsScreen(vm: OrderViewModel, step: Int, total: Int) {
                         )
                         if (suggested != null) {
                             androidx.compose.material3.TextButton(onClick = {
-                                vm.selectVehicle(vm.config.vehicles.indexOf(suggested))
+                                vm.selectVehicle(vm.vehicles.indexOf(suggested))
                             }) { Text("Cambiar a ${suggested.name}") }
                         }
                     }

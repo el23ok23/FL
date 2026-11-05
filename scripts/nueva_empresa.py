@@ -32,7 +32,9 @@ def main():
     ap.add_argument("--color", default="#1B7BE0", help="color principal #RRGGBB")
     ap.add_argument("--acento", default="#F6B40E", help="color de acento #RRGGBB")
     ap.add_argument("--precios-de", default=None, choices=["caba", "salto"], help="de qué variante copiar los precios (por defecto, la del origen)")
-    ap.add_argument("--comision", type=float, default=None, help="comisión %% sobre el bruto (por defecto la de la base)")
+    ap.add_argument("--comision", type=float, default=0, help="comisión %% sobre el bruto (venta única: 0)")
+    ap.add_argument("--operativo", type=float, default=0, help="recargo operativo %% (venta única: 0, el dueño pone sus precios reales)")
+    ap.add_argument("--precios-url", default="", help="enlace CSV de la planilla de Google Sheets del dueño (puede agregarse después)")
     a = ap.parse_args()
 
     slug = a.slug.lower()
@@ -69,7 +71,9 @@ def main():
     if a.origen != base:
         ocfg = json.load(open(os.path.join(ROOT, "app", "src", a.origen, "assets", "config.json")), object_pairs_hook=collections.OrderedDict)
         cfg["origen"] = ocfg["origen"]
-    if a.comision is not None: cfg["precios"]["comision_porcentaje"] = a.comision
+    cfg["precios"]["comision_porcentaje"] = a.comision
+    cfg["precios"]["recargo_operativo_porcentaje"] = a.operativo
+    cfg["precios_remotos"]["url"] = a.precios_url
     dst_dir = os.path.join(ROOT, "app", "src", slug, "assets"); os.makedirs(dst_dir, exist_ok=True)
     s = json.dumps(cfg, ensure_ascii=False, indent=2)
     s = re.sub(r'\{\s+"id": "([^"]+)",\s+"nombre": "([^"]+)",\s+"descripcion": "([^"]+)",\s+"medidas": "([^"]+)",\s+"carga": "([^"]+)",\s+"tarifa_base": (\d+),\s+"por_km": (\d+),\s+"minutos_carga": (\d+),\s+"m3": ([\d.]+)\s+\}',
@@ -94,7 +98,9 @@ def main():
     w = re.sub(r"<title>[^<]*</title>", f"<title>{a.nombre}</title>", w, count=1)
     w = w.replace("--celeste:#1B7BE0; --celeste-oscuro:#0F5FB8; --sol:#F6B40E;", f"--celeste:{a.color.upper()}; --celeste-oscuro:{a.color.upper()}; --sol:{a.acento.upper()};")
     w = re.sub(r'<div id="brandname">FLETABA.*?<small', f'<div id="brandname">{a.nombre.upper()}<small', w, count=1, flags=re.S)
-    if a.comision is not None: w = re.sub(r"comision_porcentaje: [\d.]+", f"comision_porcentaje: {a.comision:g}", w)
+    w = re.sub(r"comision_porcentaje: [\d.]+", f"comision_porcentaje: {a.comision:g}", w)
+    w = re.sub(r"recargo_operativo_porcentaje: [\d.]+", f"recargo_operativo_porcentaje: {a.operativo:g}", w)
+    w = re.sub(r'precios_remotos_url: "[^"]*"', f'precios_remotos_url: {json.dumps(a.precios_url)}', w)
     web_dir = os.path.join(ROOT, "docs", slug); os.makedirs(web_dir, exist_ok=True)
     open(os.path.join(web_dir, "index.html"), "w").write(w)
 
@@ -111,6 +117,7 @@ def main():
   App:   variante '{slug}' · id {app_id} · config en app/src/{slug}/assets/config.json
   Web:   docs/{slug}/index.html  →  https://el23ok23.github.io/FL/{slug}/
   APK:   tras el push, https://github.com/el23ok23/FL/releases/download/ultima-version/{release_name}.apk
+  Precios: {"planilla " + a.precios_url if a.precios_url else "los del config.json (agregá la planilla del dueño en precios_remotos.url cuando la tenga)"}
 Siguiente paso: git add -A && git commit -m "Nueva empresa: {a.nombre}" && git push""")
 
 if __name__ == "__main__":

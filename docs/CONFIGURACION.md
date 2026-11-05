@@ -76,6 +76,10 @@ Cada ayudante tiene una base fija (`por_ayudante`) más un valor por kilómetro 
 
 Cada vehículo tiene `minutos_carga`: lo que tarda **una persona** en cargarlo lleno (Kangoo 30, furgón mediano 45, camión grande 140…). El presupuesto incluye ese tiempo en el origen y en el destino (y la mitad en cada parada intermedia), dividido por la cantidad de personas (chofer solo: 100 %, con 1 ayudante: 60 %, con 2: 45 %), más los minutos de escalera por piso o el fijo de ascensor. El resultado se muestra al cliente parada por parada y va en el pedido para el conductor; pasado ese tiempo se cobra `espera_por_15_min`.
 
+### Planilla de precios del dueño (opcional)
+
+Si `precios_remotos.url` tiene el enlace CSV de una planilla de Google Sheets publicada, la app descarga los precios al abrir (y guarda una copia para usarla sin internet). Formato: dos columnas `clave,valor` (plantillas en `docs/plantilla-precios.csv` y `docs/plantilla-precios-salto.csv`). Lo que no esté en la planilla queda como en el `config.json`. Instructivo para el dueño en `ventas/ENTREGA_AL_CLIENTE.md`.
+
 ### Comisión y recargo operativo (invisibles para el cliente)
 
 ```json

@@ -130,7 +130,7 @@ fun QuoteScreen(vm: OrderViewModel, step: Int, total: Int) {
 
         // Tiempo incluido: útil para el cliente y para el conductor
         val lt = vm.loadTime
-        val waitFee = vm.config.times.waitFeePer15Min
+        val waitFee = vm.times.waitFeePer15Min
         Spacer(Modifier.height(14.dp))
         Surface(
             shape = MaterialTheme.shapes.large,

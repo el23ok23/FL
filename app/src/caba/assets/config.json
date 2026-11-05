@@ -51,6 +51,10 @@
     "recargo_operativo_porcentaje": 20,
     "_recargo_operativo_porcentaje": "Colchón para nafta, seguro, peajes y desgaste, como porcentaje sobre el costo base (tarifas + km + ayudantes + pisos + paradas). También invisible para el cliente. Cómo se calcula el precio final: costo base × (1 + recargo operativo) ÷ (1 − comisión)."
   },
+  "precios_remotos": {
+    "_ayuda": "Opcional. Enlace CSV de una planilla de Google Sheets publicada (Archivo → Compartir → Publicar en la web → CSV) con dos columnas: clave,valor. Si está, el dueño cambia los precios desde la planilla sin tocar la app; los de arriba quedan como respaldo. Plantilla: docs/plantilla-precios.csv",
+    "url": ""
+  },
   "tiempos": {
     "_ayuda": "Tiempo de carga y descarga INCLUIDO en el precio (le sirve al cliente y al conductor). Cada vehículo tiene 'minutos_carga': lo que tarda una persona en cargarlo lleno; se aplica en origen y en destino, y una fracción en cada parada intermedia. Con ayudantes el tiempo baja (2 personas: 60 %, 3 personas: 45 %). La escalera suma minutos por piso y el ascensor un fijo. Pasado el tiempo incluido se cobra espera.",
     "minutos_por_piso_escalera": 6,
