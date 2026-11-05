@@ -82,7 +82,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     var pricesFromSheet by mutableStateOf(false)
         private set
 
-    private val remotePrices = RemotePrices(app, config.remotePricesUrl, config.localOwnerPin)
+    private val remotePrices = RemotePrices(app, config.remotePricesUrl, config.localOwnerPin, config.recoveryEmail)
 
     // ---- Marca (también editable por el dueño) -------------------------------------------------
     var businessName: String by mutableStateOf(config.businessName)
@@ -196,6 +196,73 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setAdminValue(key: String, value: String) { adminValues[key] = value }
+
+    // ---- Seguridad: PIN y correo de recuperación ----------------------------------------------
+    val recoveryEmail: String? get() = remotePrices.recoveryEmail()
+    private var emailTick by mutableIntStateOf(0) // fuerza recomposición al guardar el correo
+    val recoveryEmailShown: String? get() { emailTick; return remotePrices.recoveryEmail() }
+
+    fun changePin(current: String, newPin: String) {
+        if (adminBusy) return
+        adminBusy = true; adminMessage = null
+        viewModelScope.launch {
+            adminMessage = when (remotePrices.changePin(current.trim(), newPin.trim())) {
+                RemotePrices.Status.OK -> { remotePrices.rememberPin(newPin.trim()); "PIN cambiado." }
+                RemotePrices.Status.WRONG_PIN -> "El PIN actual no es correcto."
+                RemotePrices.Status.INVALID -> "El PIN nuevo tiene que tener entre 4 y 32 caracteres."
+                else -> "Sin conexión. No se pudo cambiar el PIN."
+            }
+            adminBusy = false
+        }
+    }
+
+    fun saveRecoveryEmail(email: String) {
+        if (adminBusy) return
+        val pin = remotePrices.rememberedPin() ?: run { adminUnlocked = false; return }
+        adminBusy = true; adminMessage = null
+        viewModelScope.launch {
+            adminMessage = when (remotePrices.saveRecoveryEmail(pin, email)) {
+                RemotePrices.Status.OK -> { emailTick++; if (email.isBlank()) "Correo de recuperación quitado." else "Correo de recuperación guardado." }
+                RemotePrices.Status.INVALID -> "Ese correo no parece válido."
+                RemotePrices.Status.WRONG_PIN -> { adminUnlocked = false; "Volvé a entrar con tu PIN." }
+                else -> "Sin conexión. No se pudo guardar el correo."
+            }
+            adminBusy = false
+        }
+    }
+
+    /** "Olvidé mi PIN": lo manda al correo de recuperación (o abre el correo en modo local). */
+    fun recoverPin() {
+        if (adminBusy) return
+        adminBusy = true; adminMessage = null
+        viewModelScope.launch {
+            val (st, info) = remotePrices.recover()
+            adminMessage = when (st) {
+                RemotePrices.Status.OK -> {
+                    if (remotePrices.synced) "Te mandamos el PIN a $info."
+                    else {
+                        val (mail, pin) = info.orEmpty().split("|").let { it[0] to it.getOrElse(1) { "" } }
+                        openMail(mail, "Tu PIN del panel · $businessName", "Tu PIN para entrar al panel del dueño es: $pin")
+                        "Se abrió tu correo con el PIN para $mail. Enviátelo y listo."
+                    }
+                }
+                RemotePrices.Status.NO_EMAIL -> "No hay un correo de recuperación cargado. Pedile el PIN a quien te entregó la app."
+                RemotePrices.Status.LIMIT -> "Ya se mandó el PIN tres veces en la última hora. Revisá el correo (y el spam)."
+                else -> "Sin conexión. Probá de nuevo con internet."
+            }
+            adminBusy = false
+        }
+    }
+
+    private fun openMail(to: String, subject: String, body: String) {
+        val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+            putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(to))
+            putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
+            putExtra(android.content.Intent.EXTRA_TEXT, body)
+            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        runCatching { getApplication<Application>().startActivity(intent) }
+    }
     /** Vuelve a cargar en el formulario los precios originales de la app (no guarda hasta tocar Guardar). */
     fun resetAdminValues() { loadAdminValues(config.pricing, config.vehicles, config.times, PriceSheet.Branding()); adminMessage = "Precios originales cargados. Tocá Guardar para aplicarlos." }
     val adminValid: Boolean get() = adminForm.flatMap { it.fields }.all { PriceSheet.isValid(it.key, adminValues[it.key] ?: "") }

@@ -12,6 +12,11 @@ Todo se cambia **desde la misma app, en tu teléfono**, con tu PIN. No hace falt
 **Desde la web (computadora o celular)**
 Abrí tu dirección web con `?panel` al final (por ejemplo `https://el23ok23.github.io/FL/salto/?panel`), o bajá hasta el pie de la página y tocá "Panel del dueño". Es el mismo panel, con el mismo PIN.
 
+## Tu PIN
+
+- El PIN inicial te lo damos en la entrega (en la app de Salto de prueba es `salto2026fletes`). Cambialo desde el panel: **Seguridad → Cambiar PIN**.
+- Cargá un **correo de recuperación** en la misma sección. Si olvidás el PIN, tocá "Olvidé mi PIN" en la pantalla de entrada y te llega por correo.
+
 ## Qué podés cambiar
 
 | Sección | Qué hace |
@@ -23,6 +28,7 @@ Abrí tu dirección web con `?panel` al final (por ejemplo `https://el23ok23.git
 | **Ayudantes** | Lo que cobra cada ayudante: base + por kilómetro. |
 | **Recargos** | Por piso por escalera, por parada en el medio, la espera cada 15 minutos y el porcentaje extra de sábados y domingos (0 = sin recargo). |
 | **General** | Kilómetros mínimos que se cobran y a qué múltiplo se redondea el total. |
+| **Seguridad** | Correo de recuperación y cambio de PIN. |
 
 Tocá **Guardar** abajo. Si algo quedó en rojo, corregilo antes.
 "Volver a los valores originales" carga los que tenía la app al entregarla (también hay que tocar Guardar).

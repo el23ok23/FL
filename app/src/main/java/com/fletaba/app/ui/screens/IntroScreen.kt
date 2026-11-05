@@ -142,7 +142,7 @@ fun IntroScreen(title: String, subtitle: String, logo: Bitmap? = null, onFinishe
                     Text(
                         subtitle,
                         style = MaterialTheme.typography.titleMedium,
-                        color = colors.tertiary,
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }

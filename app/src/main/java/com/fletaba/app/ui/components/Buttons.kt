@@ -66,7 +66,8 @@ fun PrimaryButton(
     val interaction = remember { MutableInteractionSource() }
     val colors = MaterialTheme.colorScheme
     val active = enabled && !loading
-    val gradient = Brush.horizontalGradient(listOf(colors.primary, colors.primary.copy(alpha = 0.82f)))
+    // Un solo color: el principal de la marca (sin degradés multicolor).
+    val fill = colors.primary
     Button(
         onClick = onClick,
         enabled = active,
@@ -75,7 +76,7 @@ fun PrimaryButton(
             .fillMaxWidth()
             .height(58.dp)
             .pressScale(interaction, 0.97f)
-            .then(if (active) Modifier.background(gradient, MaterialTheme.shapes.medium) else Modifier),
+            .then(if (active) Modifier.background(fill, MaterialTheme.shapes.medium) else Modifier),
         shape = MaterialTheme.shapes.medium,
         elevation = ButtonDefaults.buttonElevation(defaultElevation = if (active) 4.dp else 0.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
         colors = ButtonDefaults.buttonColors(

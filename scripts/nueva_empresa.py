@@ -34,6 +34,8 @@ def main():
     ap.add_argument("--precios-de", default=None, choices=["caba", "salto"], help="de qué variante copiar los precios (por defecto, la del origen)")
     ap.add_argument("--comision", type=float, default=0, help="comisión %% sobre el bruto (venta única: 0)")
     ap.add_argument("--operativo", type=float, default=0, help="recargo operativo %% (venta única: 0, el dueño pone sus precios reales)")
+    ap.add_argument("--radio-km", type=float, default=0, help="zona de origen circular: hasta N km del centro (0 = usar la zona del preset)")
+    ap.add_argument("--centro", default="", help="centro de la zona circular 'lat,lng' (por defecto, el de la ciudad elegida)")
     ap.add_argument("--pin", default="", help="PIN local del panel del dueño (si no hay Apps Script); vacío = sin panel local")
     ap.add_argument("--precios-url", default="", help="dirección /exec del Apps Script de la planilla del dueño (ver ventas/CONFIGURAR_PANEL_DEL_DUENO.md); puede agregarse después")
     a = ap.parse_args()
@@ -74,6 +76,9 @@ def main():
         cfg["origen"] = ocfg["origen"]
     cfg["precios"]["comision_porcentaje"] = a.comision
     cfg["precios"]["recargo_operativo_porcentaje"] = a.operativo
+    if a.radio_km > 0:
+        centro = [float(x) for x in a.centro.split(",")] if a.centro else ([-34.2925, -60.2550] if a.origen == "salto" else [-34.6037, -58.3816])
+        cfg["origen"] = collections.OrderedDict([("preset", a.origen), ("nombre", f"{'Salto' if a.origen == 'salto' else 'Capital Federal'} y alrededores"), ("centro", centro), ("radio_km", a.radio_km)])
     cfg["precios_remotos"]["url"] = a.precios_url
     cfg["precios_remotos"]["pin_local"] = a.pin
     dst_dir = os.path.join(ROOT, "app", "src", slug, "assets"); os.makedirs(dst_dir, exist_ok=True)

@@ -55,10 +55,14 @@
     "recargo_operativo_porcentaje": 20,
     "_recargo_operativo_porcentaje": "Colchón para nafta, seguro, peajes y desgaste, como porcentaje sobre el costo base (tarifas + km + ayudantes + pisos + paradas). También invisible para el cliente. Cómo se calcula el precio final: costo base × (1 + recargo operativo) ÷ (1 − comisión)."
   },
+  "seguridad": {
+    "_ayuda": "Correo inicial para recuperar el PIN del panel. El dueño lo cambia desde el panel (Seguridad). Con Apps Script, el correo se guarda allá.",
+    "correo_recuperacion": ""
+  },
   "precios_remotos": {
     "_ayuda": "Panel del dueño (se abre manteniendo apretado el título de la primera pantalla). url: dirección del Apps Script de la planilla del dueño (ver ventas/CONFIGURAR_PANEL_DEL_DUENO.md); con url, lo que guarda rige en todos los teléfonos y el PIN se valida allá. pin_local: PIN para usar el panel sin planilla (los cambios valen solo en ese teléfono; sirve para probar).",
     "url": "",
-    "pin_local": "1234"
+    "pin_local": "salto2026fletes"
   },
   "tiempos": {
     "_ayuda": "Tiempo de carga y descarga INCLUIDO en el precio (le sirve al cliente y al conductor). Cada vehículo tiene 'minutos_carga': lo que tarda una persona en cargarlo lleno; se aplica en origen y en destino, y una fracción en cada parada intermedia. Con ayudantes el tiempo baja (2 personas: 60 %, 3 personas: 45 %). La escalera suma minutos por piso y el ascensor un fijo. Pasado el tiempo incluido se cobra espera.",

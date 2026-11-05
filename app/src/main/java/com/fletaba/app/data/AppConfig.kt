@@ -40,6 +40,8 @@ data class AppConfig(
     val remotePricesUrl: String? = null,
     /** PIN del panel del dueño cuando no hay planilla (los cambios valen solo en ese teléfono). */
     val localOwnerPin: String? = null,
+    /** Correo inicial para recuperar el PIN (el dueño lo cambia desde el panel). */
+    val recoveryEmail: String? = null,
 ) {
     companion object {
         private const val TAG = "AppConfig"
@@ -68,6 +70,7 @@ data class AppConfig(
             val origen = root.optJSONObject("origen")
             val marca = root.optJSONObject("marca") ?: JSONObject()
             val remotos = root.optJSONObject("precios_remotos") ?: JSONObject()
+            val seguridad = root.optJSONObject("seguridad") ?: JSONObject()
 
             val vehicles = ArrayList<VehicleSpec>()
             root.optJSONArray("vehiculos")?.let { arr ->
@@ -130,6 +133,7 @@ data class AppConfig(
                 ),
                 remotePricesUrl = clean(remotos.optString("url"))?.takeIf { it.startsWith("https://") },
                 localOwnerPin = clean(remotos.optString("pin_local")),
+                recoveryEmail = clean(seguridad.optString("correo_recuperacion")),
             )
         }
 
@@ -157,6 +161,11 @@ data class AppConfig(
                     val pt = arr.optJSONArray(i) ?: continue
                     if (pt.length() >= 2) polygon += LatLng(pt.getDouble(0), pt.getDouble(1))
                 }
+            }
+            // "centro": [lat, lng] + "radio_km": zona circular (p. ej. hasta 120 km de una ciudad).
+            z.optJSONArray("centro")?.let { c ->
+                val r = z.optDouble("radio_km", 0.0)
+                if (c.length() >= 2 && r > 0) { polygon.clear(); polygon += OriginZone.circle(LatLng(c.getDouble(0), c.getDouble(1)), r) }
             }
             if (preset == null && polygon.size < 3) return null
             return OriginZone(

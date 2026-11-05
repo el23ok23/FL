@@ -81,7 +81,7 @@ import com.fletaba.core.OrderSummary
 @Composable
 fun stopColor(index: Int, count: Int): Color = when (index) {
     0 -> MaterialTheme.colorScheme.primary
-    count - 1 -> MaterialTheme.colorScheme.tertiary
+    count - 1 -> MaterialTheme.colorScheme.onPrimaryContainer
     else -> MaterialTheme.colorScheme.secondary
 }
 
@@ -256,7 +256,7 @@ fun RouteScreen(vm: OrderViewModel, step: Int, total: Int) {
         val density = LocalDensity.current
         val dark = isSystemInDarkTheme()
         val primaryHex = hex(MaterialTheme.colorScheme.primary)
-        val destinationHex = hex(MaterialTheme.colorScheme.tertiary)
+        val destinationHex = hex(MaterialTheme.colorScheme.onPrimaryContainer)
         val service = vm.staticMaps
         val knownPoints = resolvedPoints.filterNotNull()
         val mapKey = knownPoints.joinToString { "${it.location.lat},${it.location.lng}" } + (vm.route?.encodedPolyline ?: "")
@@ -347,7 +347,7 @@ private fun StopField(
                 .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) onFocus() },
             label = { Text(label) },
-            placeholder = { Text(if (letter == "A") "Calle y altura, $originShort" else "Calle, altura y localidad") },
+            placeholder = { Text(if (letter == "A") "Calle, altura y localidad" else "Calle, altura y localidad") },
             singleLine = true,
             isError = isError,
             shape = MaterialTheme.shapes.medium,

@@ -89,7 +89,8 @@ Cada vehículo tiene `minutos_carga`: lo que tarda **una persona** en cargarlo l
 Se abre manteniendo apretado el título de la primera pantalla y pide un PIN.
 
 - `precios_remotos.url`: dirección `/exec` del Apps Script de la planilla del dueño (cómo crearlo: `ventas/CONFIGURAR_PANEL_DEL_DUENO.md`). Con url, la app descarga precios y marca al abrir (y guarda una copia para usarla sin internet), y lo que el dueño guarda en el panel rige en todos los teléfonos y en la web. El PIN se valida en el script.
-- `precios_remotos.pin_local`: PIN para usar el panel sin planilla; los cambios valen solo en ese teléfono (para probar). Vacío = panel desactivado si tampoco hay url.
+- `precios_remotos.pin_local`: PIN para usar el panel sin planilla; los cambios valen solo en ese teléfono (para probar). Vacío = panel desactivado si tampoco hay url. El dueño puede cambiarlo desde el panel (Seguridad) y cargar un correo de recuperación (`seguridad.correo_recuperacion` es el inicial).
+- `origen`: además de `preset` o `poligono`, admite `centro: [lat, lng]` + `radio_km` para una zona circular (Fletaba Salto usa 120 km alrededor de Salto).
 
 Claves de la planilla: numéricas (`por_ayudante`, `kangoo.tarifa_base`, …; plantillas en `docs/plantilla-precios*.csv`) y de marca (`nombre`, `whatsapp`, `color_primario`, `color_acento`, `logo_url`). Lo que no esté en la planilla queda como en el `config.json`. Instructivo para el dueño: `ventas/ENTREGA_AL_CLIENTE.md`.
 

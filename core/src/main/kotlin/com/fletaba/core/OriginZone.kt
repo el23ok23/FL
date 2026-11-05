@@ -50,6 +50,16 @@ class OriginZone(
     }
 
     companion object {
+        /** Polígono que aproxima un círculo de [radiusKm] alrededor de [center] (para zonas "a X km de"). */
+        fun circle(center: LatLng, radiusKm: Double, points: Int = 72): List<LatLng> {
+            val dLat = radiusKm / 111.32
+            val dLng = radiusKm / (111.32 * Math.cos(Math.toRadians(center.lat)))
+            return (0 until points).map { i ->
+                val t = 2 * Math.PI * i / points
+                LatLng(center.lat + dLat * Math.cos(t), center.lng + dLng * Math.sin(t))
+            }
+        }
+
         /** Ciudad Autónoma de Buenos Aires (Av. General Paz, Riachuelo y Río de la Plata), simplificada. */
         val CABA = OriginZone(
             name = "Capital Federal",
@@ -77,17 +87,21 @@ class OriginZone(
             ),
         )
 
-        /** Partido de Salto (Provincia de Buenos Aires), contorno aproximado. */
+        /** Centro de Salto (Provincia de Buenos Aires). */
+        val SALTO_CENTER = LatLng(-34.2925, -60.2550)
+        /** Radio en km alrededor de Salto desde el que puede salir un flete. */
+        const val SALTO_RADIUS_KM = 120.0
+
+        /**
+         * Salto y alrededores: cualquier punto a menos de 120 km de Salto (Pergamino, San Nicolás, Junín,
+         * Chacabuco, Arrecifes, San Antonio de Areco, Mercedes, Chivilcoy…).
+         */
         val SALTO = OriginZone(
-            name = "Salto",
+            name = "Salto y alrededores",
             shortName = "Salto",
-            searchHint = "Salto, Buenos Aires",
-            polygon = listOf(
-                LatLng(-34.0500, -60.4500), LatLng(-34.0800, -60.2500), LatLng(-34.1500, -60.0500),
-                LatLng(-34.3000, -59.9800), LatLng(-34.4200, -60.0500), LatLng(-34.5000, -60.2500),
-                LatLng(-34.4800, -60.5000), LatLng(-34.4000, -60.6200), LatLng(-34.2500, -60.6000),
-                LatLng(-34.1200, -60.5500),
-            ),
+            searchHint = "Buenos Aires",
+            outsideKeywords = listOf("Uruguay"),
+            polygon = circle(SALTO_CENTER, SALTO_RADIUS_KM),
             streets = listOf(
                 "Buenos Aires", "Mitre", "Belgrano", "San Martín", "25 de Mayo", "9 de Julio", "Sarmiento",
                 "Rivadavia", "Moreno", "Alsina", "Pellegrini", "Italia", "Pringles", "Dorrego", "Lavalle",

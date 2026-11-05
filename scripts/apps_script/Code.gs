@@ -14,8 +14,11 @@
  * ventas/CONFIGURAR_PANEL_DEL_DUENO.md
  */
 
-// Cambiá el PIN acá antes de implementar. Solo números, de 4 a 8 cifras.
-const PIN = '1234';
+// PIN inicial del panel (el dueño puede cambiarlo desde la app; el nuevo queda guardado en el script).
+const PIN = 'salto2026fletes';
+
+// Correo donde el dueño recupera su PIN si lo olvida (también se cambia desde la app).
+const CORREO_RECUPERACION = '';
 
 // WhatsApp a los que llega cada pedido solo, sin que el cliente abra nada (gratis con CallMeBot).
 // Cada número se registra una vez en https://www.callmebot.com/blog/free-api-whatsapp-messages/ y
@@ -46,10 +49,25 @@ function doPost(e) {
 
   const accion = body.accion || 'guardar';
   if (accion === 'pedido') return pedido_(body);
+  if (accion === 'recuperar') return recuperar_();
 
-  if (String(body.pin || '') !== PIN) return json_({ ok: false, error: 'pin' });
+  if (String(body.pin || '') !== pinActual_()) return json_({ ok: false, error: 'pin' });
 
-  if (accion === 'verificar') return json_({ ok: true });
+  if (accion === 'verificar') return json_({ ok: true, correo: enmascarar_(correoRecuperacion_()) });
+
+  if (accion === 'cambiar_pin') {
+    const nuevo = String(body.nuevo_pin || '').trim();
+    if (nuevo.length < 4 || nuevo.length > 32) return json_({ ok: false, error: 'pin_invalido' });
+    PropertiesService.getScriptProperties().setProperty('PIN', nuevo);
+    return json_({ ok: true });
+  }
+
+  if (accion === 'correo') {
+    const correo = String(body.correo || '').trim();
+    if (correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) return json_({ ok: false, error: 'correo_invalido' });
+    PropertiesService.getScriptProperties().setProperty('CORREO_RECUPERACION', correo);
+    return json_({ ok: true, correo: enmascarar_(correo) });
+  }
 
   if (accion === 'guardar') {
     const filas = String(body.csv || '')
@@ -83,6 +101,42 @@ function doPost(e) {
   }
 
   return json_({ ok: false, error: 'accion' });
+}
+
+// ---- Seguridad --------------------------------------------------------------------------------
+
+function pinActual_() {
+  return PropertiesService.getScriptProperties().getProperty('PIN') || PIN;
+}
+
+function correoRecuperacion_() {
+  const p = PropertiesService.getScriptProperties().getProperty('CORREO_RECUPERACION');
+  return p === null ? CORREO_RECUPERACION : p;
+}
+
+/** "juan.perez@gmail.com" → "ju•••@gmail.com" */
+function enmascarar_(correo) {
+  if (!correo) return '';
+  const i = correo.indexOf('@');
+  if (i < 1) return '•••';
+  return correo.slice(0, Math.min(2, i)) + '•••' + correo.slice(i);
+}
+
+/** Manda el PIN al correo de recuperación. Máximo 3 veces por hora. */
+function recuperar_() {
+  const correo = correoRecuperacion_();
+  if (!correo) return json_({ ok: false, error: 'sin_correo' });
+  const cache = CacheService.getScriptCache();
+  const n = Number(cache.get('recuperaciones') || 0);
+  if (n >= 3) return json_({ ok: false, error: 'limite' });
+  cache.put('recuperaciones', String(n + 1), 3600);
+  const nombre = SpreadsheetApp.getActiveSpreadsheet().getName();
+  MailApp.sendEmail({
+    to: correo,
+    subject: 'Tu PIN del panel · ' + nombre,
+    body: 'Hola.\n\nTu PIN para entrar al panel del dueño es:\n\n    ' + pinActual_() + '\n\nSi no pediste este correo, cambiá el PIN desde el panel (Seguridad → Cambiar PIN).\n',
+  });
+  return json_({ ok: true, correo: enmascarar_(correo) });
 }
 
 // ---- Pedidos ----------------------------------------------------------------------------------

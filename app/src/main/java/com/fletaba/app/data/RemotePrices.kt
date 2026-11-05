@@ -16,16 +16,69 @@ import java.net.URL
  * La última versión buena queda guardada en el teléfono para usarla sin internet.
  * Sin url, el panel funciona en modo local: cambia los precios solo en este teléfono.
  */
-class RemotePrices(private val context: Context, private val url: String?, private val localPin: String?) {
+class RemotePrices(private val context: Context, private val url: String?, configPin: String?, private val configRecoveryEmail: String?) {
     private val prefs = context.applicationContext.getSharedPreferences("fletaba_precios", Context.MODE_PRIVATE)
     private val key = KEY_CSV + (url ?: "local").hashCode()
 
     /** true si los cambios llegan a todos los teléfonos (hay planilla configurada). */
     val synced: Boolean get() = url != null
+    /** PIN en modo local: el que cambió el dueño en este teléfono o, si no, el del config.json. */
+    private val localPin: String? get() = prefs.getString(KEY_LOCAL_PIN, null) ?: configPinValue
+    private val configPinValue: String? = configPin?.takeIf { it.isNotBlank() }
+
     /** true si el panel del dueño puede usarse (planilla o PIN local). */
     val available: Boolean get() = url != null || !localPin.isNullOrBlank()
 
-    enum class Status { OK, WRONG_PIN, OFFLINE, NOT_CONFIGURED }
+    enum class Status { OK, WRONG_PIN, OFFLINE, NOT_CONFIGURED, INVALID, NO_EMAIL, LIMIT }
+
+    /** Correo de recuperación conocido en este teléfono (enmascarado si vino del servidor). */
+    fun recoveryEmail(): String? = prefs.getString(KEY_EMAIL, null) ?: configRecoveryEmail
+    private fun rememberEmail(masked: String?) { prefs.edit().apply { if (masked.isNullOrBlank()) remove(KEY_EMAIL) else putString(KEY_EMAIL, masked) }.apply() }
+
+    /** Cambia el PIN (en la planilla, o en este teléfono si no hay planilla). */
+    suspend fun changePin(pin: String, newPin: String): Status {
+        if (newPin.length !in 4..32) return Status.INVALID
+        if (url == null) {
+            if (pin != localPin) return Status.WRONG_PIN
+            prefs.edit().putString(KEY_LOCAL_PIN, newPin).apply(); return Status.OK
+        }
+        return post(JSONObject().put("pin", pin).put("accion", "cambiar_pin").put("nuevo_pin", newPin))
+    }
+
+    /** Guarda el correo de recuperación. */
+    suspend fun saveRecoveryEmail(pin: String, email: String): Status {
+        val e = email.trim()
+        if (e.isNotEmpty() && !Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$").matches(e)) return Status.INVALID
+        if (url == null) {
+            if (pin != localPin) return Status.WRONG_PIN
+            rememberEmail(e); return Status.OK
+        }
+        val json = postJson(JSONObject().put("pin", pin).put("accion", "correo").put("correo", e)) ?: return Status.OFFLINE
+        return when {
+            json.optBoolean("ok") -> { rememberEmail(e); Status.OK }
+            json.optString("error") == "pin" -> Status.WRONG_PIN
+            json.optString("error") == "correo_invalido" -> Status.INVALID
+            else -> Status.OFFLINE
+        }
+    }
+
+    /**
+     * Recuperar el PIN. Con planilla, el servidor lo manda al correo. Sin planilla, devuelve el PIN
+     * para que la app lo ponga en un correo que el dueño se manda a sí mismo (modo de prueba).
+     */
+    suspend fun recover(): Pair<Status, String?> {
+        if (url == null) {
+            val mail = recoveryEmail() ?: return Status.NO_EMAIL to null
+            return Status.OK to "$mail|${localPin.orEmpty()}"
+        }
+        val json = postJson(JSONObject().put("accion", "recuperar")) ?: return Status.OFFLINE to null
+        return when {
+            json.optBoolean("ok") -> Status.OK to json.optString("correo")
+            json.optString("error") == "sin_correo" -> Status.NO_EMAIL to null
+            json.optString("error") == "limite" -> Status.LIMIT to null
+            else -> Status.OFFLINE to null
+        }
+    }
 
     /** CSV guardado de la última descarga o del último guardado (o null). */
     fun cached(): String? = prefs.getString(key, null)
@@ -53,7 +106,12 @@ class RemotePrices(private val context: Context, private val url: String?, priva
     /** Comprueba el PIN (en la planilla, o contra el PIN local si no hay planilla). */
     suspend fun verifyPin(pin: String): Status {
         if (url == null) return if (!localPin.isNullOrBlank() && pin == localPin) Status.OK else if (localPin.isNullOrBlank()) Status.NOT_CONFIGURED else Status.WRONG_PIN
-        return post(JSONObject().put("pin", pin).put("accion", "verificar"))
+        val json = postJson(JSONObject().put("pin", pin).put("accion", "verificar")) ?: return Status.OFFLINE
+        return when {
+            json.optBoolean("ok") -> { json.optString("correo").takeIf { it.isNotBlank() }?.let { rememberEmail(it) }; Status.OK }
+            json.optString("error") == "pin" -> Status.WRONG_PIN
+            else -> Status.OFFLINE
+        }
     }
 
     /** Guarda los precios nuevos: en la planilla (si hay) y siempre en este teléfono. */
@@ -139,6 +197,8 @@ class RemotePrices(private val context: Context, private val url: String?, priva
         const val TAG = "RemotePrices"
         const val KEY_CSV = "csv_"
         const val KEY_PIN = "pin"
+        const val KEY_LOCAL_PIN = "pin_local"
+        const val KEY_EMAIL = "correo_recuperacion"
         const val LOGO_FILE = "logo.png"
     }
 }

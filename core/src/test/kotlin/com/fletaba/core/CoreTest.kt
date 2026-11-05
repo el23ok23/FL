@@ -42,14 +42,28 @@ class OriginZoneTest {
         assertTrue(CabaZone.isInside(obelisco, listOf(null, "")))
     }
 
-    @Test fun `zona de salto`() {
+    @Test fun `zona de salto hasta 120 km a la redonda`() {
         val salto = OriginZone.SALTO
         assertTrue(salto.contains(LatLng(-34.2925, -60.2550))) // Salto centro
-        assertTrue(salto.contains(LatLng(-34.3764, -60.2664))) // Berdier
-        assertFalse(salto.contains(LatLng(-33.8900, -60.5700))) // Pergamino
-        assertFalse(salto.contains(LatLng(-34.6037, -58.3816))) // Obelisco
+        assertTrue(salto.contains(LatLng(-33.8900, -60.5700))) // Pergamino (~55 km)
+        assertTrue(salto.contains(LatLng(-33.3358, -60.2107))) // San Nicolás (~106 km)
+        assertTrue(salto.contains(LatLng(-34.5850, -60.9430))) // Junín (~71 km)
+        assertFalse(salto.contains(LatLng(-34.6037, -58.3816))) // Obelisco (~176 km)
+        assertFalse(salto.contains(LatLng(-32.9468, -60.6393))) // Rosario (~154 km)
+        // Borde: 115 km adentro, 125 km afuera (hacia el oeste)
+        val c = OriginZone.SALTO_CENTER
+        val kmPerLng = 111.32 * Math.cos(Math.toRadians(c.lat))
+        assertTrue(salto.contains(LatLng(c.lat, c.lng - 115 / kmPerLng)))
+        assertFalse(salto.contains(LatLng(c.lat, c.lng - 125 / kmPerLng)))
         // En Salto, "Provincia de Buenos Aires" no es motivo para quedar afuera.
         assertTrue(salto.isInside(LatLng(-34.2925, -60.2550), listOf("Provincia de Buenos Aires")))
+        assertFalse(salto.isInside(LatLng(-34.2925, -60.2550), listOf("Salto, Uruguay")))
+    }
+
+    @Test fun `circulo aproximado`() {
+        val poly = OriginZone.circle(LatLng(-34.0, -60.0), 10.0, 36)
+        assertEquals(36, poly.size)
+        poly.forEach { assertEquals(10.0, Geo.haversineKm(LatLng(-34.0, -60.0), it), 0.15) }
     }
 }
 

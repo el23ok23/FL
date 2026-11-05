@@ -44,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -52,6 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fletaba.app.OrderViewModel
@@ -75,6 +77,7 @@ fun AdminScreen(vm: OrderViewModel) {
 @Composable
 private fun PinGate(vm: OrderViewModel) {
     var pin by rememberSaveable { mutableStateOf("") }
+    var show by rememberSaveable { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     Column(
         Modifier
@@ -89,7 +92,7 @@ private fun PinGate(vm: OrderViewModel) {
             Modifier
                 .size(84.dp)
                 .clip(CircleShape)
-                .background(Brush.linearGradient(listOf(colors.primary, colors.tertiary))),
+                .background(colors.primary),
             contentAlignment = Alignment.Center,
         ) { Icon(Icons.Filled.Lock, contentDescription = null, tint = colors.onPrimary, modifier = Modifier.size(38.dp)) }
         Spacer(Modifier.height(20.dp))
@@ -102,19 +105,22 @@ private fun PinGate(vm: OrderViewModel) {
         Spacer(Modifier.height(26.dp))
         OutlinedTextField(
             value = pin,
-            onValueChange = { if (it.length <= 8) pin = it.filter { c -> c.isDigit() } },
+            onValueChange = { if (it.length <= 32) pin = it.trim() },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("PIN") },
             singleLine = true,
             shape = MaterialTheme.shapes.medium,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+            visualTransformation = if (show) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = { TextButton(onClick = { show = !show }) { Text(if (show) "Ocultar" else "Ver") } },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { if (pin.length >= 4) vm.unlockAdmin(pin) }),
             isError = vm.adminMessage == "PIN incorrecto",
-            supportingText = { vm.adminMessage?.let { Text(it, color = colors.error) } },
+            supportingText = { vm.adminMessage?.let { Text(it, color = if (it.startsWith("Te mandamos") || it.startsWith("Se abrió")) colors.primary else colors.error) } },
         )
         Spacer(Modifier.height(14.dp))
         PrimaryButton(text = "Entrar", onClick = { vm.unlockAdmin(pin) }, enabled = pin.length >= 4, loading = vm.adminBusy)
         Spacer(Modifier.height(6.dp))
+        SecondaryButton(text = "Olvidé mi PIN", onClick = { vm.recoverPin() })
         SecondaryButton(text = "Volver", onClick = { vm.closeAdmin() })
     }
 }
@@ -154,6 +160,7 @@ private fun OwnerPanel(vm: OrderViewModel) {
             LogoCard(vm, onPick = { pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) })
             ColorsCard(vm)
             vm.adminForm.forEach { group -> GroupCard(vm, group) }
+            SecurityCard(vm)
             Spacer(Modifier.height(4.dp))
             SecondaryButton(text = "Volver a los valores originales", onClick = { vm.resetAdminValues() })
             Spacer(Modifier.height(8.dp))
@@ -177,6 +184,55 @@ private fun OwnerPanel(vm: OrderViewModel) {
                 PrimaryButton(text = "Guardar", onClick = { vm.saveAdmin() }, enabled = vm.adminValid, loading = vm.adminBusy)
             }
         }
+    }
+}
+
+@Composable
+private fun SecurityCard(vm: OrderViewModel) {
+    val colors = MaterialTheme.colorScheme
+    var email by rememberSaveable(vm.recoveryEmailShown) { mutableStateOf(vm.recoveryEmailShown?.takeIf { !it.contains("•") } ?: "") }
+    var changing by rememberSaveable { mutableStateOf(false) }
+    var current by rememberSaveable { mutableStateOf("") }
+    var new1 by rememberSaveable { mutableStateOf("") }
+    var new2 by rememberSaveable { mutableStateOf("") }
+    PanelCard("Seguridad", "Tu PIN y el correo donde lo recuperás si lo olvidás.") {
+        val shown = vm.recoveryEmailShown
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it.trim() },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Correo de recuperación") },
+            placeholder = { Text(shown?.takeIf { it.contains("•") } ?: "tu@correo.com") },
+            singleLine = true,
+            shape = MaterialTheme.shapes.medium,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
+            supportingText = { if (!shown.isNullOrBlank()) Text("Actual: $shown") },
+        )
+        SecondaryButton(text = "Guardar correo", onClick = { vm.saveRecoveryEmail(email) })
+        Spacer(Modifier.height(4.dp))
+        if (!changing) {
+            SecondaryButton(text = "Cambiar PIN", onClick = { changing = true })
+        } else {
+            OutlinedTextField(value = current, onValueChange = { current = it.trim() }, modifier = Modifier.fillMaxWidth(), label = { Text("PIN actual") }, singleLine = true, shape = MaterialTheme.shapes.medium, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(value = new1, onValueChange = { new1 = it.trim() }, modifier = Modifier.fillMaxWidth(), label = { Text("PIN nuevo (4 a 32 caracteres)") }, singleLine = true, shape = MaterialTheme.shapes.medium, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(value = new2, onValueChange = { new2 = it.trim() }, modifier = Modifier.fillMaxWidth(), label = { Text("Repetí el PIN nuevo") }, singleLine = true, shape = MaterialTheme.shapes.medium, isError = new2.isNotEmpty() && new1 != new2, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton(text = "Cancelar", onClick = { changing = false; current = ""; new1 = ""; new2 = "" }, modifier = Modifier.weight(1f))
+                PrimaryButton(
+                    text = "Confirmar",
+                    onClick = { vm.changePin(current, new1); changing = false; current = ""; new1 = ""; new2 = "" },
+                    enabled = current.length >= 4 && new1.length in 4..32 && new1 == new2,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Text(
+            "Guardá el PIN en un lugar seguro. Si lo perdés y no cargaste un correo, vas a necesitar ayuda de quien te entregó la app.",
+            style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp),
+        )
     }
 }
 

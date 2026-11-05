@@ -177,7 +177,7 @@ fun OsmOverlayMap(
                 val color = when {
                     !inside -> colors.error
                     i == 0 -> colors.primary
-                    i == points.lastIndex -> colors.tertiary
+                    i == points.lastIndex -> colors.onPrimaryContainer
                     else -> colors.secondary
                 }
                 marker(pt, ('A' + i).toString(), color, measurer, labelStyle)
@@ -282,7 +282,7 @@ fun SchematicMap(
             val color = when {
                 !inside -> colors.error
                 i == 0 -> colors.primary
-                i == points.lastIndex -> colors.tertiary
+                i == points.lastIndex -> colors.onPrimaryContainer
                 else -> colors.secondary
             }
             marker(pt, ('A' + i).toString(), color, measurer, labelStyle)
