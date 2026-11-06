@@ -35,8 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.background
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
@@ -66,8 +64,8 @@ fun PrimaryButton(
     val interaction = remember { MutableInteractionSource() }
     val colors = MaterialTheme.colorScheme
     val active = enabled && !loading
-    // Un solo color: el principal de la marca (sin degradés multicolor).
-    val fill = colors.primary
+    // Un solo color, liso: el principal de la marca. Sin fondo propio ni sombra (en algunos teléfonos
+    // la sombra sobre un fondo transparente se veía como un recuadro más claro dentro del botón).
     Button(
         onClick = onClick,
         enabled = active,
@@ -75,12 +73,11 @@ fun PrimaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(58.dp)
-            .pressScale(interaction, 0.97f)
-            .then(if (active) Modifier.background(fill, MaterialTheme.shapes.medium) else Modifier),
+            .pressScale(interaction, 0.97f),
         shape = MaterialTheme.shapes.medium,
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = if (active) 4.dp else 0.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
+            containerColor = colors.primary,
             contentColor = colors.onPrimary,
             disabledContainerColor = colors.surfaceVariant,
             disabledContentColor = colors.onSurfaceVariant,
