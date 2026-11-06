@@ -51,15 +51,15 @@ for e in emp:
 
     # Mensaje de WhatsApp
     # Secuencia completa de WhatsApp: qué mandar y qué escribir antes de cada cosa
-    m1 = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es un solo pago, sin comisiones ni abonos.\n\n"
+    m1 = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una web app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es una web app: se abre desde un enlace y se instala en el celular sin pasar por ninguna tienda. Un solo pago, sin comisiones ni abonos.\n\n"
           f"Son dos enlaces:\n\n"
           f"1) La página que ven sus clientes, ya con el nombre {nombre}. Ábranla desde el celular y pidan un flete de prueba:\n{demo}\n\n"
           f"2) El panel del dueño, donde ustedes mismos cambian los precios, el nombre, los colores y el logo:\n{demo}?panel\nCódigo para entrar: {pin}\n\n"
           f"¿Con quién puedo hablar del tema?")
     m2 = "Les dejo un video de 30 segundos de cómo funciona 👇"
-    m3 = (f"Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos la configuramos con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?")
-    m4 = (f"Hola, ¿pudieron ver la app de {nombre}? Les recuerdo los enlaces: la página de sus clientes {demo} y el panel del dueño {demo}?panel (código {pin}). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?")
-    m5 = (f"Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
+    m3 = (f"Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos configuramos la web app con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?")
+    m4 = (f"Hola, ¿pudieron ver la web app de {nombre}? Les recuerdo los enlaces: la página de sus clientes {demo} y el panel del dueño {demo}?panel (código {pin}). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?")
+    m5 = (f"Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la web app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
     secuencia = (f"SECUENCIA DE ENVÍO · {nombre}\nTeléfonos: {tel}\n{'=' * 60}\n\n"
                  f"PASO 1 · Primer contacto (solo texto). Copiá y pegá:\n{'-' * 60}\n{m1}\n{'-' * 60}\n\n"
                  f"PASO 2 · Enseguida, en otro mensaje: escribí esto y ADJUNTÁ EL VIDEO ({slug}-video.mp4) desde la galería:\n{'-' * 60}\n{m2}\n{'-' * 60}\n\n"

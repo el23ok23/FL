@@ -38,11 +38,11 @@ for e in emp:
     p = fol
     p = p.replace("<title>Fletaba para empresas de fletes", f"<title>Propuesta para {html.escape(nombre)}")
     p = p.replace("FLETABA · PARA EMPRESAS DE FLETES DE SALTO", f"FLETABA · PROPUESTA PARA {html.escape(nombre.upper())}")
-    p = re.sub(r"<h1>.*?</h1>", f"<h1>La app de fletes de {html.escape(nombre)}, lista para sus clientes.</h1>", p, count=1, flags=re.S)
+    p = re.sub(r"<h1>.*?</h1>", f"<h1>La web app de fletes de {html.escape(nombre)}, lista para sus clientes.</h1>", p, count=1, flags=re.S)
     video = f"{BASE}/{slug}/video.mp4"
     demo = f"{BASE}/{slug}/"
     extra = (f'<h2>Pruébenla ahora, con su nombre</h2><div class="grid">'
-             f'<div class="card"><b>Demo web de {html.escape(nombre)}</b>La app completa, con su nombre y su color: <a href="{demo}">{demo}</a><br><small>Panel del dueño: mantener apretado el título o abrir <a href="{demo}?panel">{demo}?panel</a> · PIN <code>{pin}</code> (en la demo los cambios quedan solo en su navegador).</small></div>'
+             f'<div class="card"><b>Web app de prueba de {html.escape(nombre)}</b>La web app completa, con su nombre y su color. Se abre desde el enlace y se instala en el celular sin tienda: <a href="{demo}">{demo}</a><br><small>Panel del dueño: mantener apretado el título o abrir <a href="{demo}?panel">{demo}?panel</a> · PIN <code>{pin}</code> (en la demo los cambios quedan solo en su navegador).</small></div>'
              f'<div class="card"><b>Video de 30 segundos</b><a href="{video}">{video}</a></div></div>')
     p = p.replace('<h2>Qué recibís</h2>', extra + '<h2>Qué recibís</h2>', 1)
     p = p.replace("Tu nombre, tus colores, tu ícono.", f"Con el nombre {html.escape(nombre)}, sus colores y su ícono.")

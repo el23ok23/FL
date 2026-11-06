@@ -4,7 +4,7 @@ Teléfonos: (02474) 42-3149
 
 PASO 1 · Primer contacto (solo texto). Copiá y pegá:
 ------------------------------------------------------------
-Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a Transporte de Cargas Mayo: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es un solo pago, sin comisiones ni abonos.
+Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una web app de prueba a Transporte de Cargas Mayo: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es una web app: se abre desde un enlace y se instala en el celular sin pasar por ninguna tienda. Un solo pago, sin comisiones ni abonos.
 
 Son dos enlaces:
 
@@ -25,17 +25,17 @@ Les dejo un video de 30 segundos de cómo funciona 👇
 
 PASO 3 · Cuando respondan con interés: escribí esto y ADJUNTÁ LA PROPUESTA (transporte-mayo-propuesta.pdf):
 ------------------------------------------------------------
-Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos la configuramos con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?
+Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos configuramos la web app con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?
 ------------------------------------------------------------
 
 PASO 4 · Si en 2 o 3 días no respondieron (una sola vez):
 ------------------------------------------------------------
-Hola, ¿pudieron ver la app de Transporte de Cargas Mayo? Les recuerdo los enlaces: la página de sus clientes https://el23ok23.github.io/FL/empresas/transporte-mayo/ y el panel del dueño https://el23ok23.github.io/FL/empresas/transporte-mayo/?panel (código transportemayo2026). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?
+Hola, ¿pudieron ver la web app de Transporte de Cargas Mayo? Les recuerdo los enlaces: la página de sus clientes https://el23ok23.github.io/FL/empresas/transporte-mayo/ y el panel del dueño https://el23ok23.github.io/FL/empresas/transporte-mayo/?panel (código transportemayo2026). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?
 ------------------------------------------------------------
 
 PASO 5 · Cuando digan que sí: escribí esto y ADJUNTÁ EL CONTRATO (transporte-mayo-contrato.pdf). Antes completá a mano el precio y la fecha:
 ------------------------------------------------------------
-Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.
+Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la web app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.
 ------------------------------------------------------------
 
 Enlaces de Transporte de Cargas Mayo:
