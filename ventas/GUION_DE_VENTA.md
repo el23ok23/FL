@@ -4,7 +4,7 @@
 
 - **Qué decís**: "Es una app, pero no hay que bajarla de ninguna tienda. Te mando un enlace, lo abrís, tocás Instalar y te queda el ícono con tu nombre en el celular. Anda en Android y en iPhone. Mirá." (y se la instalás ahí mismo en su teléfono: menú del navegador → Instalar app).
 - **Por qué es mejor para él**: su cliente no va a ir a buscar la app a la tienda; le llega el enlace por WhatsApp y pide. Y la tiene en días.
-- **Si pregunta por Google Play**: "Se puede, es la misma app. Pero es un trámite de Google: cuenta de desarrollador a tu nombre, 25 dólares, verificación de identidad, una prueba cerrada con 12 personas durante dos semanas y la revisión de ellos. Entre todo, 45 a 60 días. Lo hacemos como segunda etapa cuando la web app ya esté trayendo pedidos, y se cotiza aparte."
+- **Si pregunta por Google Play, decí la verdad**: "Hoy no está en Google Play, y no tengo cuenta de desarrollador: nunca hizo falta, porque la app se instala desde el enlace. Si la querés en la tienda, se puede: es la misma app. Se abre una cuenta a nombre de tu empresa, cuesta 25 dólares una vez, Google te verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la web app ya esté trayendo pedidos. Se cotiza aparte." No prometas nunca "te la subo a Play" como si fuera un botón.
 - **Plazos que prometés** (con margen): enlace de prueba en 7 días, entrega en 15 días hábiles. Si lo tenés antes, mejor: entregá antes, pero no prometas antes.
 
 ## Demo en la reunión
@@ -22,7 +22,7 @@ Fleteros con 1 a 5 vehículos que hoy reciben pedidos por teléfono o WhatsApp y
 2. Deslizar los vehículos: "Acá van tus camionetas, con tus medidas y tus precios."
 3. Marcar un 3º piso por escalera y un ayudante: "Mirá cómo cambia el precio y el tiempo de carga incluido. Esto te saca las discusiones de la espera."
 4. Llegar al precio: "Esto lo ve el cliente. Y esto es lo que te llega a vos" (mostrar el mensaje de WhatsApp con el detalle).
-5. Cerrar: "Con tu nombre, tu color y tu número queda igual. La publicamos en Google Play y además tenés el enlace web para mandar por WhatsApp."
+5. Cerrar: "Con tu nombre, tu color y tu número queda igual. Tus clientes la instalan desde el enlace que les mandás por WhatsApp; no hay que bajar nada de ninguna tienda."
 
 ## Argumentos que funcionan
 - **Tiempo**: "Dejás de pasar presupuestos por teléfono. El cliente se autocotiza, vos solo confirmás."

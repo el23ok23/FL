@@ -1,6 +1,6 @@
 // Service worker: deja la app abierta sin conexión (la página y lo que ya se vio). Las búsquedas de
 // direcciones, el mapa y el envío del pedido siguen necesitando internet.
-const CACHE = 'fletaba-468b249';
+const CACHE = 'fletaba-381958e';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

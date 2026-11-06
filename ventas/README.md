@@ -2,6 +2,7 @@
 
 - `PROPUESTA_COMERCIAL.md`: qué recibe la empresa (web app instalable como producto principal, Google Play opcional), precio único, plazos con margen y preguntas frecuentes.
 - `ENTREGA_AL_CLIENTE.md`: instructivo para el dueño: cómo cambia precios, nombre, colores y logo desde la app.
+- `GOOGLE_PLAY_SIN_CUENTA.md`: para vos: qué decir sobre Google Play sin tener cuenta, y los dos caminos si una empresa la pide.
 - `CONFIGURAR_PANEL_DEL_DUENO.md`: cómo armamos la planilla y el Apps Script gratuito que sincroniza esos cambios (una vez por empresa).
 - `folleto.html`: la misma propuesta en una página para mandar como enlace o imprimir.
 - `flyer-empresas-1080x1350.png`: imagen para mandar por WhatsApp o publicar.
