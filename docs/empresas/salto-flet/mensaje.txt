@@ -1,0 +1,6 @@
+Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Salto Flet: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos.
+
+Pruébenla acá, ya con su nombre (se instala desde el enlace, sin tienda): https://el23ok23.github.io/FL/empresas/salto-flet/
+Video: https://el23ok23.github.io/FL/empresas/salto-flet/video.mp4
+
+Si les interesa, se las dejo funcionando con sus precios y su WhatsApp.
