@@ -4,7 +4,7 @@
 
 - **Qué decís**: "Es una WebApp, pero no hay que bajarla de ninguna tienda. Te mando un enlace, lo abrís, tocás Instalar y te queda el ícono con tu nombre en el celular. Anda en Android y en iPhone. Mirá." (y se la instalás ahí mismo en su teléfono: menú del navegador → Instalar WebApp).
 - **Por qué es mejor para él**: su cliente no va a ir a buscar la WebApp a la tienda; le llega el enlace por WhatsApp y pide. Y la tiene en días.
-- **Si pregunta por Google Play**: "Se puede, es la misma WebApp, en versión Android. Se publica con una cuenta de desarrollador a nombre de tu empresa: cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la WebApp ya esté trayendo pedidos. Se cotiza aparte." No prometas "te la subo a Play" como si fuera un botón: los tiempos los pone Google.
+- **Si pregunta por Google Play**: "Se puede, es la misma WebApp, en versión Android. Se publica con una cuenta de desarrollador a nombre de tu empresa: cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la WebApp. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la WebApp ya esté trayendo pedidos. Se cotiza aparte." No prometas "te la subo a Play" como si fuera un botón: los tiempos los pone Google.
 - **Plazos que prometés** (con margen): enlace de prueba en 7 días, entrega en 15 días hábiles. Si lo tenés antes, mejor: entregá antes, pero no prometas antes.
 
 ## Demo en la reunión
