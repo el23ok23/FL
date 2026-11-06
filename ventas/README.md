@@ -1,6 +1,6 @@
 # Ventas · Fletaba marca blanca para empresas de fletes de Salto
 
-- `PROPUESTA_COMERCIAL.md`: qué recibe la empresa (web app instalable como producto principal, Google Play opcional), precio único, plazos con margen y preguntas frecuentes.
+- `PROPUESTA_COMERCIAL.md`: qué recibe la empresa (WebApp instalable como producto principal, Google Play opcional), precio único, plazos con margen y preguntas frecuentes.
 - `ENTREGA_AL_CLIENTE.md`: instructivo para el dueño: cómo cambia precios, nombre, colores y logo desde la app.
 - `GOOGLE_PLAY_SIN_CUENTA.md`: para vos: qué decir sobre Google Play sin tener cuenta, y los dos caminos si una empresa la pide.
 - `CONFIGURAR_PANEL_DEL_DUENO.md`: cómo armamos la planilla y el Apps Script gratuito que sincroniza esos cambios (una vez por empresa).
@@ -9,7 +9,7 @@
 - `GUION_DE_VENTA.md`: a quién, cómo abrir, demo de 2 minutos, objeciones y cierre.
 - `CONTRATO_MODELO.md`: contrato de servicio para adaptar con un contador o abogado.
 
-Alta de una empresa nueva (crea la app, la web y la publicación automática):
+Alta de una empresa nueva (crea la WebApp, la web y la publicación automática):
 
 ```
 python3 scripts/nueva_empresa.py --slug donpedro --nombre "Fletes Don Pedro" --whatsapp 5492474123456 --origen salto --color "#0E7C4A"

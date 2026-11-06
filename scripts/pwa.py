@@ -29,13 +29,13 @@ self.addEventListener('fetch', e => {
 """
 
 PWA_JS = """
-/* ---------- Web app instalable ---------- */
+/* ---------- WebApp instalable ---------- */
 (function(){
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
   let deferred=null;const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-  function button(){if(standalone||document.getElementById('installbtn'))return;const b=document.createElement('button');b.id='installbtn';b.type='button';b.textContent='📲 Instalar la app';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;border:0;border-radius:999px;padding:10px 16px;font:600 14px/1 Inter,system-ui,sans-serif;background:var(--noche,#0B1F3A);color:#fff;box-shadow:0 10px 30px rgba(11,31,58,.25);cursor:pointer';
+  function button(){if(standalone||document.getElementById('installbtn'))return;const b=document.createElement('button');b.id='installbtn';b.type='button';b.textContent='📲 Instalar la WebApp';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;border:0;border-radius:999px;padding:10px 16px;font:600 14px/1 Inter,system-ui,sans-serif;background:var(--noche,#0B1F3A);color:#fff;box-shadow:0 10px 30px rgba(11,31,58,.25);cursor:pointer';
     b.addEventListener('click',async()=>{if(deferred){deferred.prompt();const r=await deferred.userChoice;deferred=null;if(r&&r.outcome==='accepted')b.remove();return;}
-      alert(ios?'Para instalarla en tu iPhone: tocá el botón Compartir (el cuadrado con la flecha) y después "Agregar a inicio".':'Para instalarla: abrí el menú del navegador (⋮) y tocá "Instalar app" o "Agregar a pantalla de inicio".');});
+      alert(ios?'Para instalarla en tu iPhone: tocá el botón Compartir (el cuadrado con la flecha) y después "Agregar a inicio".':'Para instalarla: abrí el menú del navegador (⋮) y tocá "Instalar aplicación" o "Agregar a pantalla de inicio".');});
     document.body.appendChild(b);setTimeout(()=>{if(b.parentNode&&!deferred)b.style.opacity='.9';},0);}
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;button();});
   window.addEventListener('appinstalled',()=>{const b=document.getElementById('installbtn');if(b)b.remove();});
@@ -96,7 +96,7 @@ for folder in FOLDERS:
             f'<link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><!-- /pwa -->')
     page = page.replace("<title>", head + "\n<title>", 1) if "<!-- pwa -->" not in page else page
     # Script (al final del último <script>)
-    page = re.sub(r"\n/\* ---------- Web app instalable ---------- \*/.*?\n\}\)\(\);\n", "\n", page, flags=re.S)
+    page = re.sub(r"\n/\* ---------- (Web app|WebApp) instalable ---------- \*/.*?\n\}\)\(\);\n", "\n", page, flags=re.S)
     i = page.rfind("</script>")
     page = page[:i] + PWA_JS + page[i:]
     open(idx, "w", encoding="utf-8").write(page)

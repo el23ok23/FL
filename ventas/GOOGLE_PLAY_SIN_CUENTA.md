@@ -4,7 +4,7 @@ Documento interno, solo para vos. Al cliente no se le dice que no tenés cuenta:
 
 ## Lo que vendés
 
-La **web app**: se instala desde el enlace, en Android y iPhone, con el ícono y el nombre de la empresa. Es el producto completo. Google Play no agrega ninguna función; solo cambia desde dónde se instala.
+La **WebApp**: se instala desde el enlace, en Android y iPhone, con el ícono y el nombre de la empresa. Es el producto completo. Google Play no agrega ninguna función; solo cambia desde dónde se instala.
 
 ## Qué decir si preguntan por Google Play
 
@@ -14,7 +14,7 @@ Nunca digas "te la subo a Play": no es un botón, y no depende de vos.
 
 ## Si una empresa la pide de verdad: dos caminos
 
-**A. Cuenta a nombre de la empresa (recomendado).** La app es de ellos; la cuenta también.
+**A. Cuenta a nombre de la empresa (recomendado).** La WebApp es de ellos; la cuenta también.
 1. El dueño entra a play.google.com/console con una cuenta de Google de la empresa, elige "Organización", paga los 25 dólares con su tarjeta y verifica identidad (DNI del responsable, datos de la empresa y número D-U-N-S, que se pide gratis en dnb.com y tarda hasta 30 días).
 2. Te agrega como usuario de la cuenta con permiso para publicar.
 3. Vos subís el archivo `.aab` que ya genera GitHub en cada build (`FletabaSalto-release.aab` o el de la empresa, en Releases), cargás la ficha (nombre, descripción, capturas, ícono), la política de privacidad (ya está publicada en la web) y el formulario de seguridad de datos.
@@ -31,4 +31,4 @@ Nunca digas "te la subo a Play": no es un botón, y no depende de vos.
 
 ## Plazos que decís al cliente
 
-Enlace de prueba en 7 días, entrega de la web app en 15 días hábiles, Google Play (si lo piden) 45 a 60 días desde que su cuenta queda verificada. Todo con margen.
+Enlace de prueba en 7 días, entrega de la WebApp en 15 días hábiles, Google Play (si lo piden) 45 a 60 días desde que su cuenta queda verificada. Todo con margen.

@@ -8,9 +8,9 @@ Para mandar a empresas de fletes antes de la reunión.
 
 # Videos para empresas de fletes (Salto)
 
-Tres videos verticales de 25 a 32 segundos, con música, grabados de la app de ejemplo "Fletes Don Pedro". Pensados para mandar por WhatsApp al dueño de cada empresa. Se generan con `node marketing/videos/make_b2b.js`.
+Tres videos verticales de 25 a 32 segundos, con música, grabados de la WebApp de ejemplo "Fletes Don Pedro". Pensados para mandar por WhatsApp al dueño de cada empresa. Se generan con `node marketing/videos/make_b2b.js`.
 
-## b2b-01 · Tu propia app (`videos/mp4/b2b-01-tu-propia-app.mp4`)
+## b2b-01 · Tu propia WebApp (`videos/mp4/b2b-01-tu-propia-app.mp4`)
 
 Primer contacto. Mensaje para acompañarlo:
 

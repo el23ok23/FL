@@ -1,4 +1,4 @@
-// Videos para vender la app a empresas de fletes (Salto): tarjetas de texto + demo real grabada de la web
+// Videos para vender la WebApp a empresas de fletes (Salto): tarjetas de texto + demo real grabada de la web
 // de la empresa de ejemplo "Fletes Don Pedro". 1080×1920, música sintetizada propia.
 // Uso: node marketing/videos/make_b2b.js   (necesita Playwright/Chromium y ffmpeg)
 const { chromium } = require('playwright');
@@ -54,10 +54,10 @@ async function make(name, dur, bpm, steps) {
 }
 
 (async () => {
-  // 1. Tu propia app
+  // 1. Tu propia WebApp
   await make('b2b-01-tu-propia-app', 40, 112, async (a) => {
     await a.card(['¿Tenés una empresa', 'de fletes en <b>Salto</b>?'], { eyebrow: 'Para empresas de fletes', logo: true }, 3200);
-    await a.card(['Tené tu <b>propia app</b>', 'con tu nombre y tu logo.'], { bg: CEL, accent: SOL }, 3200);
+    await a.card(['Tené tu <b>propia WebApp</b>', 'con tu nombre y tu logo.'], { bg: CEL, accent: SOL }, 3200);
     await a.demo(); await a.cap('Así la ve tu cliente: tu marca, tus colores'); await a.sleep(2400);
     await a.click('#demo'); await a.cap('Escribe de dónde a dónde…'); await a.sleep(2200);
     await a.click('#cta'); await a.cap('…elige el vehículo…'); await a.sleep(1200); await a.click('#next'); await a.sleep(1500);
@@ -93,7 +93,7 @@ async function make(name, dur, bpm, steps) {
     await a.click('button[data-sw="color_primario|#7C3AED"]'); await a.sleep(1000); await a.click('button[data-sw="color_primario|#DC2626"]'); await a.sleep(1000); await a.click('button[data-sw="color_primario|"]'); await a.sleep(800);
     await a.scrollTo('input[data-pk="kangoo.tarifa_base"]'); await a.cap('Cambiás un precio…'); await a.sleep(700); await a.type('input[data-pk="kangoo.tarifa_base"]', '21000'); await a.sleep(900);
     await a.scrollTo('input[data-pk="recargo_fin_de_semana_porcentaje"]'); await a.cap('…un recargo de fin de semana, un descuento de ida y vuelta…'); await a.sleep(700); await a.type('input[data-pk="recargo_fin_de_semana_porcentaje"]', '15'); await a.sleep(1200);
-    await a.scrollTo('#panelsave'); await a.cap('Guardar. Rige en la app de todos tus clientes y en la web'); await a.sleep(800); await a.click('#panelsave'); await a.sleep(2000);
+    await a.scrollTo('#panelsave'); await a.cap('Guardar. Rige en la WebApp de todos tus clientes y en la web'); await a.sleep(800); await a.click('#panelsave'); await a.sleep(2000);
     await a.card(['Sin llamar a nadie.', 'Sin esperar.', '<b>Desde tu celular.</b>'], {}, 3200);
     await a.card(['Un solo pago.', '<b>Sin comisiones.</b>', '<b>Sin abonos.</b>'], { bg: CEL, accent: SOL, small: 'Respondé este mensaje y te la muestro con tu nombre.' }, 3600);
   });

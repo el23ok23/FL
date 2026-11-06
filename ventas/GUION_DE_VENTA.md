@@ -1,10 +1,10 @@
 # Guion de venta · empresas de fletes de Salto
 
-## Cómo explicar "web app" y Google Play
+## Cómo explicar "WebApp" y Google Play
 
-- **Qué decís**: "Es una app, pero no hay que bajarla de ninguna tienda. Te mando un enlace, lo abrís, tocás Instalar y te queda el ícono con tu nombre en el celular. Anda en Android y en iPhone. Mirá." (y se la instalás ahí mismo en su teléfono: menú del navegador → Instalar app).
-- **Por qué es mejor para él**: su cliente no va a ir a buscar la app a la tienda; le llega el enlace por WhatsApp y pide. Y la tiene en días.
-- **Si pregunta por Google Play**: "Se puede, es la misma app. Se publica con una cuenta de desarrollador a nombre de tu empresa: cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la web app ya esté trayendo pedidos. Se cotiza aparte." No prometas "te la subo a Play" como si fuera un botón: los tiempos los pone Google.
+- **Qué decís**: "Es una WebApp, pero no hay que bajarla de ninguna tienda. Te mando un enlace, lo abrís, tocás Instalar y te queda el ícono con tu nombre en el celular. Anda en Android y en iPhone. Mirá." (y se la instalás ahí mismo en su teléfono: menú del navegador → Instalar WebApp).
+- **Por qué es mejor para él**: su cliente no va a ir a buscar la WebApp a la tienda; le llega el enlace por WhatsApp y pide. Y la tiene en días.
+- **Si pregunta por Google Play**: "Se puede, es la misma WebApp, en versión Android. Se publica con una cuenta de desarrollador a nombre de tu empresa: cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la WebApp ya esté trayendo pedidos. Se cotiza aparte." No prometas "te la subo a Play" como si fuera un botón: los tiempos los pone Google.
 - **Plazos que prometés** (con margen): enlace de prueba en 7 días, entrega en 15 días hábiles. Si lo tenés antes, mejor: entregá antes, pero no prometas antes.
 
 ## Demo en la reunión
@@ -15,10 +15,10 @@ Mostrá la web de la empresa ficticia **Fletes Don Pedro** (https://el23ok23.git
 Fleteros con 1 a 5 vehículos que hoy reciben pedidos por teléfono o WhatsApp y pasan presupuestos "a ojo". Dónde encontrarlos: grupos de Facebook de Salto, Marketplace, carteles en vehículos, corralones y mueblerías (preguntar con quién trabajan), la terminal, ferreterías grandes.
 
 ## Apertura (30 segundos)
-"Hola, soy COMPLETAR. Trabajo con empresas de fletes de Salto para que tengan su propia app, como las de los taxis: el cliente pone de dónde a dónde, qué lleva y ve el precio al toque; a vos te llega el pedido armado por WhatsApp. ¿Te muestro cómo queda con tu nombre? Son dos minutos."
+"Hola, soy COMPLETAR. Trabajo con empresas de fletes de Salto para que tengan su propia WebApp, como las de los taxis: el cliente pone de dónde a dónde, qué lleva y ve el precio al toque; a vos te llega el pedido armado por WhatsApp. ¿Te muestro cómo queda con tu nombre? Son dos minutos."
 
 ## Demostración (2 minutos, con el celular en la mano)
-1. Abrir la demo (`https://el23ok23.github.io/FL/salto/` o la app). Escribir "Buenos Aires 500" como origen y una dirección en Rosario como destino. Mostrar el mapa y la distancia.
+1. Abrir la demo (`https://el23ok23.github.io/FL/salto/` o la WebApp). Escribir "Buenos Aires 500" como origen y una dirección en Rosario como destino. Mostrar el mapa y la distancia.
 2. Deslizar los vehículos: "Acá van tus camionetas, con tus medidas y tus precios."
 3. Marcar un 3º piso por escalera y un ayudante: "Mirá cómo cambia el precio y el tiempo de carga incluido. Esto te saca las discusiones de la espera."
 4. Llegar al precio: "Esto lo ve el cliente. Y esto es lo que te llega a vos" (mostrar el mensaje de WhatsApp con el detalle).
@@ -26,16 +26,16 @@ Fleteros con 1 a 5 vehículos que hoy reciben pedidos por teléfono o WhatsApp y
 
 ## Argumentos que funcionan
 - **Tiempo**: "Dejás de pasar presupuestos por teléfono. El cliente se autocotiza, vos solo confirmás."
-- **Seriedad**: "Una empresa con app propia cobra mejor y cierra más rápido."
+- **Seriedad**: "Una empresa con WebApp propia cobra mejor y cierra más rápido."
 - **Precio claro**: "Tarifa, km, ayudantes, pisos: el cliente ve de dónde sale el número. Menos regateo."
 - **Espera**: "Queda escrito cuánto tiempo de carga incluye y cuánto cuesta la espera."
-- **Sin ataduras**: "Pagás una vez y es tuya. Ni comisión ni abono, nunca. Los precios, el nombre, los colores y el logo los cambiás vos desde la app."
+- **Sin ataduras**: "Pagás una vez y es tuya. Ni comisión ni abono, nunca. Los precios, el nombre, los colores y el logo los cambiás vos desde la WebApp."
 
 ## Objeciones y respuestas
 - *"Mis clientes me llaman, no usan apps."* → "Por eso también tenés la web: les mandás el enlace por WhatsApp y cotizan ahí, sin instalar nada. Y los que buscan en Google te encuentran en Play."
 - *"Es caro."* → "Es un solo pago; dividilo en los años que la vas a usar y son centavos por flete. Y no tiene comisiones ni mensual: nunca más pagás."
-- *"Ya tengo página de Facebook."* → "Perfecto, la app se promociona ahí: te doy 10 posts y 5 videos con tu marca."
-- *"¿Y si cambio los precios?"* → "Los cambiás vos desde la app, con tu PIN. Te muestro: mantengo apretado el título, entro, cambio este número, Guardar, y mirá el presupuesto."
+- *"Ya tengo página de Facebook."* → "Perfecto, la WebApp se promociona ahí: te doy 10 posts y 5 videos con tu marca."
+- *"¿Y si cambio los precios?"* → "Los cambiás vos desde la WebApp, con tu PIN. Te muestro: mantengo apretado el título, entro, cambio este número, Guardar, y mirá el presupuesto."
 - *"Lo pienso."* → "Dale. Te dejo la demo con tu nombre esta semana, sin cargo, y lo ves funcionando."
 
 ## Cierre

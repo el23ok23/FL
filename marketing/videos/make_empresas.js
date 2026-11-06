@@ -38,12 +38,12 @@ async function make(e) {
   const short = e.nombre.length > 26 ? e.nombre.split(' ').slice(0, 3).join(' ') : e.nombre;
 
   await showCard([`Para <b>${esc(short)}</b>`, 'de Salto.'], { eyebrow: 'Un video de 30 segundos', logo: true }, 3000);
-  await showCard(['Así se vería', '<b>su propia web app</b>', 'de fletes.'], { bg: e.color || '#1B7BE0', accent: SOL, small: 'Se abre desde un enlace y se instala en el celular, sin tienda.' }, 3200);
+  await showCard(['Así se vería', '<b>su propia WebApp</b>', 'de fletes.'], { bg: e.color || '#1B7BE0', accent: SOL, small: 'Se abre desde un enlace y se instala en el celular, sin tienda.' }, 3200);
   // Demo con el nombre y el color de la empresa aplicados en vivo
   await p.goto(DEMO); await p.addStyleTag({ content: 'html{zoom:2}' });
   await p.evaluate(([nombre, color]) => { applyBrand('nombre', nombre); applyBrand('color_primario', color); render(); }, [e.nombre, e.color || '#1B7BE0']);
   await sleep(500);
-  await cap(`La web app con el nombre de ${short} y sus colores`); await sleep(2300);
+  await cap(`La WebApp con el nombre de ${short} y sus colores`); await sleep(2300);
   await p.click('#demo'); await cap('El cliente escribe de dónde a dónde…'); await sleep(2000);
   await p.click('#cta'); await cap('…elige el vehículo…'); await sleep(900); await p.click('#next'); await sleep(1400);
   await p.click('#cta'); await cap('…pisos, qué lleva y cuándo…'); await sleep(2000);
@@ -53,7 +53,7 @@ async function make(e) {
   await cap('Lo envía, y el pedido les llega por WhatsApp'); await sleep(2600);
   await showCard(['Sus clientes piden', 'en <b>un minuto</b>.', 'Ustedes reciben el pedido', 'en el <b>WhatsApp</b>.'], {}, 3400);
   await showCard(['Precios, nombre y logo', '<b>los manejan ustedes</b>,', 'desde el panel del dueño.'], { bg: e.color || '#1B7BE0', accent: SOL }, 3000);
-  await showCard(['Un solo pago.', '<b>Sin comisiones.</b>', '<b>Sin abonos.</b>'], { small: `Respondan este mensaje y les dejo la web app funcionando con sus precios y su WhatsApp.` }, 3800);
+  await showCard(['Un solo pago.', '<b>Sin comisiones.</b>', '<b>Sin abonos.</b>'], { small: `Respondan este mensaje y les dejo la WebApp funcionando con sus precios y su WhatsApp.` }, 3800);
 
   await ctx.close(); await b.close();
   const webm = fs.readdirSync(TMP).filter(x => x.endsWith('.webm')).map(x => path.join(TMP, x)).sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0];

@@ -1,37 +1,37 @@
-# Para el dueño · cómo cambiar precios, nombre, colores y logo desde la app
+# Para el dueño · cómo cambiar precios, nombre, colores y logo desde la WebApp
 
-Todo se cambia **desde la misma app, en tu teléfono**, con tu PIN. No hace falta llamar a nadie ni pagar nada. Lo que guardás rige al instante en tu teléfono y, en minutos, en el de todos tus clientes (cuando vuelven a abrir la app) y en la versión web.
+Todo se cambia **desde la misma WebApp, en tu teléfono**, con tu PIN. No hace falta llamar a nadie ni pagar nada. Lo que guardás rige al instante en tu teléfono y, en minutos, en el de todos tus clientes (cuando vuelven a abrir la WebApp) y en la versión web.
 
 ## Entrar al panel
 
-**Desde la app**
-1. Abrí la app y esperá la primera pantalla ("¿A dónde va el flete?").
+**Desde la WebApp**
+1. Abrí la WebApp y esperá la primera pantalla ("¿A dónde va el flete?").
 2. **Mantené apretado el título** un segundo.
 3. Escribí tu PIN y tocá **Entrar**. El teléfono lo recuerda; con el candado de arriba a la derecha cerrás la sesión.
 
 **Desde la web (computadora o celular)**
 Abrí tu dirección web con `?panel` al final (por ejemplo `https://el23ok23.github.io/FL/salto/?panel`), o bajá hasta el pie de la página y tocá "Panel del dueño". Es el mismo panel, con el mismo PIN.
 
-## Instalar la app en el celular (vos y tus clientes)
+## Instalar la WebApp en el celular (vos y tus clientes)
 
-No hace falta ninguna tienda. Tu app vive en tu enlace.
+No hace falta ninguna tienda. Tu WebApp vive en tu enlace.
 
-- **Android (Chrome)**: abrí tu enlace, tocá el botón "Instalar la app" que aparece abajo, o el menú ⋮ → "Instalar app" / "Agregar a pantalla de inicio". Queda el ícono con tu nombre y abre a pantalla completa.
+- **Android (Chrome)**: abrí tu enlace, tocá el botón "Instalar la WebApp" que aparece abajo, o el menú ⋮ → "Instalar WebApp" / "Agregar a pantalla de inicio". Queda el ícono con tu nombre y abre a pantalla completa.
 - **iPhone (Safari)**: abrí tu enlace, tocá Compartir (el cuadrado con la flecha) → "Agregar a inicio".
 - Para tus clientes es igual: les mandás el enlace por WhatsApp o lo ponés en Instagram, y con un toque la instalan. Si no la instalan, la usan igual desde el enlace.
 
-Para usar tu app no hace falta ninguna tienda. Si más adelante la querés en Google Play, es la misma app: se publica con una cuenta de desarrollador a nombre de tu empresa y hacemos el trámite de Google juntos (verificación, prueba cerrada y revisión: 45 a 60 días).
+Para usar tu WebApp no hace falta ninguna tienda. Si más adelante la querés en Google Play, es la misma WebApp: se publica con una cuenta de desarrollador a nombre de tu empresa y hacemos el trámite de Google juntos (verificación, prueba cerrada y revisión: 45 a 60 días).
 
 ## Tu PIN
 
-- El PIN inicial te lo damos en la entrega (en la app de Salto de prueba es `salto2026fletes`). Cambialo desde el panel: **Seguridad → Cambiar PIN**.
+- El PIN inicial te lo damos en la entrega (en la WebApp de Salto de prueba es `salto2026fletes`). Cambialo desde el panel: **Seguridad → Cambiar PIN**.
 - Cargá un **correo de recuperación** en la misma sección. Si olvidás el PIN, tocá "Olvidé mi PIN" en la pantalla de entrada y te llega por correo.
 
 ## Qué podés cambiar
 
 | Sección | Qué hace |
 |---|---|
-| **Logo** | Elegí una imagen de tu galería (ideal cuadrada). Se ve al abrir la app. "Usar el de fábrica" vuelve a la camioneta. |
+| **Logo** | Elegí una imagen de tu galería (ideal cuadrada). Se ve al abrir la WebApp. "Usar el de fábrica" vuelve a la camioneta. |
 | **Colores** | Principal (botones, títulos) y acento (detalles). Tocá un círculo y listo. |
 | **Tu negocio** | El nombre que ve el cliente y el o los WhatsApp donde te llegan los pedidos (549 + código de área + número, sin 15). Si ponés varios separados por coma, el cliente ve un botón por cada número y el pedido se reparte a todos los que tengan aviso automático. |
 | **Vehículos** | Tarifa base y precio por kilómetro de cada vehículo. |
@@ -39,31 +39,31 @@ Para usar tu app no hace falta ninguna tienda. Si más adelante la querés en Go
 | **Recargos** | Por piso por escalera, por parada en el medio, la espera cada 15 minutos y el porcentaje extra de sábados y domingos (0 = sin recargo). |
 | **General** | Kilómetros mínimos que se cobran y a qué múltiplo se redondea el total. |
 | **Seguridad** | Correo de recuperación y cambio de PIN. |
-| **Pedidos** (pestaña) | Todos los pedidos con su estado. Tocás "Confirmado", "En camino", "Realizado" o "Cancelado" y el cliente lo ve en su app al instante. Botón para escribirle por WhatsApp. |
+| **Pedidos** (pestaña) | Todos los pedidos con su estado. Tocás "Confirmado", "En camino", "Realizado" o "Cancelado" y el cliente lo ve en su WebApp al instante. Botón para escribirle por WhatsApp. |
 
 Cada vehículo tiene además un **precio mínimo del viaje** (0 = sin mínimo), y en Recargos está el **descuento en la vuelta** para los fletes de ida y vuelta.
 
 Tocá **Guardar** abajo. Si algo quedó en rojo, corregilo antes.
-"Volver a los valores originales" carga los que tenía la app al entregarla (también hay que tocar Guardar).
+"Volver a los valores originales" carga los que tenía la WebApp al entregarla (también hay que tocar Guardar).
 
-## Qué ve el cliente en su app
+## Qué ve el cliente en su WebApp
 
 - Puede pedir **ida y vuelta** (el regreso con el descuento que fijes), adjuntar hasta **3 fotos** de lo que lleva, usar su **ubicación** como origen y **repetir el último flete** con un toque.
 - Después de enviar, ve el número de pedido y su **estado**, que vos cambiás desde la pestaña Pedidos. Se actualiza solo.
-- Si se queda sin internet, la app se lo avisa en vez de quedarse en blanco.
+- Si se queda sin internet, la WebApp se lo avisa en vez de quedarse en blanco.
 
 ## Cómo te llegan los pedidos
 
 1. **En tu planilla**, hoja "pedidos": fecha, cliente, WhatsApp, origen, destino, vehículo, precio, estado. Es tu historial; podés anotar ahí "confirmado" o "hecho".
 2. **Por correo**, a tu Gmail, con el mensaje completo y el enlace para responderle al cliente por WhatsApp.
-3. **Por WhatsApp**, a cada número que hayamos registrado con aviso automático (CallMeBot, gratis). Los demás números aparecen como botón en la app y el cliente les escribe directo.
+3. **Por WhatsApp**, a cada número que hayamos registrado con aviso automático (CallMeBot, gratis). Los demás números aparecen como botón en la WebApp y el cliente les escribe directo.
 
-Además, en la app el cliente ve el botón "Abrir WhatsApp" con el pedido ya armado.
+Además, en la WebApp el cliente ve el botón "Abrir WhatsApp" con el pedido ya armado.
 
 ## Preguntas
 
-- **¿El cliente puede usar su ubicación?** Sí: en el origen hay un botón "Usar mi ubicación". La app pide permiso una vez y, si está dentro de tu zona, la carga como dirección de salida.
+- **¿El cliente puede usar su ubicación?** Sí: en el origen hay un botón "Usar mi ubicación". La WebApp pide permiso una vez y, si está dentro de tu zona, la carga como dirección de salida.
 - **¿Y si me quedo sin internet?** Para entrar y guardar hace falta conexión. Los clientes que no tengan internet usan los últimos precios que su teléfono bajó.
-- **¿Cuándo ven el cambio los clientes?** La próxima vez que abran la app (la web, al recargar).
-- **¿Puedo cambiar el nombre y el ícono que se ven en la pantalla de inicio del celular?** El nombre y el logo *dentro* de la app, sí, vos mismo. El ícono y el nombre que muestra Android debajo del ícono (y en Google Play) están fijos en la app instalada: se definen cuando te la entregamos y, si algún día querés cambiarlos, generamos una versión nueva sin costo de abono ni comisión.
-- **¿Dónde quedan guardados mis datos?** En una planilla de Google de tu propia cuenta. Podés abrirla y verla cuando quieras; la app la lee y la escribe por vos.
+- **¿Cuándo ven el cambio los clientes?** La próxima vez que abran la WebApp (la web, al recargar).
+- **¿Puedo cambiar el nombre y el ícono que se ven en la pantalla de inicio del celular?** El nombre y el logo *dentro* de la WebApp, sí, vos mismo. El ícono y el nombre que muestra Android debajo del ícono (y en Google Play) están fijos en la WebApp instalada: se definen cuando te la entregamos y, si algún día querés cambiarlos, generamos una versión nueva sin costo de abono ni comisión.
+- **¿Dónde quedan guardados mis datos?** En una planilla de Google de tu propia cuenta. Podés abrirla y verla cuando quieras; la WebApp la lee y la escribe por vos.

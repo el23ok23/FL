@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Arma, para cada empresa de ventas/empresas_salto.json, su carpeta en docs/empresas/<slug>/:
-   - index.html: la app web de prueba con su nombre, su color y su teléfono (PIN del panel: <slug sin guiones>2026)
+   - index.html: la WebApp web de prueba con su nombre, su color y su teléfono (PIN del panel: <slug sin guiones>2026)
    - propuesta.html: la propuesta comercial en una página, a su nombre, con los enlaces a la demo y al video
    - video.mp4: su video personalizado (si ya se generó con marketing/videos/make_empresas.js)
    y docs/empresas/index.html con el listado. Uso: python3 scripts/demos_empresas.py"""
@@ -38,11 +38,11 @@ for e in emp:
     p = fol
     p = p.replace("<title>Fletaba para empresas de fletes", f"<title>Propuesta para {html.escape(nombre)}")
     p = p.replace("FLETABA · PARA EMPRESAS DE FLETES DE SALTO", f"FLETABA · PROPUESTA PARA {html.escape(nombre.upper())}")
-    p = re.sub(r"<h1>.*?</h1>", f"<h1>La web app de fletes de {html.escape(nombre)}, lista para sus clientes.</h1>", p, count=1, flags=re.S)
+    p = re.sub(r"<h1>.*?</h1>", f"<h1>La WebApp de fletes de {html.escape(nombre)}, lista para sus clientes.</h1>", p, count=1, flags=re.S)
     video = f"{BASE}/{slug}/video.mp4"
     demo = f"{BASE}/{slug}/"
     extra = (f'<h2>Pruébenla ahora, con su nombre</h2><div class="grid">'
-             f'<div class="card"><b>Web app de prueba de {html.escape(nombre)}</b>La web app completa, con su nombre y su color. Se abre desde el enlace y se instala en el celular sin tienda: <a href="{demo}">{demo}</a><br><small>Panel del dueño: mantener apretado el título o abrir <a href="{demo}?panel">{demo}?panel</a> · PIN <code>{pin}</code> (en la demo los cambios quedan solo en su navegador).</small></div>'
+             f'<div class="card"><b>WebApp de prueba de {html.escape(nombre)}</b>La WebApp completa, con su nombre y su color. Se abre desde el enlace y se instala en el celular sin tienda: <a href="{demo}">{demo}</a><br><small>Panel del dueño: mantener apretado el título o abrir <a href="{demo}?panel">{demo}?panel</a> · PIN <code>{pin}</code> (en la demo los cambios quedan solo en su navegador).</small></div>'
              f'<div class="card"><b>Video de 30 segundos</b><a href="{video}">{video}</a></div></div>')
     p = p.replace('<h2>Qué recibís</h2>', extra + '<h2>Qué recibís</h2>', 1)
     p = p.replace("Tu nombre, tus colores, tu ícono.", f"Con el nombre {html.escape(nombre)}, sus colores y su ícono.")
@@ -58,7 +58,7 @@ for e in emp:
 
 idx = f'''<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Demos por empresa · Salto</title>
 <style>body{{font-family:Inter,system-ui,sans-serif;margin:0;padding:24px;background:#F4F8FE;color:#0B1F3A}}h1{{font-size:26px}}table{{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}}td{{padding:12px;border-bottom:1px solid #E2E8F0;vertical-align:top;font-size:14px}}a{{color:#1B7BE0}}code{{background:#E9F0FA;padding:2px 6px;border-radius:6px}}</style></head>
-<body><h1>Demos por empresa · fletes de Salto</h1><p>Uso interno para la venta. Cada empresa tiene su app web con su nombre, su panel, su propuesta y su video.</p><table>{"".join(rows)}</table></body></html>'''
+<body><h1>Demos por empresa · fletes de Salto</h1><p>Uso interno para la venta. Cada empresa tiene su WebApp web con su nombre, su panel, su propuesta y su video.</p><table>{"".join(rows)}</table></body></html>'''
 open(os.path.join(ROOT, "docs", "empresas", "index.html"), "w", encoding="utf-8").write(idx)
 
 # Lista en ventas/EMPRESAS_SALTO.md: enlaces por empresa
@@ -72,7 +72,7 @@ if "## Kit por empresa" in md:
     md = re.sub(r"## Kit por empresa.*?(?=## Mensaje de primer contacto)", "\n".join(links) + "\n", md, flags=re.S)
 else:
     md = md[:start] + "\n".join(links) + "\n" + md[start:]
-md = md.replace("Les hice un video de 30 segundos a", "Les armé una app de prueba y un video de 30 segundos a")
+md = md.replace("Les hice un video de 30 segundos a", "Les armé una WebApp de prueba y un video de 30 segundos a")
 for e in emp:
     md = md.replace(f"se las muestro funcionando con su nombre y sus precios.\n\n", f"se las muestro funcionando con su nombre y sus precios.\n>\n> Pruébenla acá, ya con su nombre: {BASE}/{e['slug']}/ · Video: {BASE}/{e['slug']}/video.mp4\n\n", 1) if f"**{e['nombre']}**" in md else md
 open(md_path, "w", encoding="utf-8").write(md)

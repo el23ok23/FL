@@ -51,15 +51,15 @@ for e in emp:
 
     # Mensaje de WhatsApp
     # Secuencia completa de WhatsApp: qué mandar y qué escribir antes de cada cosa
-    m1 = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una web app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es una web app: se abre desde un enlace y se instala en el celular sin pasar por ninguna tienda. Un solo pago, sin comisiones ni abonos.\n\n"
+    m1 = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una WebApp de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es una WebApp: se abre desde un enlace y se instala en el celular sin pasar por ninguna tienda. Un solo pago, sin comisiones ni abonos.\n\n"
           f"Son dos enlaces:\n\n"
           f"1) La página que ven sus clientes, ya con el nombre {nombre}. Ábranla desde el celular y pidan un flete de prueba:\n{demo}\n\n"
           f"2) El panel del dueño, donde ustedes mismos cambian los precios, el nombre, los colores y el logo:\n{demo}?panel\nCódigo para entrar: {pin}\n\n"
           f"¿Con quién puedo hablar del tema?")
     m2 = "Les dejo un video de 30 segundos de cómo funciona 👇"
-    m3 = (f"Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos configuramos la web app con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?")
-    m4 = (f"Hola, ¿pudieron ver la web app de {nombre}? Les recuerdo los enlaces: la página de sus clientes {demo} y el panel del dueño {demo}?panel (código {pin}). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?")
-    m5 = (f"Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la web app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
+    m3 = (f"Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos configuramos la WebApp con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?")
+    m4 = (f"Hola, ¿pudieron ver la WebApp de {nombre}? Les recuerdo los enlaces: la página de sus clientes {demo} y el panel del dueño {demo}?panel (código {pin}). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?")
+    m5 = (f"Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la WebApp definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
     secuencia = (f"SECUENCIA DE ENVÍO · {nombre}\nTeléfonos: {tel}\n{'=' * 60}\n\n"
                  f"PASO 1 · Primer contacto (solo texto). Copiá y pegá:\n{'-' * 60}\n{m1}\n{'-' * 60}\n\n"
                  f"PASO 2 · Enseguida, en otro mensaje: escribí esto y ADJUNTÁ EL VIDEO ({slug}-video.mp4) desde la galería:\n{'-' * 60}\n{m2}\n{'-' * 60}\n\n"
@@ -76,7 +76,7 @@ for e in emp:
 <p class="noprint"><a href="../">← Todas las empresas</a></p>
 <h1>Kit de venta · {html.escape(nombre)}</h1>
 <div class="card"><b>Datos</b><br>Teléfonos: {html.escape(tel)}<br>Dirección: {html.escape(e.get("direccion", ""))}<br>Rubro: {html.escape(e.get("rubro", ""))}<br><small>Fuente: {html.escape(e.get("fuente", ""))}. Confirmar el número antes de llamar.</small></div>
-<div class="card"><b>1. Demo con su nombre</b><br><a href="{demo}">{demo}</a><br>Panel del dueño: <a href="{demo}?panel">{demo}?panel</a> · PIN <code>{pin}</code><br><small>Desde el celular, el botón "Instalar la app" deja el ícono con su nombre en la pantalla de inicio.</small></div>
+<div class="card"><b>1. Demo con su nombre</b><br><a href="{demo}">{demo}</a><br>Panel del dueño: <a href="{demo}?panel">{demo}?panel</a> · PIN <code>{pin}</code><br><small>Desde el celular, el botón "Instalar la WebApp" deja el ícono con su nombre en la pantalla de inicio.</small></div>
 <div class="card"><b>2. Video (30 s)</b><br><a href="{video}">{video}</a><br><video src="video.mp4" controls playsinline style="width:220px;border-radius:12px;margin-top:8px"></video></div>
 <div class="card"><b>3. Propuesta a su nombre</b><br><a href="{prop}">{prop}</a></div>
 <div class="card"><b>4. Contrato a su nombre</b><br><a href="{contrato}">{contrato}</a> (imprimible; los montos y la fecha se completan a mano)</div>
@@ -99,7 +99,7 @@ for e in emp:
 idx_rows = "".join(f'<tr><td><b style="color:{e.get("color","#1B7BE0")}">{html.escape(e["nombre"])}</b><br><small>{html.escape(e.get("rubro",""))}</small></td><td>{html.escape(", ".join(e["telefonos"]))}{(" · WhatsApp " + e["whatsapp"]) if e.get("whatsapp") else ""}<br><small>{html.escape(e.get("direccion",""))}</small></td><td><a href="{e["slug"]}/kit.html"><b>kit completo</b></a><br><a href="{e["slug"]}/">demo</a> · <a href="{e["slug"]}/?panel">panel</a> (PIN <code>{pin}</code>)<br><a href="{e["slug"]}/propuesta.html">propuesta</a> · <a href="{e["slug"]}/contrato.html">contrato</a> · <a href="{e["slug"]}/video.mp4">video</a></td></tr>' for e, pin in rows)
 open(os.path.join(ROOT, "docs", "empresas", "index.html"), "w", encoding="utf-8").write(f'''<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Kits por empresa · Salto</title>
 <style>body{{font-family:Inter,system-ui,sans-serif;margin:0;padding:24px;background:#F4F8FE;color:#0B1F3A}}h1{{font-size:26px}}table{{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}}td{{padding:12px;border-bottom:1px solid #E2E8F0;vertical-align:top;font-size:14px}}a{{color:#1B7BE0}}code{{background:#E9F0FA;padding:2px 6px;border-radius:6px}}</style></head>
-<body><h1>Kits por empresa · fletes de Salto</h1><p>Uso interno para la venta. Cada empresa tiene su app web con su nombre, su panel, su video, su propuesta y su contrato.</p><table>{idx_rows}</table></body></html>''')
+<body><h1>Kits por empresa · fletes de Salto</h1><p>Uso interno para la venta. Cada empresa tiene su WebApp web con su nombre, su panel, su video, su propuesta y su contrato.</p><table>{idx_rows}</table></body></html>''')
 
 # ventas/EMPRESAS_SALTO.md: sección de kits
 md_path = os.path.join(ROOT, "ventas", "EMPRESAS_SALTO.md"); md = open(md_path, encoding="utf-8").read()
