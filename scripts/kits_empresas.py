@@ -52,6 +52,7 @@ for e in emp:
     # Mensaje de WhatsApp
     msg = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas.\n\n"
            f"Ábranla desde el celular, ya tiene su nombre: {demo}\n\n"
+           f"Y acá el panel del dueño, para que vean cómo se cambian precios, nombre y colores: {demo}?panel (código: {pin})\n\n"
            f"Es un solo pago, sin comisiones ni abonos. Si les interesa, se las dejo funcionando con sus precios y su número. ¿Con quién puedo hablar?")
     msg2 = f"Les dejo un video de 30 segundos de cómo funciona: {video}"
     msg3 = (f"Hola, ¿pudieron ver la app de {nombre}? Si les sirve, en 20 minutos la configuramos con sus tarifas y su WhatsApp y la prueban con un pedido real. ¿Qué día les queda cómodo?")

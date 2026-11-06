@@ -4,6 +4,8 @@ Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a Salto
 
 Ábranla desde el celular, ya tiene su nombre: https://el23ok23.github.io/FL/empresas/salto-flet/
 
+Y acá el panel del dueño, para que vean cómo se cambian precios, nombre y colores: https://el23ok23.github.io/FL/empresas/salto-flet/?panel (código: saltoflet2026)
+
 Es un solo pago, sin comisiones ni abonos. Si les interesa, se las dejo funcionando con sus precios y su número. ¿Con quién puedo hablar?
 
 MENSAJE 2 (enseguida, aparte):
