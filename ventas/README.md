@@ -1,6 +1,6 @@
 # Ventas · Fletaba marca blanca para empresas de fletes de Salto
 
-- `PROPUESTA_COMERCIAL.md`: qué recibe la empresa, precio único (sin comisión ni abono), proceso y preguntas frecuentes.
+- `PROPUESTA_COMERCIAL.md`: qué recibe la empresa (web app instalable como producto principal, Google Play opcional), precio único, plazos con margen y preguntas frecuentes.
 - `ENTREGA_AL_CLIENTE.md`: instructivo para el dueño: cómo cambia precios, nombre, colores y logo desde la app.
 - `CONFIGURAR_PANEL_DEL_DUENO.md`: cómo armamos la planilla y el Apps Script gratuito que sincroniza esos cambios (una vez por empresa).
 - `folleto.html`: la misma propuesta en una página para mandar como enlace o imprimir.

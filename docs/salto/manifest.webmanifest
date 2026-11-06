@@ -1,0 +1,32 @@
+{
+ "name": "Fletaba Salto",
+ "short_name": "Fletaba Salt",
+ "description": "Fletaba Salto: pedí tu flete desde el celular y conocé el precio al toque.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#F4F8FE",
+ "theme_color": "#1B7BE0",
+ "lang": "es-AR",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Fletaba: pedí tu flete desde Capital Federal a todo el país y conocé el precio al toque.">
+
+
+<!-- pwa --><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0E7C4A"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Don Pedro"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><!-- /pwa -->
 <title>Fletes Don Pedro</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -596,6 +599,21 @@ function panelClose(){document.getElementById("s-panel").hidden=true;PANEL.value
   if(!PANEL.url){try{const csv=localStorage.getItem(PANEL_LS);if(csv&&applySheet(csv)>0){const car=document.getElementById("carousel");if(car)car.innerHTML="";render();}}catch(x){}}
   // ?panel abre el panel directo
   if(location.search.includes("panel"))panelOpen();
+})();
+
+
+/* ---------- Web app instalable ---------- */
+(function(){
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+  let deferred=null;const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  function button(){if(standalone||document.getElementById('installbtn'))return;const b=document.createElement('button');b.id='installbtn';b.type='button';b.textContent='📲 Instalar la app';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;border:0;border-radius:999px;padding:10px 16px;font:600 14px/1 Inter,system-ui,sans-serif;background:var(--noche,#0B1F3A);color:#fff;box-shadow:0 10px 30px rgba(11,31,58,.25);cursor:pointer';
+    b.addEventListener('click',async()=>{if(deferred){deferred.prompt();const r=await deferred.userChoice;deferred=null;if(r&&r.outcome==='accepted')b.remove();return;}
+      alert(ios?'Para instalarla en tu iPhone: tocá el botón Compartir (el cuadrado con la flecha) y después "Agregar a inicio".':'Para instalarla: abrí el menú del navegador (⋮) y tocá "Instalar app" o "Agregar a pantalla de inicio".');});
+    document.body.appendChild(b);setTimeout(()=>{if(b.parentNode&&!deferred)b.style.opacity='.9';},0);}
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;button();});
+  window.addEventListener('appinstalled',()=>{const b=document.getElementById('installbtn');if(b)b.remove();});
+  // Sin el evento (iPhone, o ya visitada): igual ofrecemos el botón con las instrucciones, pero discreto y solo tras 20 s de uso.
+  setTimeout(()=>{if(!deferred)button();},20000);
 })();
 </script>
 

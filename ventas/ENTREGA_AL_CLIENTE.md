@@ -12,6 +12,16 @@ Todo se cambia **desde la misma app, en tu teléfono**, con tu PIN. No hace falt
 **Desde la web (computadora o celular)**
 Abrí tu dirección web con `?panel` al final (por ejemplo `https://el23ok23.github.io/FL/salto/?panel`), o bajá hasta el pie de la página y tocá "Panel del dueño". Es el mismo panel, con el mismo PIN.
 
+## Instalar la app en el celular (vos y tus clientes)
+
+No hace falta ninguna tienda. Tu app vive en tu enlace.
+
+- **Android (Chrome)**: abrí tu enlace, tocá el botón "Instalar la app" que aparece abajo, o el menú ⋮ → "Instalar app" / "Agregar a pantalla de inicio". Queda el ícono con tu nombre y abre a pantalla completa.
+- **iPhone (Safari)**: abrí tu enlace, tocá Compartir (el cuadrado con la flecha) → "Agregar a inicio".
+- Para tus clientes es igual: les mandás el enlace por WhatsApp o lo ponés en Instagram, y con un toque la instalan. Si no la instalan, la usan igual desde el enlace.
+
+Si más adelante querés estar en Google Play, es la misma app: se publica como segunda etapa, con el trámite de Google (cuenta a tu nombre, verificación y revisión, 45 a 60 días).
+
 ## Tu PIN
 
 - El PIN inicial te lo damos en la entrega (en la app de Salto de prueba es `salto2026fletes`). Cambialo desde el panel: **Seguridad → Cambiar PIN**.

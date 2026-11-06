@@ -1,5 +1,12 @@
 # Guion de venta · empresas de fletes de Salto
 
+## Cómo explicar "web app" y Google Play
+
+- **Qué decís**: "Es una app, pero no hay que bajarla de ninguna tienda. Te mando un enlace, lo abrís, tocás Instalar y te queda el ícono con tu nombre en el celular. Anda en Android y en iPhone. Mirá." (y se la instalás ahí mismo en su teléfono: menú del navegador → Instalar app).
+- **Por qué es mejor para él**: su cliente no va a ir a buscar la app a la tienda; le llega el enlace por WhatsApp y pide. Y la tiene en días.
+- **Si pregunta por Google Play**: "Se puede, es la misma app. Pero es un trámite de Google: cuenta de desarrollador a tu nombre, 25 dólares, verificación de identidad, una prueba cerrada con 12 personas durante dos semanas y la revisión de ellos. Entre todo, 45 a 60 días. Lo hacemos como segunda etapa cuando la web app ya esté trayendo pedidos, y se cotiza aparte."
+- **Plazos que prometés** (con margen): enlace de prueba en 7 días, entrega en 15 días hábiles. Si lo tenés antes, mejor: entregá antes, pero no prometas antes.
+
 ## Demo en la reunión
 
 Mostrá la web de la empresa ficticia **Fletes Don Pedro** (https://el23ok23.github.io/FL/donpedro/, PIN `donpedro2026`): tiene marca propia en verde, origen hasta 120 km de Salto y el panel completo. Hacé un pedido de ida y vuelta, entrá al panel, marcalo "Confirmado" en Pedidos y mostrá cómo cambia el estado en la pantalla del cliente. Después cambiá un precio y el color. El video `marketing/videos/mp4/06-panel-del-dueno.mp4` resume lo mismo en 40 segundos para mandar por WhatsApp antes de la reunión.
