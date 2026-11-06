@@ -1,6 +1,15 @@
-Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Logística Salto: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos.
+MENSAJE 1 (primer contacto, solo texto):
 
-Pruébenla acá, ya con su nombre (se instala desde el enlace, sin tienda): https://el23ok23.github.io/FL/empresas/logistica-salto/
-Video: https://el23ok23.github.io/FL/empresas/logistica-salto/video.mp4
+Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a Logística Salto: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas.
 
-Si les interesa, se las dejo funcionando con sus precios y su WhatsApp.
+Ábranla desde el celular, ya tiene su nombre: https://el23ok23.github.io/FL/empresas/logistica-salto/
+
+Es un solo pago, sin comisiones ni abonos. Si les interesa, se las dejo funcionando con sus precios y su número. ¿Con quién puedo hablar?
+
+MENSAJE 2 (enseguida, aparte):
+
+Les dejo un video de 30 segundos de cómo funciona: https://el23ok23.github.io/FL/empresas/logistica-salto/video.mp4
+
+MENSAJE 3 (si en 2 o 3 días no respondieron):
+
+Hola, ¿pudieron ver la app de Logística Salto? Si les sirve, en 20 minutos la configuramos con sus tarifas y su WhatsApp y la prueban con un pedido real. ¿Qué día les queda cómodo?

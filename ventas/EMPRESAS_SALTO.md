@@ -37,67 +37,15 @@ Relevadas en directorios públicos el 6/11/2026. Los teléfonos vienen de guías
 
 Índice de todo: https://el23ok23.github.io/FL/empresas/
 
-## Mensaje de primer contacto (personalizado)
+## Mensajes de WhatsApp
 
-**Salto Flet**
+Los tres mensajes de cada empresa, ya con su nombre y sus enlaces, están en `docs/empresas/<slug>/mensaje.txt` y en la página de su kit. La lógica:
 
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Salto Flet: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/salto-flet/ · Video: https://el23ok23.github.io/FL/empresas/salto-flet/video.mp4
+1. **Primer contacto, solo texto, un solo enlace** (el de su demo). Corto, de persona a persona, con una pregunta al final para que tengan que contestar algo.
+2. **Enseguida, el video aparte**, en un segundo mensaje: así el primero se lee entero y el video no lo tapa.
+3. **A los 2 o 3 días**, si no respondieron, un mensaje de seguimiento que propone fecha, no que insiste.
 
-**Transporte de Cargas Mayo**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Transporte de Cargas Mayo: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/transporte-mayo/ · Video: https://el23ok23.github.io/FL/empresas/transporte-mayo/video.mp4
-
-**Mudanzas El Gringo**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Mudanzas El Gringo: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/mudanzas-el-gringo/ · Video: https://el23ok23.github.io/FL/empresas/mudanzas-el-gringo/video.mp4
-
-**Transporte y Mudanzas Los Perty**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Transporte y Mudanzas Los Perty: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/los-perty/ · Video: https://el23ok23.github.io/FL/empresas/los-perty/video.mp4
-
-**Transporte Baccinelli**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Transporte Baccinelli: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/transporte-baccinelli/ · Video: https://el23ok23.github.io/FL/empresas/transporte-baccinelli/video.mp4
-
-**Cootransa Transporte de Carga**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Cootransa Transporte de Carga: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/cootransa/ · Video: https://el23ok23.github.io/FL/empresas/cootransa/video.mp4
-
-**Transportes Mitre**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Transportes Mitre: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/transportes-mitre/ · Video: https://el23ok23.github.io/FL/empresas/transportes-mitre/video.mp4
-
-**Logística Salto**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Logística Salto: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/logistica-salto/ · Video: https://el23ok23.github.io/FL/empresas/logistica-salto/video.mp4
-
-**Novis SRL**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Novis SRL: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/novis/ · Video: https://el23ok23.github.io/FL/empresas/novis/video.mp4
-
-**Gustavo Aguilar Transporte**
-
-> Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a Gustavo Aguilar Transporte: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos. Si les interesa, se las muestro funcionando con su nombre y sus precios.
->
-> Pruébenla acá, ya con su nombre: https://el23ok23.github.io/FL/empresas/gustavo-aguilar/ · Video: https://el23ok23.github.io/FL/empresas/gustavo-aguilar/video.mp4
+Reglas: escribí a media mañana de un día hábil, no de noche ni fin de semana; no mandes más de un seguimiento; si contestan "¿cuánto sale?", respondé el precio sin vueltas y ofrecé la reunión de 20 minutos; si te dicen que no, agradecé y listo (en un pueblo, el que dice que no hoy es el que te recomienda mañana).
 
 ## Empresas de la zona (hasta 120 km) para una segunda ronda
 

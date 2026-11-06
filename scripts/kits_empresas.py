@@ -50,9 +50,12 @@ for e in emp:
     open(os.path.join(d, "contrato.md"), "w", encoding="utf-8").write(md)
 
     # Mensaje de WhatsApp
-    msg = (f"Hola, ¿cómo va? Soy [tu nombre], de Salto. Les armé una app de prueba y un video de 30 segundos a {nombre}: es una app con su nombre para que sus clientes pidan el flete desde el celular y a ustedes les llegue el pedido al WhatsApp, con el precio calculado con sus tarifas. Un solo pago, sin comisiones ni abonos.\n\n"
-           f"Pruébenla acá, ya con su nombre (se instala desde el enlace, sin tienda): {demo}\nVideo: {video}\n\nSi les interesa, se las dejo funcionando con sus precios y su WhatsApp.")
-    open(os.path.join(d, "mensaje.txt"), "w", encoding="utf-8").write(msg + "\n")
+    msg = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas.\n\n"
+           f"Ábranla desde el celular, ya tiene su nombre: {demo}\n\n"
+           f"Es un solo pago, sin comisiones ni abonos. Si les interesa, se las dejo funcionando con sus precios y su número. ¿Con quién puedo hablar?")
+    msg2 = f"Les dejo un video de 30 segundos de cómo funciona: {video}"
+    msg3 = (f"Hola, ¿pudieron ver la app de {nombre}? Si les sirve, en 20 minutos la configuramos con sus tarifas y su WhatsApp y la prueban con un pedido real. ¿Qué día les queda cómodo?")
+    open(os.path.join(d, "mensaje.txt"), "w", encoding="utf-8").write("MENSAJE 1 (primer contacto, solo texto):\n\n" + msg + "\n\nMENSAJE 2 (enseguida, aparte):\n\n" + msg2 + "\n\nMENSAJE 3 (si en 2 o 3 días no respondieron):\n\n" + msg3 + "\n")
 
     # Página del kit
     kit_html = f'''<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Kit · {html.escape(nombre)}</title><style>{CSS}</style></head><body>
@@ -63,7 +66,7 @@ for e in emp:
 <div class="card"><b>2. Video (30 s)</b><br><a href="{video}">{video}</a><br><video src="video.mp4" controls playsinline style="width:220px;border-radius:12px;margin-top:8px"></video></div>
 <div class="card"><b>3. Propuesta a su nombre</b><br><a href="{prop}">{prop}</a></div>
 <div class="card"><b>4. Contrato a su nombre</b><br><a href="{contrato}">{contrato}</a> (imprimible; los montos y la fecha se completan a mano)</div>
-<div class="card"><b>5. Mensaje de WhatsApp</b><pre style="white-space:pre-wrap;font:inherit;margin:8px 0 0">{html.escape(msg)}</pre></div>
+<div class="card"><b>5. Mensajes de WhatsApp</b><p><b>1 · Primer contacto</b> (solo texto)</p><pre style="white-space:pre-wrap;font:inherit;margin:0">{html.escape(msg)}</pre><p><b>2 · Enseguida, aparte</b></p><pre style="white-space:pre-wrap;font:inherit;margin:0">{html.escape(msg2)}</pre><p><b>3 · Si en 2 o 3 días no respondieron</b></p><pre style="white-space:pre-wrap;font:inherit;margin:0">{html.escape(msg3)}</pre></div>
 <div class="card"><b>Orden sugerido</b><ol style="margin:6px 0 0;padding-left:20px"><li>Llamar al fijo y pedir el WhatsApp del dueño.</li><li>Mandar el mensaje con el video.</li><li>Si responde: reunión de 20 minutos con la demo en su teléfono.</li><li>Propuesta y contrato. Seña del 50 %.</li></ol></div>
 </body></html>'''
     open(os.path.join(d, "kit.html"), "w", encoding="utf-8").write(kit_html)
