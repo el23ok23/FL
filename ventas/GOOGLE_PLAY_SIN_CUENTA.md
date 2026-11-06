@@ -1,6 +1,6 @@
 # Google Play: qué decir y qué hacer sin tener cuenta
 
-Situación real: **no tenés cuenta de desarrollador de Google Play**, la app no está publicada en ninguna tienda y no hace falta para vender. Este documento es para vos, no para el cliente.
+Documento interno, solo para vos. Al cliente no se le dice que no tenés cuenta: se le dice que Google Play es opcional y que, si lo quiere, se publica con una cuenta a nombre de su empresa. Lo que sigue es para que sepas qué implica si alguno lo pide.
 
 ## Lo que vendés
 
@@ -8,7 +8,7 @@ La **web app**: se instala desde el enlace, en Android y iPhone, con el ícono y
 
 ## Qué decir si preguntan por Google Play
 
-"Hoy no está en Google Play y no tengo cuenta de desarrollador; nunca hizo falta, porque se instala desde el enlace. Si la querés en la tienda, se puede: es la misma app. Se abre una cuenta a nombre de tu empresa, cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, y se cotiza aparte."
+"Se puede, es la misma app. Se publica con una cuenta de desarrollador a nombre de tu empresa, cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, y se cotiza aparte."
 
 Nunca digas "te la subo a Play": no es un botón, y no depende de vos.
 

@@ -20,7 +20,7 @@ No hace falta ninguna tienda. Tu app vive en tu enlace.
 - **iPhone (Safari)**: abrí tu enlace, tocá Compartir (el cuadrado con la flecha) → "Agregar a inicio".
 - Para tus clientes es igual: les mandás el enlace por WhatsApp o lo ponés en Instagram, y con un toque la instalan. Si no la instalan, la usan igual desde el enlace.
 
-Tu app no está en Google Play y no hace falta para usarla. Si más adelante la querés en la tienda, es la misma app: se abre una cuenta de desarrollador a nombre de tu empresa y hacemos el trámite de Google juntos (verificación, prueba cerrada y revisión: 45 a 60 días).
+Para usar tu app no hace falta ninguna tienda. Si más adelante la querés en Google Play, es la misma app: se publica con una cuenta de desarrollador a nombre de tu empresa y hacemos el trámite de Google juntos (verificación, prueba cerrada y revisión: 45 a 60 días).
 
 ## Tu PIN
 

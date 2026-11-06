@@ -4,7 +4,7 @@
 
 - **Qué decís**: "Es una app, pero no hay que bajarla de ninguna tienda. Te mando un enlace, lo abrís, tocás Instalar y te queda el ícono con tu nombre en el celular. Anda en Android y en iPhone. Mirá." (y se la instalás ahí mismo en su teléfono: menú del navegador → Instalar app).
 - **Por qué es mejor para él**: su cliente no va a ir a buscar la app a la tienda; le llega el enlace por WhatsApp y pide. Y la tiene en días.
-- **Si pregunta por Google Play, decí la verdad**: "Hoy no está en Google Play, y no tengo cuenta de desarrollador: nunca hizo falta, porque la app se instala desde el enlace. Si la querés en la tienda, se puede: es la misma app. Se abre una cuenta a nombre de tu empresa, cuesta 25 dólares una vez, Google te verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la web app ya esté trayendo pedidos. Se cotiza aparte." No prometas nunca "te la subo a Play" como si fuera un botón.
+- **Si pregunta por Google Play**: "Se puede, es la misma app. Se publica con una cuenta de desarrollador a nombre de tu empresa: cuesta 25 dólares una vez, Google verifica la identidad, pide una prueba cerrada con 12 personas durante dos semanas y después revisa la app. Entre todo, 45 a 60 días. Yo preparo todo y hacemos el trámite juntos, como segunda etapa, cuando la web app ya esté trayendo pedidos. Se cotiza aparte." No prometas "te la subo a Play" como si fuera un botón: los tiempos los pone Google.
 - **Plazos que prometés** (con margen): enlace de prueba en 7 días, entrega en 15 días hábiles. Si lo tenés antes, mejor: entregá antes, pero no prometas antes.
 
 ## Demo en la reunión
