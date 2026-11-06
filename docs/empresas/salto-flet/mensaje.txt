@@ -1,17 +1,46 @@
-MENSAJE 1 (primer contacto, solo texto):
+SECUENCIA DE ENVÍO · Salto Flet
+Teléfonos: (02474) 42-5184
+============================================================
 
-Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a Salto Flet: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas.
+PASO 1 · Primer contacto (solo texto). Copiá y pegá:
+------------------------------------------------------------
+Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a Salto Flet: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es un solo pago, sin comisiones ni abonos.
 
-Ábranla desde el celular, ya tiene su nombre: https://el23ok23.github.io/FL/empresas/salto-flet/
+Son dos enlaces:
 
-Y acá el panel del dueño, para que vean cómo se cambian precios, nombre y colores: https://el23ok23.github.io/FL/empresas/salto-flet/?panel (código: saltoflet2026)
+1) La página que ven sus clientes, ya con el nombre Salto Flet. Ábranla desde el celular y pidan un flete de prueba:
+https://el23ok23.github.io/FL/empresas/salto-flet/
 
-Es un solo pago, sin comisiones ni abonos. Si les interesa, se las dejo funcionando con sus precios y su número. ¿Con quién puedo hablar?
+2) El panel del dueño, donde ustedes mismos cambian los precios, el nombre, los colores y el logo:
+https://el23ok23.github.io/FL/empresas/salto-flet/?panel
+Código para entrar: saltoflet2026
 
-MENSAJE 2 (enseguida, aparte):
+¿Con quién puedo hablar del tema?
+------------------------------------------------------------
 
-Les dejo un video de 30 segundos de cómo funciona: https://el23ok23.github.io/FL/empresas/salto-flet/video.mp4
+PASO 2 · Enseguida, en otro mensaje: escribí esto y ADJUNTÁ EL VIDEO (salto-flet-video.mp4) desde la galería:
+------------------------------------------------------------
+Les dejo un video de 30 segundos de cómo funciona 👇
+------------------------------------------------------------
 
-MENSAJE 3 (si en 2 o 3 días no respondieron):
+PASO 3 · Cuando respondan con interés: escribí esto y ADJUNTÁ LA PROPUESTA (salto-flet-propuesta.pdf):
+------------------------------------------------------------
+Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos la configuramos con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?
+------------------------------------------------------------
 
-Hola, ¿pudieron ver la app de Salto Flet? Si les sirve, en 20 minutos la configuramos con sus tarifas y su WhatsApp y la prueban con un pedido real. ¿Qué día les queda cómodo?
+PASO 4 · Si en 2 o 3 días no respondieron (una sola vez):
+------------------------------------------------------------
+Hola, ¿pudieron ver la app de Salto Flet? Les recuerdo los enlaces: la página de sus clientes https://el23ok23.github.io/FL/empresas/salto-flet/ y el panel del dueño https://el23ok23.github.io/FL/empresas/salto-flet/?panel (código saltoflet2026). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?
+------------------------------------------------------------
+
+PASO 5 · Cuando digan que sí: escribí esto y ADJUNTÁ EL CONTRATO (salto-flet-contrato.pdf). Antes completá a mano el precio y la fecha:
+------------------------------------------------------------
+Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.
+------------------------------------------------------------
+
+Enlaces de Salto Flet:
+· Página de sus clientes: https://el23ok23.github.io/FL/empresas/salto-flet/
+· Panel del dueño (cambian precios, nombre, colores y logo): https://el23ok23.github.io/FL/empresas/salto-flet/?panel · código saltoflet2026
+· Video: https://el23ok23.github.io/FL/empresas/salto-flet/video.mp4
+· Propuesta: https://el23ok23.github.io/FL/empresas/salto-flet/propuesta.html
+· Contrato: https://el23ok23.github.io/FL/empresas/salto-flet/contrato.html

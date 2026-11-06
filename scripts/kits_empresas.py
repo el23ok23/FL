@@ -50,13 +50,26 @@ for e in emp:
     open(os.path.join(d, "contrato.md"), "w", encoding="utf-8").write(md)
 
     # Mensaje de WhatsApp
-    msg = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas.\n\n"
-           f"Ábranla desde el celular, ya tiene su nombre: {demo}\n\n"
-           f"Y acá el panel del dueño, para que vean cómo se cambian precios, nombre y colores: {demo}?panel (código: {pin})\n\n"
-           f"Es un solo pago, sin comisiones ni abonos. Si les interesa, se las dejo funcionando con sus precios y su número. ¿Con quién puedo hablar?")
-    msg2 = f"Les dejo un video de 30 segundos de cómo funciona: {video}"
-    msg3 = (f"Hola, ¿pudieron ver la app de {nombre}? Si les sirve, en 20 minutos la configuramos con sus tarifas y su WhatsApp y la prueban con un pedido real. ¿Qué día les queda cómodo?")
-    open(os.path.join(d, "mensaje.txt"), "w", encoding="utf-8").write("MENSAJE 1 (primer contacto, solo texto):\n\n" + msg + "\n\nMENSAJE 2 (enseguida, aparte):\n\n" + msg2 + "\n\nMENSAJE 3 (si en 2 o 3 días no respondieron):\n\n" + msg3 + "\n")
+    # Secuencia completa de WhatsApp: qué mandar y qué escribir antes de cada cosa
+    m1 = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una app de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es un solo pago, sin comisiones ni abonos.\n\n"
+          f"Son dos enlaces:\n\n"
+          f"1) La página que ven sus clientes, ya con el nombre {nombre}. Ábranla desde el celular y pidan un flete de prueba:\n{demo}\n\n"
+          f"2) El panel del dueño, donde ustedes mismos cambian los precios, el nombre, los colores y el logo:\n{demo}?panel\nCódigo para entrar: {pin}\n\n"
+          f"¿Con quién puedo hablar del tema?")
+    m2 = "Les dejo un video de 30 segundos de cómo funciona 👇"
+    m3 = (f"Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos la configuramos con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?")
+    m4 = (f"Hola, ¿pudieron ver la app de {nombre}? Les recuerdo los enlaces: la página de sus clientes {demo} y el panel del dueño {demo}?panel (código {pin}). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?")
+    m5 = (f"Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la app definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
+    secuencia = (f"SECUENCIA DE ENVÍO · {nombre}\nTeléfonos: {tel}\n{'=' * 60}\n\n"
+                 f"PASO 1 · Primer contacto (solo texto). Copiá y pegá:\n{'-' * 60}\n{m1}\n{'-' * 60}\n\n"
+                 f"PASO 2 · Enseguida, en otro mensaje: escribí esto y ADJUNTÁ EL VIDEO ({slug}-video.mp4) desde la galería:\n{'-' * 60}\n{m2}\n{'-' * 60}\n\n"
+                 f"PASO 3 · Cuando respondan con interés: escribí esto y ADJUNTÁ LA PROPUESTA ({slug}-propuesta.pdf):\n{'-' * 60}\n{m3}\n{'-' * 60}\n\n"
+                 f"PASO 4 · Si en 2 o 3 días no respondieron (una sola vez):\n{'-' * 60}\n{m4}\n{'-' * 60}\n\n"
+                 f"PASO 5 · Cuando digan que sí: escribí esto y ADJUNTÁ EL CONTRATO ({slug}-contrato.pdf). Antes completá a mano el precio y la fecha:\n{'-' * 60}\n{m5}\n{'-' * 60}\n\n"
+                 f"Enlaces de {nombre}:\n· Página de sus clientes: {demo}\n· Panel del dueño (cambian precios, nombre, colores y logo): {demo}?panel · código {pin}\n· Video: {video}\n· Propuesta: {prop}\n· Contrato: {contrato}\n")
+    msg, msg2, msg3 = m1, m2, m4
+    open(os.path.join(d, "mensaje.txt"), "w", encoding="utf-8").write(secuencia)
+    open(os.path.join(d, "secuencia.txt"), "w", encoding="utf-8").write(secuencia)
 
     # Página del kit
     kit_html = f'''<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Kit · {html.escape(nombre)}</title><style>{CSS}</style></head><body>
@@ -67,7 +80,7 @@ for e in emp:
 <div class="card"><b>2. Video (30 s)</b><br><a href="{video}">{video}</a><br><video src="video.mp4" controls playsinline style="width:220px;border-radius:12px;margin-top:8px"></video></div>
 <div class="card"><b>3. Propuesta a su nombre</b><br><a href="{prop}">{prop}</a></div>
 <div class="card"><b>4. Contrato a su nombre</b><br><a href="{contrato}">{contrato}</a> (imprimible; los montos y la fecha se completan a mano)</div>
-<div class="card"><b>5. Mensajes de WhatsApp</b><p><b>1 · Primer contacto</b> (solo texto)</p><pre style="white-space:pre-wrap;font:inherit;margin:0">{html.escape(msg)}</pre><p><b>2 · Enseguida, aparte</b></p><pre style="white-space:pre-wrap;font:inherit;margin:0">{html.escape(msg2)}</pre><p><b>3 · Si en 2 o 3 días no respondieron</b></p><pre style="white-space:pre-wrap;font:inherit;margin:0">{html.escape(msg3)}</pre></div>
+<div class="card"><b>5. Secuencia de WhatsApp (qué escribir antes de cada cosa)</b><pre style="white-space:pre-wrap;font:inherit;margin:8px 0 0">{html.escape(secuencia)}</pre></div>
 <div class="card"><b>Orden sugerido</b><ol style="margin:6px 0 0;padding-left:20px"><li>Llamar al fijo y pedir el WhatsApp del dueño.</li><li>Mandar el mensaje con el video.</li><li>Si responde: reunión de 20 minutos con la demo en su teléfono.</li><li>Propuesta y contrato. Seña del 50 %.</li></ol></div>
 </body></html>'''
     open(os.path.join(d, "kit.html"), "w", encoding="utf-8").write(kit_html)
@@ -77,7 +90,7 @@ for e in emp:
         os.makedirs(zip_dir, exist_ok=True)
         zp = os.path.join(zip_dir, f"{slug}.zip")
         with zipfile.ZipFile(zp, "w", zipfile.ZIP_DEFLATED) as z:
-            for fn in ["propuesta.html", "contrato.html", "contrato.md", "mensaje.txt", "video.mp4", "kit.html"]:
+            for fn in ["propuesta.html", "propuesta.pdf", "contrato.html", "contrato.pdf", "contrato.md", "secuencia.txt", "video.mp4", "kit.html"]:
                 fp = os.path.join(d, fn)
                 if os.path.exists(fp): z.write(fp, f"{slug}/{fn}")
             z.writestr(f"{slug}/LEEME.txt", f"{nombre}\nTeléfonos: {tel}\nDirección: {e.get('direccion','')}\n\nDemo con su nombre: {demo}\nPanel del dueño: {demo}?panel (PIN {pin})\nVideo: {video}\nPropuesta: {prop}\nContrato: {contrato}\nKit completo: {kit}\n\nEl mensaje de WhatsApp está en mensaje.txt. La propuesta y el contrato se abren con cualquier navegador y se imprimen o guardan en PDF desde ahí.\n")
