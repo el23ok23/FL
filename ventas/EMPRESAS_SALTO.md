@@ -45,7 +45,7 @@ Los tres mensajes de cada empresa, ya con su nombre y sus enlaces, están en `do
 2. **Enseguida, el video aparte**, en un segundo mensaje: así el primero se lee entero y el video no lo tapa.
 3. **A los 2 o 3 días**, si no respondieron, un mensaje de seguimiento que propone fecha, no que insiste.
 
-Reglas: escribí a media mañana de un día hábil, no de noche ni fin de semana; no mandes más de un seguimiento; si contestan "¿cuánto sale?", respondé el precio sin vueltas y ofrecé la reunión de 20 minutos; si te dicen que no, agradecé y listo (en un pueblo, el que dice que no hoy es el que te recomienda mañana).
+Reglas: escribí a media mañana de un día hábil, no de noche ni fin de semana; no mandes más de un seguimiento; si contestan "¿cuánto sale?", respondé "$ 1.200.000, precio final, 50 % al empezar y 50 % contra entrega, por transferencia" y ofrecé la reunión de 20 minutos; si te dicen que no, agradecé y listo (en un pueblo, el que dice que no hoy es el que te recomienda mañana).
 
 ## Empresas de la zona (hasta 120 km) para una segunda ronda
 

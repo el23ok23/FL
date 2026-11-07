@@ -46,7 +46,7 @@ for e in emp:
              f'<div class="card"><b>Video de 30 segundos</b><a href="{video}">{video}</a></div></div>')
     p = p.replace('<h2>Qué recibís</h2>', extra + '<h2>Qué recibís</h2>', 1)
     p = p.replace("Tu nombre, tus colores, tu ícono.", f"Con el nombre {html.escape(nombre)}, sus colores y su ícono.")
-    p = p.replace("<footer class=\"in\">COMPLETAR nombre · WhatsApp COMPLETAR · Salto, Provincia de Buenos Aires</footer>", f"<footer class=\"in\">Propuesta preparada para {html.escape(nombre)} · {html.escape(e.get('direccion',''))} · Fletaba, Salto, Provincia de Buenos Aires</footer>")
+    p = p.replace("<footer class=\"in\">Pablo Sebastián Peroni · Salto, Provincia de Buenos Aires</footer>", f"<footer class=\"in\">Propuesta preparada para {html.escape(nombre)} · {html.escape(e.get('direccion',''))} · Pablo Sebastián Peroni, Salto, Provincia de Buenos Aires</footer>")
     open(os.path.join(d, "propuesta.html"), "w", encoding="utf-8").write(p)
 
     # Video

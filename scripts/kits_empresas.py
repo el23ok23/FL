@@ -41,6 +41,7 @@ for e in emp:
 
     # Contrato a su nombre
     md = contrato_md.replace("# Contrato de servicio · modelo", f"# Contrato de servicio · {nombre}")
+    md = md.replace('**Entre** COMPLETAR (en adelante, "el Proveedor"), con domicilio en COMPLETAR, Salto, Provincia de Buenos Aires', '**Entre** Pablo Sebastián Peroni, DNI/CUIT COMPLETAR (en adelante, "el Proveedor"), con domicilio en COMPLETAR, Salto, Provincia de Buenos Aires')
     md = md.replace("**y** COMPLETAR (razón social o nombre, CUIT COMPLETAR; en adelante, \"la Empresa\")",
                     f"**y** {nombre} (razón social COMPLETAR, CUIT COMPLETAR, con domicilio en {e.get('direccion', 'Salto')}; en adelante, \"la Empresa\")")
     md = md.replace("en el WhatsApp indicado por la Empresa (COMPLETAR número)", f"en el WhatsApp indicado por la Empresa ({e['whatsapp'] if e.get('whatsapp') else 'COMPLETAR número'})")
@@ -51,7 +52,7 @@ for e in emp:
 
     # Mensaje de WhatsApp
     # Secuencia completa de WhatsApp: qué mandar y qué escribir antes de cada cosa
-    m1 = (f"Hola, ¿qué tal? Soy [tu nombre], de Salto. Les armé una WebApp de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es una WebApp: se abre desde un enlace y se instala en el celular sin pasar por ninguna tienda. Un solo pago, sin comisiones ni abonos.\n\n"
+    m1 = (f"Hola, ¿qué tal? Soy Pablo Peroni, de Salto. Les armé una WebApp de prueba a {nombre}: sus clientes piden el flete desde el celular y a ustedes les llega el pedido al WhatsApp con el precio ya calculado con sus tarifas. Es una WebApp: se abre desde un enlace y se instala en el celular sin pasar por ninguna tienda. Un solo pago, sin comisiones ni abonos.\n\n"
           f"Son dos enlaces:\n\n"
           f"1) La página que ven sus clientes, ya con el nombre {nombre}. Ábranla desde el celular y pidan un flete de prueba:\n{demo}\n\n"
           f"2) El panel del dueño, donde ustedes mismos cambian los precios, el nombre, los colores y el logo:\n{demo}?panel\nCódigo para entrar: {pin}\n\n"
@@ -59,13 +60,13 @@ for e in emp:
     m2 = "Les dejo un video de 30 segundos de cómo funciona 👇"
     m3 = (f"Buenísimo. Les paso la propuesta completa en PDF: qué incluye, el precio único y los plazos. Cualquier duda me escriben, y si quieren en 20 minutos configuramos la WebApp con sus tarifas y su WhatsApp para que la prueben con un pedido real. ¿Qué día les queda cómodo?")
     m4 = (f"Hola, ¿pudieron ver la WebApp de {nombre}? Les recuerdo los enlaces: la página de sus clientes {demo} y el panel del dueño {demo}?panel (código {pin}). Si les sirve, coordinamos 20 minutos y la dejamos andando con sus precios. ¿Qué día les queda bien?")
-    m5 = (f"Les paso el contrato modelo en PDF para que lo revisen con tranquilidad. Es un solo pago, 50 % al empezar y 50 % contra entrega, sin comisiones ni abonos; en 15 días hábiles tienen la WebApp definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
+    m5 = (f"Les paso el contrato en PDF para que lo revisen con tranquilidad. Es un solo pago de $ 1.200.000, precio final: 50 % al empezar y 50 % contra entrega, por transferencia (les paso alias o CBU por acá). Sin comisiones ni abonos; en 15 días hábiles tienen la WebApp definitiva con su nombre, su WhatsApp y su panel. Si están de acuerdo, lo firmamos y arrancamos.")
     secuencia = (f"SECUENCIA DE ENVÍO · {nombre}\nTeléfonos: {tel}\n{'=' * 60}\n\n"
                  f"PASO 1 · Primer contacto (solo texto). Copiá y pegá:\n{'-' * 60}\n{m1}\n{'-' * 60}\n\n"
                  f"PASO 2 · Enseguida, en otro mensaje: escribí esto y ADJUNTÁ EL VIDEO ({slug}-video.mp4) desde la galería:\n{'-' * 60}\n{m2}\n{'-' * 60}\n\n"
                  f"PASO 3 · Cuando respondan con interés: escribí esto y ADJUNTÁ LA PROPUESTA ({slug}-propuesta.pdf):\n{'-' * 60}\n{m3}\n{'-' * 60}\n\n"
                  f"PASO 4 · Si en 2 o 3 días no respondieron (una sola vez):\n{'-' * 60}\n{m4}\n{'-' * 60}\n\n"
-                 f"PASO 5 · Cuando digan que sí: escribí esto y ADJUNTÁ EL CONTRATO ({slug}-contrato.pdf). Antes completá a mano el precio y la fecha:\n{'-' * 60}\n{m5}\n{'-' * 60}\n\n"
+                 f"PASO 5 · Cuando digan que sí: escribí esto y ADJUNTÁ EL CONTRATO ({slug}-contrato.pdf). Antes completá a mano la fecha, tu DNI o CUIT, tu domicilio y la razón social y el CUIT de la empresa:\n{'-' * 60}\n{m5}\n{'-' * 60}\n\n"
                  f"Enlaces de {nombre}:\n· Página de sus clientes: {demo}\n· Panel del dueño (cambian precios, nombre, colores y logo): {demo}?panel · código {pin}\n· Video: {video}\n· Propuesta: {prop}\n· Contrato: {contrato}\n")
     msg, msg2, msg3 = m1, m2, m4
     open(os.path.join(d, "mensaje.txt"), "w", encoding="utf-8").write(secuencia)
