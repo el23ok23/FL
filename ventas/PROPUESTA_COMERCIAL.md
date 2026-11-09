@@ -24,7 +24,7 @@ Sin pagos dentro de la WebApp: el cliente confirma con vos por WhatsApp y vos co
 | **Pago único** | $ 1.200.000, precio final |
 | Comisión por flete | **Ninguna, nunca** |
 | Abono mensual | **Ninguno** |
-| Cambiar precios, nombre, colores y logo | **Vos mismo, desde la WebApp**, con tu PIN: tocás Guardar y rige en todos los teléfonos. Sin pedirle a nadie. |
+| Cambiar precios, nombre, colores y logo | **Vos mismo, desde la WebApp**, con tu PIN: tocás Guardar y rige en todos los teléfonos, incluidos el nombre y el ícono con que queda instalada. Sin pedirle a nadie. |
 | Incluye | **WebApp con tu marca**, que tus clientes instalan en el celular desde un enlace (sin tienda, sin descargas, en Android y iPhone), pedidos a tu WhatsApp (uno o varios números), historial de pedidos en tu planilla con aviso por correo, estado del pedido que ve el cliente, fotos de la carga, planilla de precios, material para redes (10 posts y 5 videos), capacitación de 1 hora y 60 días de garantía por fallas. |
 | Opcional | **Publicación en Google Play**: la versión Android de la WebApp, publicada en la tienda con una cuenta de desarrollador a nombre de tu empresa. Nosotros preparamos la WebApp y te acompañamos en el trámite de Google (ver abajo). Segunda etapa, se cotiza aparte. Soporte y mejoras después de la garantía: por hora o por trabajo. |
 

@@ -41,6 +41,34 @@ PWA_JS = """
   window.addEventListener('appinstalled',()=>{const b=document.getElementById('installbtn');if(b)b.remove();});
   // Sin el evento (iPhone, o ya visitada): igual ofrecemos el botón con las instrucciones, pero discreto y solo tras 20 s de uso.
   setTimeout(()=>{if(!deferred)button();},20000);
+
+  // Nombre e ícono con los que la WebApp queda instalada: salen del panel del dueño (nombre, color y logo),
+  // no de un archivo fijo. Se arma el manifest en el momento y se actualiza cada vez que cambian.
+  const BASE_ICONS=[{src:new URL('icon-192.png',location.href).href,sizes:'192x192',type:'image/png',purpose:'any'},{src:new URL('icon-512.png',location.href).href,sizes:'512x512',type:'image/png',purpose:'any'},{src:new URL('icon-512.png',location.href).href,sizes:'512x512',type:'image/png',purpose:'maskable'}];
+  const GENERIC=new Set(['transporte','transportes','fletes','flete','mudanzas','mudanza','logística','logistica','de','y','cargas','carga','srl','sa','el','la','los','las']);
+  let lastManifestUrl=null;
+  window.updateManifest=function(){
+    try{
+      const name=(typeof CONFIG!=='undefined'&&CONFIG.negocio&&CONFIG.negocio.nombre)||document.title||'WebApp';
+      const words=name.split(/\\s+/).filter(w=>!GENERIC.has(w.toLowerCase().replace(/[.,]/g,'')));
+      const joined=words.join(' ')||name;const short=name.length<=15?name:(joined.length<=15?joined:(words[0]||name).slice(0,15));
+      const theme=(getComputedStyle(document.documentElement).getPropertyValue('--celeste')||'#1B7BE0').trim();
+      const logo=(typeof PANEL!=='undefined'&&PANEL.brand&&PANEL.brand.logo_url)||'';
+      const icons=/^https:\\/\\//.test(logo)?[{src:logo,sizes:'512x512',type:'image/png',purpose:'any'},{src:logo,sizes:'192x192',type:'image/png',purpose:'any'}].concat(BASE_ICONS):BASE_ICONS;
+      const m={id:new URL('./',location.href).href,name,short_name:short,description:name+': pedí tu flete desde el celular y conocé el precio al toque.',start_url:new URL('./',location.href).href,scope:new URL('./',location.href).href,display:'standalone',orientation:'portrait',background_color:'#F4F8FE',theme_color:theme,lang:'es-AR',icons};
+      const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
+      const url=URL.createObjectURL(blob);
+      let link=document.querySelector('link[rel="manifest"]');if(!link){link=document.createElement('link');link.rel='manifest';document.head.appendChild(link);}
+      link.href=url;if(lastManifestUrl)URL.revokeObjectURL(lastManifestUrl);lastManifestUrl=url;
+      const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=theme;
+      const at=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(at)at.content=short;
+      const ai=document.querySelector('link[rel="apple-touch-icon"]');if(ai&&/^https:\\/\\//.test(logo))ai.href=logo;
+    }catch(e){}
+  };
+  // Cada vez que se aplican precios y marca (al abrir, al guardar en el panel), se rearma el manifest.
+  if(typeof applySheet==='function'){const _as=applySheet;applySheet=function(csv){const r=_as(csv);updateManifest();return r;};}
+  if(typeof panelRestoreFactory==='function'){const _pr=panelRestoreFactory;panelRestoreFactory=function(){const r=_pr();updateManifest();return r;};}
+  setTimeout(updateManifest,0);
 })();
 """
 
