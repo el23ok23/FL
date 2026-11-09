@@ -44,6 +44,11 @@ android {
             applicationId = "com.fletaba.salto"
             resValue("string", "app_name", "Fletaba Salto")
         }
+        create("demo") {
+            dimension = "origen"
+            applicationId = "com.fletaba.demo"
+            resValue("string", "app_name", "Tu Empresa de Fletes")
+        }
         create("donpedro") {
             dimension = "origen"
             applicationId = "com.fletaba.donpedro"
