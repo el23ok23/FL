@@ -357,6 +357,33 @@ class PriceSheetTest {
     }
 
     @Test
+    fun vehiclesEditableAndExtras() {
+        val cfg = PricingConfig(perHelper = 0, perHelperKm = 0, perStairFloor = 0, perExtraStop = 0, roundTo = 1, urbanDistanceFactor = 1.0, minKm = 1.0)
+        val vs = listOf(
+            VehicleSpec(VehicleKind.KANGOO, "Kangoo", "Utilitario", "1,8 m", "650 kg", 25000, 1800),
+            VehicleSpec(VehicleKind.PICKUP, "Pickup", "Caja abierta", "1,5 m", "1.000 kg", 30000, 2000),
+        )
+        val csv = "kangoo.nombre,Kangoo Sr. Pérez\nkangoo.medidas,2 × 1,2 m\npickup.activo,0\nextra1.activo,1\nextra1.nombre,Camión con hidrogrúa\nextra1.icono,camion_playo\nextra1.tarifa_base,80000\nextra1.por_km,4000\n"
+        val r = PriceSheet.apply(csv, cfg, vs, TimeConfig(6, 10, 0.5, 6000))
+        assertEquals(3, r.vehicles.size)
+        assertEquals("Kangoo Sr. Pérez", r.vehicles[0].name); assertEquals("2 × 1,2 m", r.vehicles[0].dimensions); assertTrue(r.vehicles[0].enabled)
+        assertFalse(r.vehicles[1].enabled)
+        val extra = r.vehicles[2]
+        assertEquals("extra1", extra.id); assertEquals(VehicleKind.CAMION_PLAYO, extra.kind); assertEquals("Camión con hidrogrúa", extra.name); assertEquals(80000, extra.baseFare); assertTrue(extra.enabled)
+        // Ida y vuelta por la planilla: lo que se arma se vuelve a leer igual
+        val values = PriceSheet.currentValues(cfg, r.vehicles, TimeConfig(6, 10, 0.5, 6000))
+        assertEquals("0", values["pickup.activo"]); assertEquals("camion_playo", values["extra1.icono"])
+        val again = PriceSheet.apply(PriceSheet.toCsv(values), cfg, vs, TimeConfig(6, 10, 0.5, 6000))
+        assertEquals(listOf("Kangoo Sr. Pérez", "Pickup", "Camión con hidrogrúa"), again.vehicles.map { it.name })
+        assertEquals(listOf(true, false, true), again.vehicles.map { it.enabled })
+        // El formulario muestra los extras presentes en los valores
+        val groups = PriceSheet.form(vs, advanced = false, values = values)
+        assertTrue(groups.any { it.vehicleId == "extra1" && it.title == "Camión con hidrogrúa" })
+        assertTrue(groups.first { it.vehicleId == "kangoo" }.fields.any { it.bool })
+        assertTrue(PriceSheet.isValid("extra1.nombre", "Camión")); assertFalse(PriceSheet.isValid("extra1.nombre", "")); assertTrue(PriceSheet.isValid("kangoo.activo", "0"))
+    }
+
+    @Test
     fun brandingKeys() {
         val csv = "clave,valor\nnombre,Fletes Don Pedro, Salto\nwhatsapp,+54 9 2474 12-3456\ncolor_primario,0e7c4a\ncolor_acento,#ZZZ\nlogo_url,https://x/y.png\nkangoo.por_km,1500\n"
         val b = PriceSheet.branding(csv)

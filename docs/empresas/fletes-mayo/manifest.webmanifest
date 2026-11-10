@@ -1,7 +1,7 @@
 {
- "name": "Transporte de Cargas Mayo",
- "short_name": "Mayo",
- "description": "Transporte de Cargas Mayo: pedí tu flete desde el celular y conocé el precio al toque.",
+ "name": "Fletes Mayo S.R.L.",
+ "short_name": "Mayo S.R.L.",
+ "description": "Fletes Mayo S.R.L.: pedí tu flete desde el celular y conocé el precio al toque.",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",

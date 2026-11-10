@@ -193,6 +193,24 @@ class RemotePrices(private val context: Context, private val url: String?, confi
         return postJson(JSONObject().put("pin", pin).put("accion", "estado").put("id", id).put("estado", estado))?.optBoolean("ok") == true
     }
 
+    /** Borra un pedido (en la planilla o en este teléfono). */
+    suspend fun deleteOrder(pin: String, id: String): Boolean {
+        if (url == null) {
+            val list = localOrders().filter { it.optString("id") != id }
+            prefs.edit().putString(KEY_ORDERS, JSONArray(list).toString()).apply(); return true
+        }
+        return postJson(JSONObject().put("pin", pin).put("accion", "borrar_pedido").put("id", id))?.optBoolean("ok") == true
+    }
+
+    /** Borra todos los pedidos hechos y cancelados. */
+    suspend fun clearFinishedOrders(pin: String): Boolean {
+        if (url == null) {
+            val list = localOrders().filter { it.optString("estado") !in setOf("hecho", "cancelado") }
+            prefs.edit().putString(KEY_ORDERS, JSONArray(list).toString()).apply(); return true
+        }
+        return postJson(JSONObject().put("pin", pin).put("accion", "limpiar_pedidos"))?.optBoolean("ok") == true
+    }
+
     /** Guarda un pedido hecho desde este teléfono (modo local, para la demo del panel). */
     fun saveLocalOrder(order: JSONObject) {
         val list = ArrayList(localOrders())

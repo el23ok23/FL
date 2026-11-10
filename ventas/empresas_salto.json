@@ -1,12 +1,124 @@
 [
-  {"slug": "salto-flet", "nombre": "Salto Flet", "telefonos": ["(02474) 42-5184"], "whatsapp": "", "direccion": "25 de Mayo 39, Salto", "rubro": "Fletes y mudanzas puerta a puerta a Buenos Aires y Rosario", "fuente": "argentino.com.ar, arempresas.com, facebook.com/saltoflet", "color": "#1B7BE0"},
-  {"slug": "transporte-mayo", "nombre": "Transporte de Cargas Mayo", "telefonos": ["(02474) 42-3149"], "whatsapp": "", "direccion": "V. Vergara 51 / Paraguay 550, Salto", "rubro": "Transporte de cargas, mudanzas y comisiones (Expreso Mayo)", "fuente": "argentino.com.ar, telexplorer.com.ar, salto.licuo.com.ar", "color": "#0F5FB8"},
-  {"slug": "mudanzas-el-gringo", "nombre": "Mudanzas El Gringo", "telefonos": ["(02474) 43-1618"], "whatsapp": "", "direccion": "Lobos, Salto", "rubro": "Mudanzas y fletes", "fuente": "telexplorer.com.ar", "color": "#D97706"},
-  {"slug": "los-perty", "nombre": "Transporte y Mudanzas Los Perty", "telefonos": ["02474 15-6889 (incompleto en el directorio: verificar)"], "whatsapp": "", "direccion": "Salto", "rubro": "Mudanzas (camión de 28 m³) y transporte de corta y larga distancia", "fuente": "argentino.com.ar/salto/transporte+de+carga", "color": "#0E7C4A"},
-  {"slug": "transporte-baccinelli", "nombre": "Transporte Baccinelli", "telefonos": ["(02474) 42-2808"], "whatsapp": "", "direccion": "Ruta 191 km 97½, Salto", "rubro": "Transporte de cargas", "fuente": "redargentina.com.ar", "color": "#DC2626"},
-  {"slug": "cootransa", "nombre": "Cootransa Transporte de Carga", "telefonos": ["(02474) 43-0039"], "whatsapp": "", "direccion": "Av. Italia 401, Salto", "rubro": "Transporte de cargas", "fuente": "redargentina.com.ar", "color": "#0891B2"},
-  {"slug": "transportes-mitre", "nombre": "Transportes Mitre", "telefonos": ["(02474) 42-2763", "(02474) 42-3171", "2474 15-679538"], "whatsapp": "5492474561559", "direccion": "H. Yrigoyen 650, Salto", "rubro": "Transporte de cargas y mudanzas", "fuente": "instagram.com/transportesmitresalto (WhatsApp), laguiaonline.com.ar, saltomobile.com/transportes", "color": "#7C3AED"},
-  {"slug": "logistica-salto", "nombre": "Logística Salto", "telefonos": ["2474 15-685007"], "whatsapp": "", "direccion": "Av. E. de Lavalle 373, Salto", "rubro": "Logística y transporte de cargas (logisticasalto373@gmail.com)", "fuente": "saltomobile.com/transportes", "color": "#BE185D"},
-  {"slug": "novis", "nombre": "Novis SRL", "telefonos": ["no publicado en los directorios consultados (ver saltomobile.com/transportes)"], "whatsapp": "", "direccion": "Salto", "rubro": "Logística, almacenamiento y distribución", "fuente": "saltomobile.com/transportes", "color": "#374151"},
-  {"slug": "gustavo-aguilar", "nombre": "Gustavo Aguilar Transporte", "telefonos": ["no publicado en los directorios consultados (ver saltomobile.com/transportes)"], "whatsapp": "", "direccion": "Salto", "rubro": "Transporte de cargas", "fuente": "saltomobile.com/transportes", "color": "#0B1F3A"}
+  {
+    "slug": "salto-flet",
+    "nombre": "Salto Flet",
+    "telefonos": [
+      "(02474) 42-5184"
+    ],
+    "whatsapp": "",
+    "direccion": "25 de Mayo 39, Salto",
+    "rubro": "Fletes y mudanzas puerta a puerta a Buenos Aires y Rosario",
+    "fuente": "argentino.com.ar, arempresas.com, facebook.com/saltoflet",
+    "color": "#1B7BE0"
+  },
+  {
+    "slug": "fletes-mayo",
+    "nombre": "Fletes Mayo S.R.L.",
+    "telefonos": [
+      "(02474) 42-3149"
+    ],
+    "whatsapp": "",
+    "direccion": "V. Vergara 51 / Paraguay 550, Salto",
+    "rubro": "Fletes, transporte de cargas y mudanzas (Transporte de Cargas Mayo / Expreso Mayo)",
+    "fuente": "argentino.com.ar, telexplorer.com.ar, salto.licuo.com.ar",
+    "color": "#0F5FB8"
+  },
+  {
+    "slug": "mudanzas-el-gringo",
+    "nombre": "Mudanzas El Gringo",
+    "telefonos": [
+      "(02474) 43-1618"
+    ],
+    "whatsapp": "",
+    "direccion": "Lobos, Salto",
+    "rubro": "Mudanzas y fletes",
+    "fuente": "telexplorer.com.ar",
+    "color": "#D97706"
+  },
+  {
+    "slug": "los-perty",
+    "nombre": "Transporte y Mudanzas Los Perty",
+    "telefonos": [
+      "02474 15-6889 (incompleto en el directorio: verificar)"
+    ],
+    "whatsapp": "",
+    "direccion": "Salto",
+    "rubro": "Mudanzas (camión de 28 m³) y transporte de corta y larga distancia",
+    "fuente": "argentino.com.ar/salto/transporte+de+carga",
+    "color": "#0E7C4A"
+  },
+  {
+    "slug": "transporte-baccinelli",
+    "nombre": "Transporte Baccinelli",
+    "telefonos": [
+      "(02474) 42-2808"
+    ],
+    "whatsapp": "",
+    "direccion": "Ruta 191 km 97½, Salto",
+    "rubro": "Transporte de cargas",
+    "fuente": "redargentina.com.ar",
+    "color": "#DC2626"
+  },
+  {
+    "slug": "cootransa",
+    "nombre": "Cootransa Transporte de Carga",
+    "telefonos": [
+      "(02474) 43-0039"
+    ],
+    "whatsapp": "",
+    "direccion": "Av. Italia 401, Salto",
+    "rubro": "Transporte de cargas",
+    "fuente": "redargentina.com.ar",
+    "color": "#0891B2"
+  },
+  {
+    "slug": "transportes-mitre",
+    "nombre": "Transportes Mitre",
+    "telefonos": [
+      "(02474) 42-2763",
+      "(02474) 42-3171",
+      "2474 15-679538"
+    ],
+    "whatsapp": "5492474561559",
+    "direccion": "H. Yrigoyen 650, Salto",
+    "rubro": "Transporte de cargas y mudanzas",
+    "fuente": "instagram.com/transportesmitresalto (WhatsApp), laguiaonline.com.ar, saltomobile.com/transportes",
+    "color": "#7C3AED"
+  },
+  {
+    "slug": "logistica-salto",
+    "nombre": "Logística Salto",
+    "telefonos": [
+      "2474 15-685007"
+    ],
+    "whatsapp": "",
+    "direccion": "Av. E. de Lavalle 373, Salto",
+    "rubro": "Logística y transporte de cargas (logisticasalto373@gmail.com)",
+    "fuente": "saltomobile.com/transportes",
+    "color": "#BE185D"
+  },
+  {
+    "slug": "novis",
+    "nombre": "Novis SRL",
+    "telefonos": [
+      "no publicado en los directorios consultados (ver saltomobile.com/transportes)"
+    ],
+    "whatsapp": "",
+    "direccion": "Salto",
+    "rubro": "Logística, almacenamiento y distribución",
+    "fuente": "saltomobile.com/transportes",
+    "color": "#374151"
+  },
+  {
+    "slug": "gustavo-aguilar",
+    "nombre": "Gustavo Aguilar Transporte",
+    "telefonos": [
+      "no publicado en los directorios consultados (ver saltomobile.com/transportes)"
+    ],
+    "whatsapp": "",
+    "direccion": "Salto",
+    "rubro": "Transporte de cargas",
+    "fuente": "saltomobile.com/transportes",
+    "color": "#0B1F3A"
+  }
 ]

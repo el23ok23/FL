@@ -64,6 +64,7 @@ import com.fletaba.app.ui.components.VehicleIcon
 import androidx.compose.foundation.horizontalScroll
 import com.fletaba.core.OrderStatus
 import com.fletaba.core.Money
+import androidx.compose.material3.Switch
 import com.fletaba.core.PriceSheet
 import com.fletaba.core.VehicleKind
 
@@ -180,6 +181,7 @@ private fun OwnerPanel(vm: OrderViewModel) {
                 LogoCard(vm, onPick = { pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) })
                 ColorsCard(vm)
                 vm.adminForm.forEach { group -> GroupCard(vm, group) }
+                SecondaryButton(text = "+ Agregar un vehículo", onClick = { vm.addVehicleSlot() })
                 SecurityCard(vm)
                 Spacer(Modifier.height(4.dp))
                 SecondaryButton(text = "Volver a los valores originales", onClick = { vm.resetAdminValues() })
@@ -268,6 +270,9 @@ private fun OrdersList(vm: OrderViewModel) {
         )
         SecondaryButton(text = if (vm.ordersLoading) "Cargando…" else "Actualizar", onClick = { vm.loadOrders() }, modifier = Modifier.width(120.dp))
     }
+    if (vm.adminOrders.any { it.optString("estado") in setOf("hecho", "cancelado") }) {
+        SecondaryButton(text = "Borrar los pedidos hechos y cancelados", onClick = { vm.clearFinishedOrders() })
+    }
     vm.ordersMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }
     vm.adminOrders.forEach { o ->
         val st = OrderStatus.parse(o.optString("estado")) ?: OrderStatus.NEW
@@ -279,7 +284,12 @@ private fun OrdersList(vm: OrderViewModel) {
                 SecondaryButton(text = "Escribirle por WhatsApp", onClick = { vm.openWhatsAppTo(wa, "Hola ${o.optString("cliente")}, te escribimos por tu pedido de flete ${o.optString("id")}.") })
             }
             Spacer(Modifier.height(6.dp))
-            Text("Estado", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("Estado", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, modifier = Modifier.weight(1f))
+                if (st == OrderStatus.DONE || st == OrderStatus.CANCELLED) {
+                    TextButton(onClick = { vm.deleteOrder(o.optString("id")) }) { Text("Borrar", color = colors.error) }
+                }
+            }
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 OrderStatus.entries.forEach { option ->
                     val on = option == st
@@ -405,15 +415,45 @@ private fun Swatch(hex: String, selected: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun GroupCard(vm: OrderViewModel, group: PriceSheet.Group) {
+    val colors = MaterialTheme.colorScheme
     PanelCard(group.title, group.subtitle) {
-        val twoColumns = group.fields.size == 2 && group.fields.none { it.text }
-        if (twoColumns) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                group.fields.forEach { f -> ValueField(vm, f, Modifier.weight(1f)) }
+        val numeric = group.fields.filter { !it.text && !it.bool && !it.icon }
+        val others = group.fields.filter { it.text || it.bool || it.icon }
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            others.forEach { f ->
+                when {
+                    f.bool -> Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(f.label, style = MaterialTheme.typography.bodyMedium, color = colors.onSurface, modifier = Modifier.weight(1f))
+                        val on = (vm.adminValues[f.key] ?: "1").trim().lowercase() !in setOf("0", "no", "false", "off")
+                        Switch(checked = on, onCheckedChange = { vm.setAdminValue(f.key, if (it) "1" else "0") })
+                    }
+                    f.icon -> Column {
+                        Text(f.label, style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
+                        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            VehicleKind.entries.forEach { k ->
+                                val sel = (vm.adminValues[f.key] ?: "") == k.name.lowercase()
+                                Box(
+                                    Modifier
+                                        .size(width = 76.dp, height = 48.dp)
+                                        .clip(MaterialTheme.shapes.small)
+                                        .background(if (sel) colors.primaryContainer else colors.surfaceVariant)
+                                        .border(if (sel) 2.dp else 0.dp, if (sel) colors.primary else Color.Transparent, MaterialTheme.shapes.small)
+                                        .clickable { vm.setAdminValue(f.key, k.name.lowercase()) },
+                                    contentAlignment = Alignment.Center,
+                                ) { VehicleIcon(kind = k, modifier = Modifier.size(width = 60.dp, height = 34.dp)) }
+                            }
+                        }
+                    }
+                    else -> ValueField(vm, f, Modifier.fillMaxWidth())
+                }
             }
-        } else {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                group.fields.forEach { f -> ValueField(vm, f, Modifier.fillMaxWidth()) }
+            if (numeric.size == 2) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { numeric.forEach { f -> ValueField(vm, f, Modifier.weight(1f)) } }
+            } else {
+                numeric.forEach { f -> ValueField(vm, f, Modifier.fillMaxWidth()) }
+            }
+            if (group.vehicleId?.startsWith("extra") == true) {
+                SecondaryButton(text = "Quitar este vehículo", onClick = { vm.removeVehicleSlot(group.vehicleId) })
             }
         }
     }
@@ -441,6 +481,7 @@ private fun ValueField(vm: OrderViewModel, field: PriceSheet.Field, modifier: Mo
         keyboardOptions = KeyboardOptions(
             keyboardType = when {
                 field.key == PriceSheet.KEY_WHATSAPP -> KeyboardType.Phone
+                field.key.endsWith(".activo") -> KeyboardType.Number
                 field.text -> KeyboardType.Text
                 field.decimal -> KeyboardType.Decimal
                 else -> KeyboardType.Number

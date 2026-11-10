@@ -55,23 +55,55 @@ object PriceSheet {
             intermediateFactor = dbl("factor_parada_intermedia", times.intermediateFactor),
             waitFeePer15Min = int("espera_por_15_min", times.waitFeePer15Min),
         )
-        val v = vehicles.map { veh ->
-            val id = veh.kind.name.lowercase()
+        fun txt(key: String, current: String): String = m[key]?.trim()?.takeIf { it.isNotEmpty() }?.also { applied++ } ?: current
+        fun flag(key: String, current: Boolean): Boolean = m[key]?.let { raw ->
+            applied++
+            when (raw.trim().lowercase()) { "0", "no", "false", "off" -> false else -> true }
+        } ?: current
+        val base = vehicles.map { veh ->
+            val id = veh.id
             veh.copy(
                 baseFare = int("$id.tarifa_base", veh.baseFare),
                 perKm = int("$id.por_km", veh.perKm),
                 loadMinutes = int("$id.minutos_carga", veh.loadMinutes),
                 volumeM3 = dbl("$id.m3", veh.volumeM3),
                 minFare = int("$id.precio_minimo", veh.minFare),
+                name = txt("$id.nombre", veh.name),
+                description = txt("$id.descripcion", veh.description),
+                dimensions = txt("$id.medidas", veh.dimensions),
+                capacity = txt("$id.carga", veh.capacity),
+                enabled = flag("$id.activo", veh.enabled),
             )
         }
+        // Vehículos agregados por el dueño: extra1..extra4, con el dibujo de un tipo existente ("icono").
+        val extras = (1..MAX_EXTRAS).mapNotNull { n ->
+            val id = "extra$n"
+            if (m.keys.none { it.startsWith("$id.") }) return@mapNotNull null
+            val kind = VehicleKind.fromId(m["$id.icono"] ?: "") ?: VehicleKind.FURGON_MEDIANO
+            val sample = vehicles.firstOrNull { it.kind == kind } ?: vehicles.firstOrNull()
+            applied++
+            VehicleSpec(
+                kind = kind, id = id,
+                name = txt("$id.nombre", "Vehículo $n"),
+                description = txt("$id.descripcion", sample?.description ?: ""),
+                dimensions = txt("$id.medidas", sample?.dimensions ?: ""),
+                capacity = txt("$id.carga", sample?.capacity ?: ""),
+                baseFare = int("$id.tarifa_base", sample?.baseFare ?: 0),
+                perKm = int("$id.por_km", sample?.perKm ?: 0),
+                loadMinutes = int("$id.minutos_carga", sample?.loadMinutes ?: 45),
+                volumeM3 = dbl("$id.m3", sample?.volumeM3 ?: 10.0),
+                minFare = int("$id.precio_minimo", 0),
+                enabled = flag("$id.activo", true),
+            )
+        }
+        val v = base + extras
         return Result(p, v, t, applied)
     }
 
     // ---- Formulario del panel del dueño -----------------------------------------------------
 
     /** Un valor editable: clave de la planilla, etiqueta para mostrar y si admite decimales (o es texto). */
-    data class Field(val key: String, val label: String, val decimal: Boolean = false, val unit: String = "$", val text: Boolean = false)
+    data class Field(val key: String, val label: String, val decimal: Boolean = false, val unit: String = "$", val text: Boolean = false, val bool: Boolean = false, val icon: Boolean = false)
 
     // ---- Marca (también editable por el dueño) ------------------------------------------------
 
@@ -80,8 +112,12 @@ object PriceSheet {
     const val KEY_PRIMARY = "color_primario"
     const val KEY_ACCENT = "color_acento"
     const val KEY_LOGO = "logo_url"
+    const val MAX_EXTRAS = 4
     /** Claves cuyo valor es texto (no se validan como número). */
     val TEXT_KEYS = setOf(KEY_NAME, KEY_WHATSAPP, KEY_PRIMARY, KEY_ACCENT, KEY_LOGO)
+    private val VEHICLE_TEXT = Regex("""^[a-z0-9_]+\.(nombre|descripcion|medidas|carga|icono)$""")
+    /** true si la clave lleva texto: las de marca y las de nombre/descripción/medidas/carga/icono de un vehículo. */
+    fun isTextKey(key: String): Boolean = key in TEXT_KEYS || VEHICLE_TEXT.matches(key)
 
     /** Lo que el dueño puede cambiar de su marca desde la app. null = sin cambio. */
     data class Branding(
@@ -118,13 +154,13 @@ object PriceSheet {
         return if (Regex("^[0-9A-F]{6}$").matches(h)) "#$h" else null
     }
 
-    data class Group(val title: String, val fields: List<Field>, val subtitle: String? = null)
+    data class Group(val title: String, val fields: List<Field>, val subtitle: String? = null, val vehicleId: String? = null)
 
     /**
      * Grupos y campos que ve el dueño en el panel, en orden. [advanced] agrega los porcentajes
      * invisibles para el cliente (recargo operativo y comisión).
      */
-    fun form(vehicles: List<VehicleSpec>, advanced: Boolean): List<Group> {
+    fun form(vehicles: List<VehicleSpec>, advanced: Boolean, values: Map<String, String> = emptyMap()): List<Group> {
         val out = ArrayList<Group>()
         out += Group(
             "Tu negocio",
@@ -133,12 +169,25 @@ object PriceSheet {
                 Field(KEY_WHATSAPP, "WhatsApp donde llegan los pedidos (varios: separalos con coma)", text = true, unit = ""),
             ),
         )
-        vehicles.forEach { v ->
-            val id = v.kind.name.lowercase()
+        val ids = vehicles.map { it.id to it.name }.toMutableList()
+        (1..MAX_EXTRAS).forEach { n -> val id = "extra$n"; if (ids.none { it.first == id } && values.keys.any { it.startsWith("$id.") }) ids += id to (values["$id.nombre"] ?: "Vehículo $n") }
+        ids.forEach { (id, name) ->
+            val extra = id.startsWith("extra")
             out += Group(
-                title = v.name,
-                subtitle = v.dimensions,
-                fields = listOf(Field("$id.tarifa_base", "Tarifa base"), Field("$id.por_km", "Por kilómetro"), Field("$id.precio_minimo", "Precio mínimo del viaje")),
+                title = values["$id.nombre"]?.takeIf { it.isNotBlank() } ?: name,
+                subtitle = if (extra) "Vehículo agregado por vos" else null,
+                vehicleId = id,
+                fields = listOfNotNull(
+                    Field("$id.activo", "Se ofrece a los clientes", bool = true, unit = ""),
+                    Field("$id.nombre", "Nombre", text = true, unit = ""),
+                    Field("$id.descripcion", "Descripción corta", text = true, unit = ""),
+                    Field("$id.medidas", "Medidas", text = true, unit = ""),
+                    Field("$id.carga", "Carga que lleva", text = true, unit = ""),
+                    if (extra) Field("$id.icono", "Dibujo", icon = true, unit = "") else null,
+                    Field("$id.tarifa_base", "Tarifa base"),
+                    Field("$id.por_km", "Por kilómetro"),
+                    Field("$id.precio_minimo", "Precio mínimo del viaje"),
+                ),
             )
         }
         out += Group("Ayudantes", listOf(Field("por_ayudante", "Por ayudante (base)"), Field("por_ayudante_km", "Por ayudante, por km")))
@@ -183,7 +232,14 @@ object PriceSheet {
     fun isNumber(text: String): Boolean = text.toNumber() != null
 
     /** true si el valor sirve para esa clave (número, o texto no vacío en las claves de texto). */
-    fun isValid(key: String, value: String): Boolean = when (key) {
+    fun isValid(key: String, value: String): Boolean = when {
+        key.endsWith(".nombre") && key != KEY_NAME -> value.trim().length in 1..40
+        key.endsWith(".activo") -> value.isBlank() || value.trim() in setOf("0", "1", "si", "no", "sí", "true", "false")
+        VEHICLE_TEXT.matches(key) -> true
+        else -> isValidBasic(key, value)
+    }
+
+    private fun isValidBasic(key: String, value: String): Boolean = when (key) {
         KEY_NAME -> value.isBlank() || value.trim().length in 2..40
         KEY_WHATSAPP -> value.isBlank() || value.split(',', ';', '/', '\n').filter { it.isNotBlank() }.all { ArgentinePhone.normalize(it) != null || it.filter { c -> c.isDigit() }.length in 10..15 }
         KEY_PRIMARY, KEY_ACCENT -> value.isBlank() || hex(value) != null
@@ -196,9 +252,11 @@ object PriceSheet {
         appendLine("clave,valor")
         values.forEach { (k, v) ->
             if (k.isBlank()) return@forEach
-            if (k in TEXT_KEYS) {
+            if (isTextKey(k)) {
                 val t = v.trim().replace('\n', ' ').replace('\r', ' ')
                 if (t.isNotEmpty()) appendLine("$k,$t")
+            } else if (k.endsWith(".activo")) {
+                appendLine("$k,${if (v.trim().lowercase() in setOf("0", "no", "false", "off")) 0 else 1}")
             } else if (v.toNumber() != null) {
                 appendLine("$k,${v.trim().replace(',', '.')}")
             }
@@ -231,7 +289,13 @@ object PriceSheet {
         appendLine("recargo_fin_de_semana_porcentaje,${num(pricing.weekendPct * 100)}")
         appendLine("descuento_ida_vuelta_porcentaje,${num(pricing.roundTripDiscountPct * 100)}")
         vehicles.forEach { v ->
-            val id = v.kind.name.lowercase()
+            val id = v.id
+            appendLine("$id.activo,${if (v.enabled) 1 else 0}")
+            appendLine("$id.nombre,${v.name}")
+            appendLine("$id.descripcion,${v.description}")
+            appendLine("$id.medidas,${v.dimensions}")
+            appendLine("$id.carga,${v.capacity}")
+            if (id.startsWith("extra")) appendLine("$id.icono,${v.kind.name.lowercase()}")
             appendLine("$id.tarifa_base,${v.baseFare}")
             appendLine("$id.por_km,${v.perKm}")
             appendLine("$id.precio_minimo,${v.minFare}")

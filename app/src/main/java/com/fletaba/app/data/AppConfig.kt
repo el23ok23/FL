@@ -87,6 +87,8 @@ data class AppConfig(
                         perKm = v.optInt("por_km", 0),
                         loadMinutes = v.optInt("minutos_carga", DEFAULT_LOAD_MINUTES[kind] ?: 45),
                         volumeM3 = v.optDouble("m3", DEFAULT_M3[kind] ?: 10.0),
+                        minFare = v.optInt("precio_minimo", 0),
+                        enabled = v.optBoolean("activo", true),
                     )
                 }
             }

@@ -1,8 +1,8 @@
-# Contrato de servicio · Transporte de Cargas Mayo
+# Contrato de servicio · Fletes Mayo S.R.L.
 
 > Modelo orientativo para adaptar con un contador o abogado antes de firmar. Completar los campos marcados.
 
-**Entre** Pablo Sebastián Peroni, DNI/CUIT COMPLETAR (en adelante, "el Proveedor"), con domicilio en COMPLETAR, Salto, Provincia de Buenos Aires, **y** Transporte de Cargas Mayo (razón social COMPLETAR, CUIT COMPLETAR, con domicilio en V. Vergara 51 / Paraguay 550, Salto; en adelante, "la Empresa"), se acuerda:
+**Entre** Pablo Sebastián Peroni, DNI/CUIT COMPLETAR (en adelante, "el Proveedor"), con domicilio en COMPLETAR, Salto, Provincia de Buenos Aires, **y** Fletes Mayo S.R.L. (razón social COMPLETAR, CUIT COMPLETAR, con domicilio en V. Vergara 51 / Paraguay 550, Salto; en adelante, "la Empresa"), se acuerda:
 
 **1. Objeto.** El Proveedor desarrolla, personaliza y entrega a la Empresa una aplicación web instalable (WebApp) para que los clientes de la Empresa soliciten presupuestos de fletes desde el celular (en adelante, "la WebApp"), con el nombre, los colores y las tarifas de la Empresa, publicada en una dirección web propia.
 

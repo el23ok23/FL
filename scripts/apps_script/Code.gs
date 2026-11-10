@@ -12,6 +12,7 @@
  *  - GET  url?pedido=ID                       → estado de ese pedido (lo consulta la app del cliente).
  *  - POST {pin, accion:"pedidos"}             → últimos pedidos (para el panel del dueño).
  *  - POST {pin, accion:"estado", id, estado}  → cambia el estado de un pedido (nuevo, confirmado, en_camino, hecho, cancelado).
+ *  - POST {pin, accion:"borrar_pedido", id}   → borra un pedido; {pin, accion:"limpiar_pedidos"} borra los hechos y cancelados.
  *
  * Cómo se instala (una sola vez por empresa, lo hacemos nosotros en la entrega): ver
  * ventas/CONFIGURAR_PANEL_DEL_DUENO.md
@@ -61,6 +62,10 @@ function doPost(e) {
   if (accion === 'verificar') return json_({ ok: true, correo: enmascarar_(correoRecuperacion_()) });
 
   if (accion === 'pedidos') return json_({ ok: true, pedidos: listarPedidos_(Number(body.limite || 60)) });
+
+  if (accion === 'borrar_pedido') return json_({ ok: borrarPedido_(String(body.id || '')) });
+
+  if (accion === 'limpiar_pedidos') return json_({ ok: true, borrados: limpiarPedidos_() });
 
   if (accion === 'estado') {
     const estado = String(body.estado || '').trim().toLowerCase();
@@ -218,6 +223,28 @@ function listarPedidos_(limite) {
     out.push({ id: String(f[14] || ''), fecha: f[0], cliente: String(f[1] || ''), whatsapp: String(f[2] || '').replace(/^'/, ''), origen: String(f[3] || ''), destino: String(f[4] || ''), vehiculo: String(f[5] || ''), ayudantes: Number(f[6] || 0), cuando: String(f[8] || ''), km: Number(f[9] || 0), precio: Number(f[10] || 0), estado: String(f[12] || 'nuevo'), fotos: String(f[15] || '') });
   }
   return out;
+}
+
+function borrarPedido_(id) {
+  if (!id) return false;
+  const hoja = hojaPedidos_();
+  const datos = hoja.getDataRange().getValues();
+  for (let i = datos.length - 1; i >= 1; i--) {
+    if (String(datos[i][14]) === id) { hoja.deleteRow(i + 1); return true; }
+  }
+  return false;
+}
+
+/** Borra los pedidos hechos y cancelados. Devuelve cuántos. */
+function limpiarPedidos_() {
+  const hoja = hojaPedidos_();
+  const datos = hoja.getDataRange().getValues();
+  let n = 0;
+  for (let i = datos.length - 1; i >= 1; i--) {
+    const estado = String(datos[i][12] || '').trim().toLowerCase();
+    if (estado === 'hecho' || estado === 'cancelado') { hoja.deleteRow(i + 1); n++; }
+  }
+  return n;
 }
 
 function cambiarEstado_(id, estado) {

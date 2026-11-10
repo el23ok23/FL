@@ -46,6 +46,10 @@ data class VehicleSpec(
     val volumeM3: Double = 10.0,
     /** Precio mínimo del viaje con este vehículo (0 = sin mínimo). */
     val minFare: Int = 0,
+    /** Identificador en la planilla: el del tipo ("kangoo") o "extra1".."extra4" para vehículos agregados por el dueño. */
+    val id: String = kind.name.lowercase(),
+    /** false = el dueño lo sacó de la lista (no se ofrece). */
+    val enabled: Boolean = true,
 )
 
 /** Valores generales de la tarifa (config.json → "precios"). */

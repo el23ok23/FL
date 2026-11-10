@@ -75,8 +75,12 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     // ---- Precios (editables por el dueño desde su planilla) ---------------------------------
     var pricing: PricingConfig by mutableStateOf(config.pricing)
         private set
-    var vehicles: List<VehicleSpec> by mutableStateOf(config.vehicles)
+    /** Todos los vehículos, incluidos los que el dueño sacó de la lista (para el panel). */
+    var allVehicles: List<VehicleSpec> by mutableStateOf(config.vehicles)
         private set
+    /** Los que se ofrecen al cliente. Si el dueño los desactivó todos, se muestran todos igual. */
+    val vehicles: List<VehicleSpec>
+        get() = allVehicles.filter { it.enabled }.ifEmpty { allVehicles }
     var times: TimeConfig by mutableStateOf(config.times)
         private set
     /** true cuando los precios vienen de la planilla del dueño (descargada o en caché). */
@@ -108,7 +112,7 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     private fun applySheet(csv: String) {
         val r = PriceSheet.apply(csv, config.pricing, config.vehicles, config.times)
         if (r.applied > 0) {
-            pricing = r.pricing; vehicles = r.vehicles; times = r.times
+            pricing = r.pricing; allVehicles = r.vehicles; times = r.times
             pricesFromSheet = true
             if (vehicleIndex > vehicles.lastIndex) vehicleIndex = vehicles.lastIndex
         }
@@ -147,11 +151,23 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
     /** true si los cambios llegan a todos los teléfonos; false si valen solo en este. */
     val adminSynced: Boolean get() = remotePrices.synced
     val adminForm: List<PriceSheet.Group>
-        get() = PriceSheet.form(config.vehicles, advanced = config.pricing.commissionPct > 0 || config.pricing.operatingPct > 0)
+        get() = PriceSheet.form(config.vehicles, advanced = config.pricing.commissionPct > 0 || config.pricing.operatingPct > 0, values = adminValues)
+
+    /** Agrega un vehículo nuevo (hasta 4), con los valores del furgón mediano como punto de partida. */
+    fun addVehicleSlot() {
+        val n = (1..PriceSheet.MAX_EXTRAS).firstOrNull { k -> adminValues.keys.none { it.startsWith("extra$k.") } } ?: run { adminMessage = "Ya agregaste el máximo de vehículos (${PriceSheet.MAX_EXTRAS})."; return }
+        val sample = config.vehicles.firstOrNull { it.kind == com.fletaba.core.VehicleKind.FURGON_MEDIANO } ?: config.vehicles.first()
+        val id = "extra$n"
+        adminValues["$id.activo"] = "1"; adminValues["$id.nombre"] = "Vehículo nuevo"; adminValues["$id.descripcion"] = sample.description
+        adminValues["$id.medidas"] = sample.dimensions; adminValues["$id.carga"] = sample.capacity; adminValues["$id.icono"] = sample.kind.name.lowercase()
+        adminValues["$id.tarifa_base"] = sample.baseFare.toString(); adminValues["$id.por_km"] = sample.perKm.toString(); adminValues["$id.precio_minimo"] = "0"
+    }
+    /** Quita un vehículo agregado (los de fábrica se desactivan con el interruptor). */
+    fun removeVehicleSlot(id: String) { adminValues.keys.filter { it.startsWith("$id.") }.forEach { adminValues.remove(it) } }
 
     fun openAdmin() {
         adminMessage = null
-        loadAdminValues(pricing, vehicles, times)
+        loadAdminValues(pricing, allVehicles, times)
         adminOpen = true
         val pin = remotePrices.rememberedPin()
         if (pin != null && !adminUnlocked) unlockAdmin(pin, remember = true)
@@ -670,6 +686,20 @@ class OrderViewModel(app: Application) : AndroidViewModel(app) {
             if (list == null) ordersMessage = "No se pudieron cargar los pedidos. Revisá la conexión."
             else { adminOrders.clear(); adminOrders.addAll(list); if (list.isEmpty()) ordersMessage = "Todavía no hay pedidos." }
             ordersLoading = false
+        }
+    }
+    fun deleteOrder(id: String) {
+        val pin = remotePrices.rememberedPin() ?: return
+        viewModelScope.launch {
+            if (remotePrices.deleteOrder(pin, id)) adminOrders.removeAll { it.optString("id") == id }
+            else ordersMessage = "No se pudo borrar el pedido. Revisá la conexión."
+        }
+    }
+    fun clearFinishedOrders() {
+        val pin = remotePrices.rememberedPin() ?: return
+        viewModelScope.launch {
+            if (remotePrices.clearFinishedOrders(pin)) { adminOrders.removeAll { it.optString("estado") in setOf("hecho", "cancelado") }; ordersMessage = "Listo: se borraron los pedidos hechos y cancelados." }
+            else ordersMessage = "No se pudo limpiar. Revisá la conexión."
         }
     }
     fun setOrderStatus(id: String, status: com.fletaba.core.OrderStatus) {
