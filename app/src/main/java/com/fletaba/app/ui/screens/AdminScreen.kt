@@ -452,8 +452,9 @@ private fun GroupCard(vm: OrderViewModel, group: PriceSheet.Group) {
             } else {
                 numeric.forEach { f -> ValueField(vm, f, Modifier.fillMaxWidth()) }
             }
-            if (group.vehicleId?.startsWith("extra") == true) {
-                SecondaryButton(text = "Quitar este vehículo", onClick = { vm.removeVehicleSlot(group.vehicleId) })
+            val vid = group.vehicleId
+            if (vid != null && vid.startsWith("extra")) {
+                SecondaryButton(text = "Quitar este vehículo", onClick = { vm.removeVehicleSlot(vid) })
             }
         }
     }
